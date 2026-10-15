@@ -23,7 +23,6 @@
             --bg: #f7fafc;
             --border: #e2e8f0;
             --success: #38a169;
-            --success-light: #f0fff4;
             --danger: #e53e3e;
             --warning: #d69e2e;
             --warning-light: #fffaf0;
@@ -63,7 +62,35 @@
         }
 
         .header h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.3px; }
-        .header-actions { display: flex; gap: 10px; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+
+        .sync-status {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #a0aec0;
+            transition: background 0.3s;
+        }
+
+        .sync-dot.online { background: #48bb78; box-shadow: 0 0 8px #48bb78; }
+        .sync-dot.offline { background: #f56565; }
+        .sync-dot.syncing { background: #ecc94b; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
 
         .header-actions button {
             background: rgba(255,255,255,0.1);
@@ -515,10 +542,11 @@
             .tab-content { padding: 15px; }
             th, td { padding: 10px 8px; font-size: 12px; }
             .form-row { flex-direction: column; gap: 0; }
-            .header-actions { width: 100%; }
+            .header-actions { width: 100%; flex-wrap: wrap; }
             .header-actions button { flex: 1; }
             .recap-card { flex-direction: column; align-items: flex-start; }
             .recap-prices { width: 100%; justify-content: space-between; }
+            .sync-status { font-size: 11px; }
         }
     </style>
 </head>
@@ -528,6 +556,10 @@
     <div class="header">
         <h1>Gestion des Tarifs - Révision Auto</h1>
         <div class="header-actions">
+            <div class="sync-status" title="Statut de synchronisation">
+                <span class="sync-dot" id="sync-dot"></span>
+                <span id="sync-label">Connexion...</span>
+            </div>
             <button onclick="exporterDonnees()">Exporter</button>
             <button onclick="document.getElementById('import-file').click()">Importer</button>
             <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importerDonnees(event)">
@@ -582,16 +614,16 @@
             <h3 style="margin-bottom: 20px; color: var(--primary);">Nouveau véhicule</h3>
             <form id="form-ajout" onsubmit="event.preventDefault(); ajouterVehicule();">
                 <div class="info-box">
-                    Le <strong>prix HT</strong> est calculé automatiquement à partir des pièces. Le <strong>prix TTC</strong> est le montant officiel facturé au client.
+                    Le <strong>prix HT</strong> est calculé automatiquement. Le <strong>prix TTC</strong> est le montant facturé au client. Le <strong>filtre à gasoil</strong> est réservé aux véhicules diesel (laisser vide si non concerné).
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Modèle *</label>
-                        <input type="text" id="add-modele" required placeholder="Ex: CS 15">
+                        <input type="text" id="add-modele" required placeholder="Ex: P201 GASOIL">
                     </div>
                     <div class="form-group">
                         <label>Prix Révision TTC (FCFA) *</label>
-                        <input type="number" id="add-prix-ttc" required placeholder="Ex: 75000">
+                        <input type="number" id="add-prix-ttc" required placeholder="Ex: 125000">
                         <span class="help-text">Montant facturé au client</span>
                     </div>
                 </div>
@@ -606,6 +638,13 @@
                     <div class="form-group"><label>Filtre à Huile (F.H)</label><input type="number" id="add-fh" placeholder="0"></div>
                     <div class="form-group"><label>Filtre à Air (F.A)</label><input type="number" id="add-fa" placeholder="0"></div>
                     <div class="form-group"><label>Filtre à Pollen (F.P)</label><input type="number" id="add-fp" placeholder="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Filtre à Gasoil (F.G)</label>
+                        <input type="number" id="add-fg" placeholder="0">
+                        <span class="help-text">Véhicules diesel uniquement</span>
+                    </div>
                     <div class="form-group"><label>Main d'Œuvre (MOD)</label><input type="number" id="add-mod" placeholder="0"></div>
                 </div>
 
@@ -634,6 +673,9 @@
             <div class="form-group"><label>F.H</label><input type="number" id="edit-fh"></div>
             <div class="form-group"><label>F.A</label><input type="number" id="edit-fa"></div>
             <div class="form-group"><label>F.P</label><input type="number" id="edit-fp"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Filtre à Gasoil (F.G)</label><input type="number" id="edit-fg"></div>
             <div class="form-group"><label>MOD</label><input type="number" id="edit-mod"></div>
         </div>
         <div class="form-actions">
@@ -643,14 +685,37 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getFirestore, 
+        collection, 
+        doc, 
+        onSnapshot, 
+        addDoc, 
+        updateDoc, 
+        deleteDoc,
+        enableIndexedDbPersistence,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
     /* ==========================================
-       DONNÉES INITIALES
-       prixTTC = montant officiel facturé au client
-       details = décomposition HT des pièces
+       ⚠️ CONFIGURATION FIREBASE - REMPLACE CES VALEURS
+       ========================================== */
+    const firebaseConfig = {
+        apiKey: "TON_API_KEY",
+        authDomain: "TON_PROJECT_ID.firebaseapp.com",
+        projectId: "TON_PROJECT_ID",
+        storageBucket: "TON_PROJECT_ID.appspot.com",
+        messagingSenderId: "TON_SENDER_ID",
+        appId: "TON_APP_ID"
+    };
+
+    /* ==========================================
+       DONNÉES INITIALES (premier lancement uniquement)
        ========================================== */
     const donneesInitiales = [
-        { modele: "CS 15", prixTTC: 75000, details: { huile: 24000, fh: 12000, fa: 10559, fp: 12000, mod: 5000 }, custom: [], prestations: "" },
+        { modele: "CS 15", prixTTC: 75000, details: { huile: 24000, fh: 12000, fa: 10559, fp: 12000, fg: 0, mod: 5000 }, custom: [], prestations: "" },
         { modele: "CS 35", prixTTC: 75000, details: null, custom: [], prestations: "" },
         { modele: "CS 35+", prixTTC: 80000, details: null, custom: [], prestations: "" },
         { modele: "CS 55", prixTTC: 90000, details: null, custom: [], prestations: "" },
@@ -685,9 +750,61 @@
         { modele: "X70+", prixTTC: 100000, details: null, custom: [], prestations: "" }
     ];
 
+    /* ==========================================
+       INITIALISATION FIREBASE
+       ========================================== */
+    let db = null;
+    let collectionRef = null;
+    let firebaseDisponible = false;
+    let premierChargement = true;
+    let unsubscribe = null;
+
+    function initFirebase() {
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+           collectionRef = collection(db, "tarifs_revision");
+            firebaseDisponible = true;
+            console.log("Firebase initialisé");
+
+            // Activation de la persistance hors ligne (IndexedDB)
+            enableIndexedDbPersistence(db).catch((err) => {
+                if (err.code === 'failed-precondition') {
+                    console.warn("Persistance hors ligne impossible : plusieurs onglets ouverts.");
+                } else if (err.code === 'unimplemented') {
+                    console.warn("Le navigateur ne supporte pas la persistance hors ligne.");
+                }
+            });
+
+            return true;
+        } catch (e) {
+            console.warn("Firebase non disponible, mode local activé.", e);
+            firebaseDisponible = false;
+            return false;
+        }
+    }
+
+    /* ==========================================
+       STATUT DE SYNCHRONISATION
+       ========================================== */
+    function majStatutSync(statut) {
+        const dot = document.getElementById('sync-dot');
+        const label = document.getElementById('sync-label');
+        dot.className = 'sync-dot ' + statut;
+        if (statut === 'online') label.textContent = 'Synchronisé';
+        else if (statut === 'syncing') label.textContent = 'Synchronisation...';
+        else if (statut === 'offline') label.textContent = 'Hors ligne';
+        else label.textContent = '...';
+    }
+
+    window.addEventListener('online', () => majStatutSync('syncing'));
+    window.addEventListener('offline', () => majStatutSync('offline'));
+
+    /* ==========================================
+       VARIABLES GLOBALES
+       ========================================== */
     let vehicules = [];
     let selectedId = null;
-    const STORAGE_KEY = "tarifs_vehicules_v4";
 
     /* ==========================================
        CALCULS
@@ -695,7 +812,7 @@
     function calculerPrixHT(v) {
         if (!v.details) return 0;
         const d = v.details;
-        return (d.huile || 0) + (d.fh || 0) + (d.fa || 0) + (d.fp || 0) + (d.mod || 0);
+        return (d.huile || 0) + (d.fh || 0) + (d.fa || 0) + (d.fp || 0) + (d.fg || 0) + (d.mod || 0);
     }
 
     function calculerPrixExtras(v) {
@@ -708,44 +825,85 @@
     }
 
     /* ==========================================
-       INITIALISATION
+       CHARGEMENT DES DONNÉES
        ========================================== */
-    function init() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                vehicules = JSON.parse(saved);
-            } catch (e) {
+    async function chargerDonnees() {
+        if (!firebaseDisponible) {
+            // Mode local
+            const saved = localStorage.getItem("tarifs_vehicules_v5");
+            if (saved) {
+                try {
+                    vehicules = JSON.parse(saved);
+                } catch (e) {
+                    vehicules = JSON.parse(JSON.stringify(donneesInitiales));
+                }
+            } else {
                 vehicules = JSON.parse(JSON.stringify(donneesInitiales));
             }
-        } else {
-            vehicules = JSON.parse(JSON.stringify(donneesInitiales));
+            preparerDonnees();
+            majStatutSync('offline');
+            afficherTableau(vehicules);
+            afficherRecap();
+            return;
         }
 
-        // Migration : s'assurer que chaque véhicule a les bons champs
-        vehicules.forEach((v, index) => {
-            if (!v.id) v.id = 'id_' + index + '_' + Date.now() + Math.random().toString(36).substr(2, 5);
+        // Mode Firebase : écoute en temps réel
+        majStatutSync('syncing');
+        
+        unsubscribe = onSnapshot(collectionRef, (snapshot) => {
+            const cloudData = [];
+            snapshot.forEach((doc) => {
+                cloudData.push({ id: doc.id, ...doc.data() });
+            });
+
+            // Premier chargement : si vide, on injecte les données initiales
+            if (premierChargement && cloudData.length === 0) {
+                premierChargement = false;
+                console.log("Base Firebase vide, injection des données initiales...");
+                injecterDonneesInitiales();
+                return;
+            }
+
+            premierChargement = false;
+            vehicules = cloudData;
+            preparerDonnees();
+            majStatutSync('online');
+            afficherTableau(vehicules);
+            afficherRecap();
+
+            // Si le panneau est ouvert, rafraîchir les détails
+            if (selectedId) {
+                const v = vehicules.find(x => x.id === selectedId);
+                if (v) afficherDetails(v);
+                else fermerPanneau();
+            }
+        }, (error) => {
+            console.error("Erreur Firestore :", error);
+            majStatutSync('offline');
+        });
+    }
+
+    function preparerDonnees() {
+        vehicules.forEach((v) => {
             if (!v.custom) v.custom = [];
             if (v.prixTTC === undefined || v.prixTTC === null) {
-                // Ancien format : on récupère depuis donneesInitiales ou on met HT
                 const orig = donneesInitiales.find(d => d.modele === v.modele);
                 v.prixTTC = orig ? orig.prixTTC : calculerPrixHT(v);
             }
         });
-
-        sauvegarder();
-        afficherTableau(vehicules);
-        afficherRecap();
     }
 
-    function sauvegarder() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicules));
+    async function injecterDonneesInitiales() {
+        for (const item of donneesInitiales) {
+            const { id, ...data } = item;
+            await addDoc(collectionRef, data);
+        }
     }
 
     /* ==========================================
        ONGLETS
        ========================================== */
-    function ouvrirOnglet(event, tabId) {
+    window.ouvrirOnglet = function(event, tabId) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         event.currentTarget.classList.add('active');
@@ -765,7 +923,10 @@
             return;
         }
 
-        liste.forEach(v => {
+        // Tri alphabétique
+        const triee = [...liste].sort((a, b) => a.modele.localeCompare(b.modele));
+
+        triee.forEach(v => {
             const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
             const tr = document.createElement('tr');
@@ -784,7 +945,7 @@
         document.getElementById('status').textContent = liste.length + ' modèle(s)';
     }
 
-    function filtrer() {
+    window.filtrer = function() {
         const terme = document.getElementById('search').value.toLowerCase().trim();
         if (!terme) { afficherTableau(vehicules); return; }
         const filtres = vehicules.filter(v => v.modele.toLowerCase().includes(terme));
@@ -805,7 +966,7 @@
         afficherTableau(vehicules);
     }
 
-    function fermerPanneau() {
+    window.fermerPanneau = function() {
         selectedId = null;
         document.getElementById('details-panel').classList.remove('open');
         document.getElementById('table-wrapper').classList.remove('shrunk');
@@ -814,7 +975,7 @@
 
     function afficherDetails(v) {
         const contenu = document.getElementById('panel-content');
-        const d = v.details || { huile: 0, fh: 0, fa: 0, fp: 0, mod: 0 };
+        const d = v.details || { huile: 0, fh: 0, fa: 0, fp: 0, fg: 0, mod: 0 };
         const prixHT = calculerPrixHT(v);
         const prixExtras = calculerPrixExtras(v);
         const marge = calculerMarge(v);
@@ -835,6 +996,10 @@
             customHtml = '<p style="font-size:13px; color:#a0aec0; padding:8px 0;">Aucune autre pièce ajoutée.</p>';
         }
 
+        const fgHtml = (d.fg && d.fg > 0) 
+            ? `<div class="detail-row"><span>Filtre à Gasoil (F.G)</span><strong>${d.fg.toLocaleString('fr-FR')} F</strong></div>`
+            : '';
+
         contenu.innerHTML = `
             <div class="detail-section revision-section">
                 <h4>Détails de la révision (HT)</h4>
@@ -842,6 +1007,7 @@
                 <div class="detail-row"><span>Filtre à Huile (F.H)</span><strong>${(d.fh || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="detail-row"><span>Filtre à Air (F.A)</span><strong>${(d.fa || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="detail-row"><span>Filtre à Pollen (F.P)</span><strong>${(d.fp || 0).toLocaleString('fr-FR')} F</strong></div>
+                ${fgHtml}
                 <div class="detail-row"><span>Main d'Œuvre (MOD)</span><strong>${(d.mod || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="sub-total">
                     <span>Total HT</span>
@@ -897,7 +1063,7 @@
     /* ==========================================
        AJOUT / SUPPRESSION DE PIÈCE
        ========================================== */
-    function ajouterPiece(id) {
+    window.ajouterPiece = async function(id) {
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
         const nomInput = document.getElementById('piece-name-' + id);
@@ -910,29 +1076,53 @@
             return;
         }
 
-        if (!v.custom) v.custom = [];
-        v.custom.push({ nom, prix });
-        sauvegarder();
-        afficherDetails(v);
-        afficherTableau(vehicules);
-        afficherRecap();
+        const custom = v.custom ? [...v.custom] : [];
+        custom.push({ nom, prix });
+
+        if (firebaseDisponible) {
+            try {
+                await updateDoc(doc(db, "vehicules", id), { custom });
+            } catch (e) {
+                console.error("Erreur Firebase :", e);
+                alert("Erreur de synchronisation. Vérifie ta connexion.");
+            }
+        } else {
+            v.custom = custom;
+            localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+            afficherDetails(v);
+            afficherTableau(vehicules);
+            afficherRecap();
+        }
     }
 
-    function supprimerPiece(id, index) {
+    window.supprimerPiece = async function(id, index) {
         const v = vehicules.find(item => item.id === id);
         if (!v || !v.custom) return;
         if (!confirm("Supprimer cette pièce ?")) return;
-        v.custom.splice(index, 1);
-        sauvegarder();
-        afficherDetails(v);
-        afficherTableau(vehicules);
-        afficherRecap();
+        
+        const custom = [...v.custom];
+        custom.splice(index, 1);
+
+        if (firebaseDisponible) {
+            try {
+                await updateDoc(doc(db, "vehicules", id), { custom });
+            } catch (e) {
+                console.error("Erreur Firebase :", e);
+                alert("Erreur de synchronisation.");
+            }
+        } else {
+            v.custom = custom;
+            localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+            afficherDetails(v);
+            afficherTableau(vehicules);
+            afficherRecap();
+        }
     }
 
     /* ==========================================
        AJOUT VÉHICULE
        ========================================== */
-    function ajouterVehicule() {
+    window.ajouterVehicule = async function() {
         const modele = document.getElementById('add-modele').value.trim();
         const prixTTC = parseInt(document.getElementById('add-prix-ttc').value);
         const prestations = document.getElementById('add-prestations').value.trim();
@@ -944,26 +1134,39 @@
         const fh = parseInt(document.getElementById('add-fh').value) || 0;
         const fa = parseInt(document.getElementById('add-fa').value) || 0;
         const fp = parseInt(document.getElementById('add-fp').value) || 0;
+        const fg = parseInt(document.getElementById('add-fg').value) || 0;
         const mod = parseInt(document.getElementById('add-mod').value) || 0;
 
         let details = null;
-        if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || mod > 0) {
-            details = { huile, fh, fa, fp, mod };
+        if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || fg > 0 || mod > 0) {
+            details = { huile, fh, fa, fp, fg, mod };
         }
 
-        vehicules.push({
-            id: 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        const nouveau = {
             modele,
             prixTTC,
             prestations,
             details,
             custom: []
-        });
+        };
 
-        sauvegarder();
+        if (firebaseDisponible) {
+            try {
+                await addDoc(collectionRef, nouveau);
+            } catch (e) {
+                console.error("Erreur Firebase :", e);
+                alert("Erreur de synchronisation. Vérifie ta connexion.");
+                return;
+            }
+        } else {
+            nouveau.id = 'local_' + Date.now();
+            vehicules.push(nouveau);
+            localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+            afficherTableau(vehicules);
+            afficherRecap();
+        }
+
         document.getElementById('form-ajout').reset();
-        afficherTableau(vehicules);
-        afficherRecap();
         alert("Véhicule ajouté avec succès !");
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -974,61 +1177,94 @@
     /* ==========================================
        MODIFICATION VÉHICULE
        ========================================== */
-    function ouvrirModification(id) {
+    window.ouvrirModification = function(id) {
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
         document.getElementById('edit-id').value = v.id;
         document.getElementById('edit-modele').value = v.modele;
         document.getElementById('edit-prix-ttc').value = v.prixTTC || '';
         document.getElementById('edit-prestations').value = v.prestations || '';
-        const d = v.details || { huile: 0, fh: 0, fa: 0, fp: 0, mod: 0 };
+        const d = v.details || { huile: 0, fh: 0, fa: 0, fp: 0, fg: 0, mod: 0 };
         document.getElementById('edit-huile').value = d.huile || '';
         document.getElementById('edit-fh').value = d.fh || '';
         document.getElementById('edit-fa').value = d.fa || '';
         document.getElementById('edit-fp').value = d.fp || '';
+        document.getElementById('edit-fg').value = d.fg || '';
         document.getElementById('edit-mod').value = d.mod || '';
         document.getElementById('modal-edit').style.display = "block";
     }
 
-    function sauvegarderModification() {
+    window.sauvegarderModification = async function() {
         const id = document.getElementById('edit-id').value;
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
-        v.modele = document.getElementById('edit-modele').value.trim() || v.modele;
-        v.prixTTC = parseInt(document.getElementById('edit-prix-ttc').value) || 0;
-        v.prestations = document.getElementById('edit-prestations').value.trim();
+
+        const modele = document.getElementById('edit-modele').value.trim() || v.modele;
+        const prixTTC = parseInt(document.getElementById('edit-prix-ttc').value) || 0;
+        const prestations = document.getElementById('edit-prestations').value.trim();
         const huile = parseInt(document.getElementById('edit-huile').value) || 0;
         const fh = parseInt(document.getElementById('edit-fh').value) || 0;
         const fa = parseInt(document.getElementById('edit-fa').value) || 0;
         const fp = parseInt(document.getElementById('edit-fp').value) || 0;
+        const fg = parseInt(document.getElementById('edit-fg').value) || 0;
         const mod = parseInt(document.getElementById('edit-mod').value) || 0;
 
-        if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || mod > 0) {
-            v.details = { huile, fh, fa, fp, mod };
-        } else {
-            v.details = null;
+        let details = null;
+        if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || fg > 0 || mod > 0) {
+            details = { huile, fh, fa, fp, fg, mod };
         }
-        sauvegarder();
+
+        const updateData = { modele, prixTTC, prestations, details };
+
+        if (firebaseDisponible) {
+            try {
+                await updateDoc(doc(db, "vehicules", id), updateData);
+            } catch (e) {
+                console.error("Erreur Firebase :", e);
+                alert("Erreur de synchronisation.");
+                return;
+            }
+        } else {
+            Object.assign(v, updateData);
+            localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+            afficherTableau(vehicules);
+            afficherRecap();
+            if (selectedId === id) afficherDetails(v);
+        }
+
         fermerModal('modal-edit');
-        afficherTableau(vehicules);
-        afficherRecap();
-        if (selectedId === id) afficherDetails(v);
     }
 
-    function fermerModal(id) { document.getElementById(id).style.display = "none"; }
-    window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = "none"; }
+    window.fermerModal = function(id) { 
+        document.getElementById(id).style.display = "none"; 
+    }
+
+    window.onclick = function(event) { 
+        if (event.target.classList.contains('modal')) event.target.style.display = "none"; 
+    }
 
     /* ==========================================
        SUPPRESSION
        ========================================== */
-    function supprimerVehicule(id) {
+    window.supprimerVehicule = async function(id) {
         if (!confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) return;
-        const index = vehicules.findIndex(v => v.id === id);
-        if (index !== -1) vehicules.splice(index, 1);
-        sauvegarder();
+
+        if (firebaseDisponible) {
+            try {
+                await deleteDoc(doc(db, "vehicules", id));
+            } catch (e) {
+                console.error("Erreur Firebase :", e);
+                alert("Erreur de synchronisation.");
+                return;
+            }
+        } else {
+            const index = vehicules.findIndex(v => v.id === id);
+            if (index !== -1) vehicules.splice(index, 1);
+            localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+            afficherTableau(vehicules);
+            afficherRecap();
+        }
         fermerPanneau();
-        afficherTableau(vehicules);
-        afficherRecap();
     }
 
     /* ==========================================
@@ -1041,7 +1277,10 @@
             container.innerHTML = '<p style="text-align:center; color:#a0aec0; padding:30px;">Aucun véhicule.</p>';
             return;
         }
-        vehicules.forEach(v => {
+
+        const triee = [...vehicules].sort((a, b) => a.modele.localeCompare(b.modele));
+
+        triee.forEach(v => {
             const prixExtras = calculerPrixExtras(v);
             const total = (v.prixTTC || 0) + prixExtras;
             const card = document.createElement('div');
@@ -1070,7 +1309,7 @@
     /* ==========================================
        EXPORT / IMPORT
        ========================================== */
-    function exporterDonnees() {
+    window.exporterDonnees = function() {
         const dataStr = JSON.stringify(vehicules, null, 2);
         const blob = new Blob([dataStr], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -1081,29 +1320,46 @@
         URL.revokeObjectURL(url);
     }
 
-    function importerDonnees(event) {
+    window.importerDonnees = async function(event) {
         const file = event.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const data = JSON.parse(e.target.result);
-                if (Array.isArray(data)) {
-                    if (confirm("Cela va remplacer toutes vos données actuelles. Continuer ?")) {
-                        vehicules = data;
-                        vehicules.forEach((v, i) => {
-                            if (!v.id) v.id = 'id_' + i + '_' + Date.now();
-                            if (!v.custom) v.custom = [];
-                            if (v.prixTTC === undefined) v.prixTTC = calculerPrixHT(v);
-                        });
-                        sauvegarder();
-                        afficherTableau(vehicules);
-                        afficherRecap();
-                        fermerPanneau();
-                        alert("Import réussi : " + vehicules.length + " véhicules chargés.");
+                if (!Array.isArray(data)) { alert("Fichier invalide."); return; }
+                if (!confirm("Cela va remplacer toutes vos données actuelles (cloud et local). Continuer ?")) return;
+
+                if (firebaseDisponible) {
+                    // Suppression de tous les documents existants
+                    for (const v of vehicules) {
+                        if (v.id && !v.id.startsWith('local_')) {
+                            try { await deleteDoc(doc(db, "vehicules", v.id)); } catch(e) {}
+                        }
                     }
-                } else { alert("Fichier invalide."); }
-            } catch (err) { alert("Erreur lors de la lecture du fichier."); }
+                    // Ajout des nouveaux
+                    for (const item of data) {
+                        const { id, ...rest } = item;
+                        if (!rest.custom) rest.custom = [];
+                        await addDoc(collectionRef, rest);
+                    }
+                } else {
+                    vehicules = data;
+                    vehicules.forEach((v, i) => {
+                        if (!v.id) v.id = 'local_' + i + '_' + Date.now();
+                        if (!v.custom) v.custom = [];
+                        if (v.prixTTC === undefined) v.prixTTC = calculerPrixHT(v);
+                    });
+                    localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+                    afficherTableau(vehicules);
+                    afficherRecap();
+                    fermerPanneau();
+                }
+                alert("Import réussi : " + data.length + " véhicules chargés.");
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de la lecture du fichier.");
+            }
         };
         reader.readAsText(file);
         event.target.value = "";
@@ -1112,7 +1368,8 @@
     /* ==========================================
        LANCEMENT
        ========================================== */
-    init();
+    initFirebase();
+    chargerDonnees();
 
     // === PWA : Enregistrement du Service Worker ===
     if ('serviceWorker' in navigator) {
