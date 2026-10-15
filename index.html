@@ -826,7 +826,7 @@
     /* ==========================================
        CHARGEMENT DES DONNÉES (CORRIGÉ)
        ========================================== */
-    async function chargerDonnees() {
+     async function chargerDonnees() {
         if (!firebaseDisponible) {
             // Mode local
             const saved = localStorage.getItem("tarifs_vehicules_v5");
@@ -858,27 +858,34 @@
 
             console.log("📥 Snapshot reçu : " + cloudData.length + " véhicules. premierChargement=" + premierChargement);
 
-            // Si la collection est vide ET qu'on est au premier chargement
+            // Cas 1 : La collection est vide ET on est au premier chargement
             if (cloudData.length === 0 && premierChargement) {
-                premierChargement = false;
-                console.log("📦 Base vide, injection des " + donneesInitiales.length + " données initiales...");
+                console.log("📦 Base vide, tentative d'injection des " + donneesInitiales.length + " données initiales...");
                 majStatutSync('syncing');
-                await injecterDonneesInitiales();
-                // onSnapshot va se redéclencher automatiquement après l'injection
+                const succes = await injecterDonneesInitiales();
+                if (succes) {
+                    premierChargement = false;
+                    // onSnapshot va se redéclencher avec les données injectées
+                } else {
+                    console.warn("⚠️ Injection partielle. Nouvelle tentative au prochain rechargement.");
+                }
                 return;
             }
 
-            premierChargement = false;
-            vehicules = cloudData;
-            preparerDonnees();
-            majStatutSync('online');
-            afficherTableau(vehicules);
-            afficherRecap();
+            // Cas 2 : On a reçu des données → on affiche
+            if (cloudData.length > 0) {
+                premierChargement = false;
+                vehicules = cloudData;
+                preparerDonnees();
+                majStatutSync('online');
+                afficherTableau(vehicules);
+                afficherRecap();
 
-            if (selectedId) {
-                const v = vehicules.find(x => x.id === selectedId);
-                if (v) afficherDetails(v);
-                else fermerPanneau();
+                if (selectedId) {
+                    const v = vehicules.find(x => x.id === selectedId);
+                    if (v) afficherDetails(v);
+                    else fermerPanneau();
+                }
             }
         }, (error) => {
             console.error("❌ Erreur Firestore :", error);
@@ -896,32 +903,24 @@
         });
     }
 
-    async function injecterDonneesInitiales() {
+       async function injecterDonneesInitiales() {
         console.log("🚀 Début de l'injection...");
         let count = 0;
+        let erreurs = 0;
         for (const item of donneesInitiales) {
             try {
                 const { id, ...data } = item;
                 await addDoc(collectionRef, data);
                 count++;
+                console.log("   ✔ " + item.modele + " (" + count + "/" + donneesInitiales.length + ")");
             } catch (e) {
-                console.error("❌ Erreur ajout " + item.modele + " :", e);
+                erreurs++;
+                console.error("   ❌ Erreur ajout " + item.modele + " :", e.message || e);
             }
         }
-        console.log("✅ " + count + "/" + donneesInitiales.length + " véhicules injectés.");
+        console.log("✅ " + count + "/" + donneesInitiales.length + " véhicules injectés. Erreurs : " + erreurs);
+        return erreurs === 0;
     }
-
-    /* ==========================================
-       ONGLETS
-       ========================================== */
-    window.ouvrirOnglet = function(event, tabId) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-        if (tabId === 'tab-recap') afficherRecap();
-    }
-
     /* ==========================================
        TABLEAU
        ========================================== */
