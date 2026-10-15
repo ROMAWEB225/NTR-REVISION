@@ -9,8 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a202c">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Tarifs Auto">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
     
     <style>
         :root {
@@ -688,14 +690,15 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { 
-        getFirestore, 
+        initializeFirestore,
+        persistentLocalCache,
+        persistentMultipleTabManager,
         collection, 
         doc, 
         onSnapshot, 
         addDoc, 
         updateDoc, 
-        deleteDoc,
-        enableIndexedDbPersistence
+        deleteDoc
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     /* ==========================================
@@ -712,7 +715,7 @@
 };
 
     /* ==========================================
-       DONNÉES INITIALES (premier lancement uniquement)
+       DONNÉES INITIALES
        ========================================== */
     const donneesInitiales = [
         { modele: "CS 15", prixTTC: 75000, details: { huile: 24000, fh: 12000, fa: 10559, fp: 12000, fg: 0, mod: 5000 }, custom: [], prestations: "" },
@@ -762,19 +765,15 @@
     function initFirebase() {
         try {
             const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
+            // Nouvelle API avec cache persistant (remplace enableIndexedDbPersistence)
+            db = initializeFirestore(app, {
+                localCache: persistentLocalCache({
+                    tabManager: persistentMultipleTabManager()
+                })
+            });
             collectionRef = collection(db, "tarifs_revision");
             firebaseDisponible = true;
             console.log("✅ Firebase initialisé sur la collection : tarifs_revision");
-
-            enableIndexedDbPersistence(db).catch((err) => {
-                if (err.code === 'failed-precondition') {
-                    console.warn("Persistance hors ligne impossible : plusieurs onglets ouverts.");
-                } else if (err.code === 'unimplemented') {
-                    console.warn("Le navigateur ne supporte pas la persistance hors ligne.");
-                }
-            });
-
             return true;
         } catch (e) {
             console.warn("Firebase non disponible, mode local activé.", e);
@@ -824,11 +823,10 @@
     }
 
     /* ==========================================
-       CHARGEMENT DES DONNÉES (CORRIGÉ)
+       CHARGEMENT DES DONNÉES
        ========================================== */
-     async function chargerDonnees() {
+    async function chargerDonnees() {
         if (!firebaseDisponible) {
-            // Mode local
             const saved = localStorage.getItem("tarifs_vehicules_v5");
             if (saved) {
                 try {
@@ -846,7 +844,6 @@
             return;
         }
 
-        // Mode Firebase : écoute en temps réel
         majStatutSync('syncing');
         console.log("🔌 Connexion à Firestore...");
 
@@ -865,7 +862,6 @@
                 const succes = await injecterDonneesInitiales();
                 if (succes) {
                     premierChargement = false;
-                    // onSnapshot va se redéclencher avec les données injectées
                 } else {
                     console.warn("⚠️ Injection partielle. Nouvelle tentative au prochain rechargement.");
                 }
@@ -903,7 +899,7 @@
         });
     }
 
-       async function injecterDonneesInitiales() {
+    async function injecterDonneesInitiales() {
         console.log("🚀 Début de l'injection...");
         let count = 0;
         let erreurs = 0;
@@ -921,6 +917,18 @@
         console.log("✅ " + count + "/" + donneesInitiales.length + " véhicules injectés. Erreurs : " + erreurs);
         return erreurs === 0;
     }
+
+    /* ==========================================
+       ONGLETS (attaché à window pour onclick HTML)
+       ========================================== */
+    window.ouvrirOnglet = function(event, tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+        if (tabId === 'tab-recap') afficherRecap();
+    }
+
     /* ==========================================
        TABLEAU
        ========================================== */
@@ -1241,7 +1249,7 @@
             if (selectedId === id) afficherDetails(v);
         }
 
-        fermerModal('modal-edit');
+        window.fermerModal('modal-edit');
     }
 
     window.fermerModal = function(id) { 
@@ -1273,7 +1281,7 @@
             afficherTableau(vehicules);
             afficherRecap();
         }
-        fermerPanneau();
+        window.fermerPanneau();
     }
 
     /* ==========================================
@@ -1340,13 +1348,11 @@
                 if (!confirm("Cela va remplacer toutes vos données actuelles (cloud et local). Continuer ?")) return;
 
                 if (firebaseDisponible) {
-                    // Suppression de tous les documents existants
                     for (const v of vehicules) {
                         if (v.id && !v.id.startsWith('local_')) {
                             try { await deleteDoc(doc(db, "tarifs_revision", v.id)); } catch(e) {}
                         }
                     }
-                    // Ajout des nouveaux
                     for (const item of data) {
                         const { id, ...rest } = item;
                         if (!rest.custom) rest.custom = [];
@@ -1363,7 +1369,7 @@
                     localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
                     afficherTableau(vehicules);
                     afficherRecap();
-                    fermerPanneau();
+                    window.fermerPanneau();
                 }
                 alert("Import réussi : " + data.length + " véhicules chargés.");
             } catch (err) {
@@ -1385,8 +1391,8 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('Service Worker enregistré :', reg.scope))
-                .catch(err => console.log('Erreur Service Worker :', err));
+                .then(reg => console.log('✅ Service Worker enregistré :', reg.scope))
+                .catch(err => console.log('⚠️ Service Worker non enregistré :', err.message));
         });
     }
 </script>
