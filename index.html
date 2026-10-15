@@ -530,6 +530,259 @@
         }
         .close:hover { color: var(--primary); }
 
+        /* ==========================================
+           ASSISTANT VOCAL
+           ========================================== */
+        .voice-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(49, 130, 206, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .voice-fab:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 25px rgba(49, 130, 206, 0.55);
+        }
+
+        .voice-fab.listening {
+            background: var(--danger);
+            animation: pulse-fab 1.2s infinite;
+        }
+
+        .voice-fab svg { width: 28px; height: 28px; }
+
+        @keyframes pulse-fab {
+            0% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(229, 62, 62, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0); }
+        }
+
+        .voice-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 1001;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .voice-modal.open { display: flex; }
+
+        .voice-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .voice-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #a0aec0;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .voice-modal-close:hover { color: var(--primary); }
+
+        .voice-icon-big {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: all 0.3s;
+        }
+
+        .voice-icon-big.listening {
+            background: #fff5f5;
+            color: var(--danger);
+            animation: pulse-icon 1.2s infinite;
+        }
+
+        .voice-icon-big svg { width: 48px; height: 48px; }
+
+        @keyframes pulse-icon {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .voice-transcript {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 20px 0;
+            min-height: 40px;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        .voice-hint {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .voice-result {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .voice-result.open { display: block; }
+
+        .voice-result-modele {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .voice-result-prix {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 15px 0;
+        }
+
+        .voice-result-prix small {
+            font-size: 18px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .voice-result-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .voice-result-detail:last-child { border-bottom: none; }
+
+        .voice-result-detail span { color: var(--text-light); }
+        .voice-result-detail strong { color: var(--text); }
+
+        .voice-suggestions {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .voice-suggestions-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .voice-suggestion-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-family: inherit;
+            text-align: left;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .voice-suggestion-btn:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .voice-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .voice-actions button { flex: 1; }
+
+        .btn-voice-action {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+        }
+
+        .btn-voice-action:hover { background: #2b6cb0; }
+
+        .btn-voice-retry {
+            background: var(--bg);
+            color: var(--secondary);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+        }
+
+        .btn-voice-retry:hover { background: #edf2f7; }
+
+        .voice-not-supported {
+            background: #fffaf0;
+            border: 1px solid #fbd38d;
+            color: #744210;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
         @media (max-width: 1000px) {
             .main-layout { flex-direction: column; }
             .table-wrapper.shrunk { flex: 1; }
@@ -549,6 +802,11 @@
             .recap-card { flex-direction: column; align-items: flex-start; }
             .recap-prices { width: 100%; justify-content: space-between; }
             .sync-status { font-size: 11px; }
+            .voice-fab { bottom: 20px; right: 20px; width: 56px; height: 56px; }
+            .voice-fab svg { width: 24px; height: 24px; }
+            .voice-result-prix { font-size: 32px; }
+            .voice-result-modele { font-size: 22px; }
+            .voice-modal-content { padding: 30px 20px; }
         }
     </style>
 </head>
@@ -687,6 +945,47 @@
     </div>
 </div>
 
+<!-- ==========================================
+     ASSISTANT VOCAL : BOUTON FLOTTANT
+     ========================================== -->
+<button class="voice-fab" id="voice-fab" onclick="ouvrirAssistantVocal()" title="Assistant vocal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+</button>
+
+<!-- ==========================================
+     ASSISTANT VOCAL : MODALE
+     ========================================== -->
+<div class="voice-modal" id="voice-modal">
+    <div class="voice-modal-content">
+        <button class="voice-modal-close" onclick="fermerAssistantVocal()">&times;</button>
+
+        <div class="voice-icon-big" id="voice-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+        </div>
+
+        <div class="voice-transcript" id="voice-transcript">Appuyez sur le micro et dites un modèle...</div>
+        <div class="voice-hint" id="voice-hint">Exemple : "CS 15", "P201 Gasoil", "T70"</div>
+
+        <div id="voice-result" class="voice-result"></div>
+
+        <div class="voice-actions" id="voice-actions" style="display:none;">
+            <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
+        </div>
+
+        <div id="voice-not-supported" class="voice-not-supported" style="display:none;"></div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { 
@@ -702,17 +1001,16 @@
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     /* ==========================================
-       ⚠️ CONFIGURATION FIREBASE - REMPLACE CES VALEURS
+       CONFIGURATION FIREBASE - REMPLACE CES VALEURS
        ========================================== */
     const firebaseConfig = {
-  apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
-  authDomain: "ntr-garage.firebaseapp.com",
-  databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ntr-garage",
-  storageBucket: "ntr-garage.firebasestorage.app",
-  messagingSenderId: "606167388967",
-  appId: "1:606167388967:web:7ad669fd353cdeeb7a8f02"
-};
+        apiKey: "TON_API_KEY",
+        authDomain: "TON_PROJECT_ID.firebaseapp.com",
+        projectId: "TON_PROJECT_ID",
+        storageBucket: "TON_PROJECT_ID.appspot.com",
+        messagingSenderId: "TON_SENDER_ID",
+        appId: "TON_APP_ID"
+    };
 
     /* ==========================================
        DONNÉES INITIALES
@@ -765,7 +1063,6 @@
     function initFirebase() {
         try {
             const app = initializeApp(firebaseConfig);
-            // Nouvelle API avec cache persistant (remplace enableIndexedDbPersistence)
             db = initializeFirestore(app, {
                 localCache: persistentLocalCache({
                     tabManager: persistentMultipleTabManager()
@@ -773,10 +1070,10 @@
             });
             collectionRef = collection(db, "tarifs_revision");
             firebaseDisponible = true;
-            console.log("✅ Firebase initialisé sur la collection : tarifs_revision");
+            console.log("✅ Firebase initialisé");
             return true;
         } catch (e) {
-            console.warn("Firebase non disponible, mode local activé.", e);
+            console.warn("Firebase non disponible.", e);
             firebaseDisponible = false;
             return false;
         }
@@ -829,11 +1126,8 @@
         if (!firebaseDisponible) {
             const saved = localStorage.getItem("tarifs_vehicules_v5");
             if (saved) {
-                try {
-                    vehicules = JSON.parse(saved);
-                } catch (e) {
-                    vehicules = JSON.parse(JSON.stringify(donneesInitiales));
-                }
+                try { vehicules = JSON.parse(saved); }
+                catch (e) { vehicules = JSON.parse(JSON.stringify(donneesInitiales)); }
             } else {
                 vehicules = JSON.parse(JSON.stringify(donneesInitiales));
             }
@@ -845,7 +1139,6 @@
         }
 
         majStatutSync('syncing');
-        console.log("🔌 Connexion à Firestore...");
 
         unsubscribe = onSnapshot(collectionRef, async (snapshot) => {
             const cloudData = [];
@@ -853,22 +1146,13 @@
                 cloudData.push({ id: doc.id, ...doc.data() });
             });
 
-            console.log("📥 Snapshot reçu : " + cloudData.length + " véhicules. premierChargement=" + premierChargement);
-
-            // Cas 1 : La collection est vide ET on est au premier chargement
             if (cloudData.length === 0 && premierChargement) {
-                console.log("📦 Base vide, tentative d'injection des " + donneesInitiales.length + " données initiales...");
                 majStatutSync('syncing');
                 const succes = await injecterDonneesInitiales();
-                if (succes) {
-                    premierChargement = false;
-                } else {
-                    console.warn("⚠️ Injection partielle. Nouvelle tentative au prochain rechargement.");
-                }
+                if (succes) premierChargement = false;
                 return;
             }
 
-            // Cas 2 : On a reçu des données → on affiche
             if (cloudData.length > 0) {
                 premierChargement = false;
                 vehicules = cloudData;
@@ -900,26 +1184,22 @@
     }
 
     async function injecterDonneesInitiales() {
-        console.log("🚀 Début de l'injection...");
-        let count = 0;
-        let erreurs = 0;
+        let count = 0, erreurs = 0;
         for (const item of donneesInitiales) {
             try {
                 const { id, ...data } = item;
                 await addDoc(collectionRef, data);
                 count++;
-                console.log("   ✔ " + item.modele + " (" + count + "/" + donneesInitiales.length + ")");
             } catch (e) {
                 erreurs++;
-                console.error("   ❌ Erreur ajout " + item.modele + " :", e.message || e);
+                console.error("Erreur ajout :", e.message || e);
             }
         }
-        console.log("✅ " + count + "/" + donneesInitiales.length + " véhicules injectés. Erreurs : " + erreurs);
         return erreurs === 0;
     }
 
     /* ==========================================
-       ONGLETS (attaché à window pour onclick HTML)
+       ONGLETS
        ========================================== */
     window.ouvrirOnglet = function(event, tabId) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1100,8 +1380,7 @@
             try {
                 await updateDoc(doc(db, "tarifs_revision", id), { custom });
             } catch (e) {
-                console.error("Erreur Firebase :", e);
-                alert("Erreur de synchronisation. Vérifie ta connexion.");
+                alert("Erreur de synchronisation.");
             }
         } else {
             v.custom = custom;
@@ -1124,7 +1403,6 @@
             try {
                 await updateDoc(doc(db, "tarifs_revision", id), { custom });
             } catch (e) {
-                console.error("Erreur Firebase :", e);
                 alert("Erreur de synchronisation.");
             }
         } else {
@@ -1159,20 +1437,13 @@
             details = { huile, fh, fa, fp, fg, mod };
         }
 
-        const nouveau = {
-            modele,
-            prixTTC,
-            prestations,
-            details,
-            custom: []
-        };
+        const nouveau = { modele, prixTTC, prestations, details, custom: [] };
 
         if (firebaseDisponible) {
             try {
                 await addDoc(collectionRef, nouveau);
             } catch (e) {
-                console.error("Erreur Firebase :", e);
-                alert("Erreur de synchronisation. Vérifie ta connexion.");
+                alert("Erreur de synchronisation.");
                 return;
             }
         } else {
@@ -1237,7 +1508,6 @@
             try {
                 await updateDoc(doc(db, "tarifs_revision", id), updateData);
             } catch (e) {
-                console.error("Erreur Firebase :", e);
                 alert("Erreur de synchronisation.");
                 return;
             }
@@ -1270,7 +1540,6 @@
             try {
                 await deleteDoc(doc(db, "tarifs_revision", id));
             } catch (e) {
-                console.error("Erreur Firebase :", e);
                 alert("Erreur de synchronisation.");
                 return;
             }
@@ -1345,7 +1614,7 @@
             try {
                 const data = JSON.parse(e.target.result);
                 if (!Array.isArray(data)) { alert("Fichier invalide."); return; }
-                if (!confirm("Cela va remplacer toutes vos données actuelles (cloud et local). Continuer ?")) return;
+                if (!confirm("Cela va remplacer toutes vos données actuelles. Continuer ?")) return;
 
                 if (firebaseDisponible) {
                     for (const v of vehicules) {
@@ -1373,7 +1642,6 @@
                 }
                 alert("Import réussi : " + data.length + " véhicules chargés.");
             } catch (err) {
-                console.error(err);
                 alert("Erreur lors de la lecture du fichier.");
             }
         };
@@ -1382,16 +1650,369 @@
     }
 
     /* ==========================================
+       ASSISTANT VOCAL
+       ========================================== */
+    let recognition = null;
+    let isListening = false;
+    let derniereTranscription = "";
+
+    // Dictionnaire de conversion des nombres en lettres vers chiffres
+    const nombresEnLettres = {
+        'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5,
+        'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9, 'dix': 10,
+        'onze': 11, 'douze': 12, 'treize': 13, 'quatorze': 14, 'quinze': 15,
+        'seize': 16, 'vingt': 20, 'trente': 30, 'quarante': 40, 'cinquante': 50,
+        'soixante': 60, 'soixante-dix': 70, 'quatre-vingt': 80, 'quatre-vingts': 80,
+        'quatre-vingt-dix': 90, 'cent': 100
+    };
+
+    // Convertit "quinze" -> "15", "trente-cinq" -> "35", "soixante-quinze" -> "75"
+    function convertirNombresEnLettres(texte) {
+        let resultat = texte.toLowerCase();
+        // Remplace d'abord les nombres composés (trente-cinq, soixante-quinze, etc.)
+        const composes = {
+            'trente-cinq': '35', 'trente-cinq': '35',
+            'quarante-cinq': '45', 'cinquante-cinq': '55',
+            'soixante-cinq': '65', 'soixante-quinze': '75',
+            'quatre-vingt-cinq': '85', 'quatre-vingt-quinze': '95',
+            'vingt-cinq': '25', 'quarante': '40', 'cinquante': '50',
+            'trente': '30'
+        };
+        Object.keys(composes).forEach(k => {
+            resultat = resultat.replace(new RegExp(k, 'g'), composes[k]);
+        });
+        // Puis les nombres simples
+        Object.keys(nombresEnLettres).forEach(mot => {
+            resultat = resultat.replace(new RegExp('\\b' + mot + '\\b', 'g'), nombresEnLettres[mot]);
+        });
+        return resultat;
+    }
+
+    // Normalise le texte pour la recherche : enlève espaces, met en majuscules
+    function normaliser(texte) {
+        if (!texte) return "";
+        let t = texte.toLowerCase();
+        // Convertit les nombres en lettres
+        t = convertirNombresEnLettres(t);
+        // Remplace "changan" par "cs" (nom courant)
+        t = t.replace(/changan/g, 'cs');
+        t = t.replace(/chang an/g, 'cs');
+        t = t.replace(/changeant/g, 'cs');
+        // Enlève tous les espaces, tirets et caractères spéciaux
+        t = t.replace(/[\s\-\.\,\']/g, '');
+        // Retire les mots parasites
+        t = t.replace(/^(le|la|les|un|une|des|du|de|prix|combien|coute|coûte|tarif|revision|révision|pour|vehicule|véhicule|modele|modèle)/g, '');
+        t = t.replace(/(le|la|les|un|une|des|du|de|prix|combien|coute|coûte|tarif|revision|révision|pour|vehicule|véhicule|modele|modèle)$/g, '');
+        // Gère les "+"
+        t = t.replace(/plus/g, '+');
+        t = t.replace(/\+/g, '+');
+        return t.toUpperCase();
+    }
+
+    // Trouve les modèles correspondants avec tolérance aux fautes
+    function trouverModeles(texte) {
+        const normalise = normaliser(texte);
+        
+        if (!normalise) return { exact: [], proches: [] };
+
+        // 1. Recherche exacte après normalisation
+        const exact = vehicules.filter(v => {
+            const vNorm = normaliser(v.modele);
+            return vNorm === normalise;
+        });
+
+        if (exact.length > 0) return { exact, proches: [] };
+
+        // 2. Recherche par inclusion (le texte saisi est contenu dans le modèle)
+        const proches = vehicules.filter(v => {
+            const vNorm = normaliser(v.modele);
+            return vNorm.includes(normalise) || normalise.includes(vNorm);
+        });
+
+        // 3. Recherche par distance de Levenshtein (tolérance aux fautes de frappe)
+        if (proches.length === 0 && normalise.length >= 3) {
+            const scores = vehicules.map(v => {
+                const vNorm = normaliser(v.modele);
+                return { v, distance: levenshtein(normalise, vNorm) };
+            });
+            scores.sort((a, b) => a.distance - b.distance);
+            // On garde les 5 meilleurs
+            const meilleurs = scores.slice(0, 5).filter(s => s.distance <= 3);
+            return { exact: [], proches: meilleurs.map(s => s.v) };
+        }
+
+        return { exact: [], proches };
+    }
+
+    // Distance de Levenshtein (nombre de caractères à changer pour passer de a à b)
+    function levenshtein(a, b) {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+                }
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    // Synthèse vocale
+    function parler(texte) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(texte);
+        utterance.lang = 'fr-FR';
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        // Cherche une voix française
+        const voices = window.speechSynthesis.getVoices();
+        const voixFr = voices.find(v => v.lang.startsWith('fr'));
+        if (voixFr) utterance.voice = voixFr;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // Formate le prix en texte parlé
+    function prixEnTexte(prix) {
+        return prix.toLocaleString('fr-FR').replace(/\s/g, ' ') + " francs CFA";
+    }
+
+    // Ouvre la modale de l'assistant vocal
+    window.ouvrirAssistantVocal = function() {
+        document.getElementById('voice-modal').classList.add('open');
+        document.getElementById('voice-result').classList.remove('open');
+        document.getElementById('voice-result').innerHTML = '';
+        document.getElementById('voice-transcript').textContent = "Appuyez sur le micro et dites un modèle...";
+        document.getElementById('voice-hint').textContent = 'Exemple : "CS 15", "P201 Gasoil", "T70"';
+        document.getElementById('voice-actions').style.display = 'none';
+        
+        // Vérifier le support
+        const supporte = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+        if (!supporte) {
+            document.getElementById('voice-not-supported').style.display = 'block';
+            document.getElementById('voice-not-supported').innerHTML = 
+                '<strong>⚠️ Reconnaissance vocale non supportée</strong><br>' +
+                'Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez <strong>Google Chrome</strong> ou <strong>Microsoft Edge</strong> sur Android ou PC.';
+            document.getElementById('voice-icon').style.display = 'none';
+            return;
+        } else {
+            document.getElementById('voice-not-supported').style.display = 'none';
+            document.getElementById('voice-icon').style.display = 'flex';
+        }
+
+        // Lance l'écoute automatiquement
+        setTimeout(() => demarrerEcoute(), 300);
+    }
+
+    window.fermerAssistantVocal = function() {
+        arreterEcoute();
+        document.getElementById('voice-modal').classList.remove('open');
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    window.relancerEcoute = function() {
+        document.getElementById('voice-result').classList.remove('open');
+        document.getElementById('voice-result').innerHTML = '';
+        document.getElementById('voice-actions').style.display = 'none';
+        document.getElementById('voice-transcript').textContent = "Je vous écoute...";
+        demarrerEcoute();
+    }
+
+    function demarrerEcoute() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
+
+        recognition = new SpeechRecognition();
+        recognition.lang = 'fr-FR';
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 3;
+
+        recognition.onstart = () => {
+            isListening = true;
+            document.getElementById('voice-icon').classList.add('listening');
+            document.getElementById('voice-fab').classList.add('listening');
+            document.getElementById('voice-transcript').textContent = "Je vous écoute...";
+        };
+
+        recognition.onresult = (event) => {
+            let transcription = '';
+            let final = false;
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcription += event.results[i][0].transcript;
+                if (event.results[i].isFinal) final = true;
+            }
+            
+            document.getElementById('voice-transcript').textContent = '"' + transcription + '"';
+
+            if (final) {
+                derniereTranscription = transcription;
+                traiterTranscription(transcription);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Erreur reconnaissance :", event.error);
+            isListening = false;
+            document.getElementById('voice-icon').classList.remove('listening');
+            document.getElementById('voice-fab').classList.remove('listening');
+            
+            if (event.error === 'not-allowed') {
+                document.getElementById('voice-transcript').textContent = "⚠️ Micro non autorisé";
+                document.getElementById('voice-hint').textContent = "Autorisez le micro dans les paramètres du navigateur.";
+            } else if (event.error === 'no-speech') {
+                document.getElementById('voice-transcript').textContent = "Aucune parole détectée";
+                document.getElementById('voice-hint').textContent = "Réessayez en parlant plus fort.";
+            } else {
+                document.getElementById('voice-transcript').textContent = "Erreur : " + event.error;
+            }
+            document.getElementById('voice-actions').style.display = 'flex';
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            document.getElementById('voice-icon').classList.remove('listening');
+            document.getElementById('voice-fab').classList.remove('listening');
+        };
+
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function arreterEcoute() {
+        if (recognition) {
+            try { recognition.stop(); } catch (e) {}
+            recognition = null;
+        }
+        isListening = false;
+    }
+
+    // Traite la transcription et affiche le résultat
+    function traiterTranscription(texte) {
+        console.log("🎤 Transcription :", texte);
+        const { exact, proches } = trouverModeles(texte);
+
+        if (exact.length === 1) {
+            afficherResultatVocal(exact[0]);
+        } else if (exact.length > 1) {
+            afficherSuggestions(exact, "Plusieurs correspondances exactes :");
+        } else if (proches.length === 1) {
+            afficherResultatVocal(proches[0]);
+        } else if (proches.length > 1) {
+            afficherSuggestions(proches, "Vouliez-vous dire :");
+        } else {
+            // Aucun résultat
+            document.getElementById('voice-transcript').textContent = '"' + texte + '"';
+            document.getElementById('voice-hint').innerHTML = 
+                "❌ Aucun modèle trouvé.<br>Réessayez ou vérifiez le nom.";
+            document.getElementById('voice-actions').style.display = 'flex';
+            parler("Désolé, je n'ai pas trouvé ce modèle.");
+        }
+    }
+
+    // Affiche le résultat vocal d'un modèle
+    function afficherResultatVocal(v) {
+        const prixTTC = v.prixTTC || 0;
+        const prixExtras = calculerPrixExtras(v);
+        const total = prixTTC + prixExtras;
+        const prixHT = calculerPrixHT(v);
+
+        const resultDiv = document.getElementById('voice-result');
+        resultDiv.innerHTML = `
+            <div class="voice-result-modele">${v.modele}</div>
+            <div class="voice-result-prix">${prixTTC.toLocaleString('fr-FR')} <small>FCFA TTC</small></div>
+            ${prixExtras > 0 ? `
+                <div class="voice-result-detail">
+                    <span>Autres pièces</span>
+                    <strong>+${prixExtras.toLocaleString('fr-FR')} F</strong>
+                </div>
+                <div class="voice-result-detail">
+                    <span>Total avec extras</span>
+                    <strong>${total.toLocaleString('fr-FR')} F</strong>
+                </div>
+            ` : ''}
+            ${prixHT > 0 ? `
+                <div class="voice-result-detail">
+                    <span>Coût HT</span>
+                    <strong>${prixHT.toLocaleString('fr-FR')} F</strong>
+                </div>
+            ` : ''}
+            ${v.prestations ? `
+                <div class="voice-result-detail">
+                    <span>Prestations</span>
+                    <strong>${v.prestations}</strong>
+                </div>
+            ` : ''}
+        `;
+        resultDiv.classList.add('open');
+        document.getElementById('voice-hint').textContent = "";
+        document.getElementById('voice-actions').style.display = 'flex';
+
+        // Réponse vocale
+        let phrase = v.modele + ", prix TTC, " + prixEnTexte(prixTTC);
+        if (prixExtras > 0) {
+            phrase += ". Avec les autres pièces, total : " + prixEnTexte(total);
+        }
+        parler(phrase);
+    }
+
+    // Affiche des suggestions cliquables
+    function afficherSuggestions(liste, titre) {
+        const resultDiv = document.getElementById('voice-result');
+        let html = `
+            <div class="voice-suggestions">
+                <div class="voice-suggestions-title">${titre}</div>
+        `;
+        liste.forEach(v => {
+            html += `
+                <button class="voice-suggestion-btn" onclick="choisirSuggestion('${v.id}')">
+                    ${v.modele} — ${(v.prixTTC || 0).toLocaleString('fr-FR')} F
+                </button>
+            `;
+        });
+        html += '</div>';
+        resultDiv.innerHTML = html;
+        resultDiv.classList.add('open');
+        document.getElementById('voice-hint').textContent = "";
+        document.getElementById('voice-actions').style.display = 'flex';
+    }
+
+    window.choisirSuggestion = function(id) {
+        const v = vehicules.find(item => item.id === id);
+        if (v) afficherResultatVocal(v);
+    }
+
+    /* ==========================================
        LANCEMENT
        ========================================== */
     initFirebase();
     chargerDonnees();
 
+    // Charge les voix pour la synthèse (nécessaire sur certains navigateurs)
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+    }
+
     // === PWA : Enregistrement du Service Worker ===
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('✅ Service Worker enregistré :', reg.scope))
+                .then(reg => console.log('✅ Service Worker enregistré'))
                 .catch(err => console.log('⚠️ Service Worker non enregistré :', err.message));
         });
     }
