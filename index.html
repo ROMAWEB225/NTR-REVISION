@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Tarifs de Révision</title>
+    <!-- Importation de Firebase (version modulaire via CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // ==========================================
+        // CONFIGURATION FIREBASE - REMPLACE CES VALEURS
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "TON_API_KEY",
+            authDomain: "TON_PROJECT_ID.firebaseapp.com",
+            projectId: "TON_PROJECT_ID",
+            storageBucket: "TON_PROJECT_ID.appspot.com",
+            messagingSenderId: "TON_SENDER_ID",
+            appId: "TON_APP_ID"
+        };
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const collectionRef = collection(db, "vehicules");
+
+        // ==========================================
+        // DONNÉES INITIALES (Basées uniquement sur le tableau tapé)
+        // ==========================================
+        const donneesInitiales = [
+            { modele: "CS 15", montant: 75000, details: { huile: 24000, fh: 12000, fa: 10559, fp: 12000, mod: 5000 }, prestations: "" },
+            { modele: "CS 35", montant: 75000, details: null, prestations: "" },
+            { modele: "CS 35+", montant: 80000, details: null, prestations: "" },
+            { modele: "CS 55", montant: 90000, details: null, prestations: "" },
+            { modele: "CS 55+", montant: 90000, details: null, prestations: "" },
+            { modele: "CS 75", montant: 90000, details: null, prestations: "" },
+            { modele: "CS 75+", montant: 90000, details: null, prestations: "" },
+            { modele: "CS 85", montant: 100000, details: null, prestations: "" },
+            { modele: "CS 95", montant: 100000, details: null, prestations: "" },
+            { modele: "EADO", montant: 110000, details: null, prestations: "" },
+            { modele: "P201 ESSENCE", montant: 120000, details: null, prestations: "" },
+            { modele: "P201 GASOIL", montant: 125000, details: null, prestations: "" },
+            { modele: "UNI-K", montant: 125000, details: null, prestations: "" },
+            { modele: "UNI-T", montant: 125000, details: null, prestations: "" },
+            { modele: "V8", montant: 75000, details: null, prestations: "" },
+            { modele: "V7", montant: 75000, details: null, prestations: "" },
+            { modele: "X7+", montant: 125000, details: null, prestations: "" },
+            { modele: "MG5", montant: 80000, details: null, prestations: "EQUILIBRAGE" },
+            { modele: "MG6", montant: 90000, details: null, prestations: "PARALLELISME" },
+            { modele: "HS", montant: 95000, details: null, prestations: "REGLAGE DE PHARE" },
+            { modele: "ONE", montant: 90000, details: null, prestations: "MISE A NIVEAU DU FREINAGE" },
+            { modele: "WHALE", montant: 115000, details: null, prestations: "PREPARATION DE LA VISITE TECHNIQUE" },
+            { modele: "ZS", montant: 90000, details: null, prestations: "VIGNETTE" },
+            { modele: "RX5", montant: 90000, details: null, prestations: "VIST TECHN+RDV" },
+            { modele: "RX8", montant: 110000, details: null, prestations: "" },
+            { modele: "T70", montant: 140000, details: null, prestations: "" },
+            { modele: "RX9", montant: 115000, details: null, prestations: "" },
+            { modele: "T60 E", montant: 110000, details: null, prestations: "" },
+            { modele: "T60 G", montant: 120000, details: null, prestations: "" },
+            { modele: "DASHING", montant: 110000, details: null, prestations: "" },
+            { modele: "T2", montant: 125000, details: null, prestations: "" },
+            { modele: "X70", montant: 100000, details: null, prestations: "" },
+            { modele: "X70+", montant: 100000, details: null, prestations: "" }
+        ];
+
+        // ==========================================
+        // LOGIQUE DE L'APPLICATION
+        // ==========================================
+        let vehicules = [];
+
+        // Fonction pour charger les données depuis Firebase
+        async function chargerDonnees() {
+            const q = query(collectionRef, orderBy("modele"));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                // Si la base Firebase est vide, on injecte les données initiales
+                console.log("Base de données vide. Initialisation avec les tarifs de base...");
+                for (const item of donneesInitiales) {
+                    await addDoc(collectionRef, item);
+                }
+                // Recharger après initialisation
+                return chargerDonnees();
+            }
+
+            vehicules = [];
+            querySnapshot.forEach((doc) => {
+                vehicules.push({ id: doc.id, ...doc.data() });
+            });
+            afficherTableau(vehicules);
+        }
+
+        // Fonction pour afficher le tableau
+        function afficherTableau(liste) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            liste.forEach(v => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="modele-cell">${v.modele}</td>
+                    <td class="montant-cell">${v.montant.toLocaleString('fr-FR')} FCFA</td>
+                    <td class="prestation-cell">${v.prestations || '-'}</td>
+                    <td class="actions-cell">
+                        <button class="btn-details" onclick="voirDetails('${v.id}')">Détails</button>
+                        <button class="btn-modifier" onclick="ouvrirModification('${v.id}')">Modifier</button>
+                        <button class="btn-supprimer" onclick="supprimerVehicule('${v.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Fonction pour voir les détails (comme le post-it)
+        window.voirDetails = function(id) {
+            const v = vehicules.find(item => item.id === id);
+            const modal = document.getElementById('modal-details');
+            const contenu = document.getElementById('details-contenu');
+
+            if (v.details) {
+                contenu.innerHTML = `
+                    <h3>Détails pour ${v.modele}</h3>
+                    <div class="detail-ligne"><span>Huile :</span> <strong>${v.details.huile.toLocaleString('fr-FR')} FCFA</strong></div>
+                    <div class="detail-ligne"><span>Filtre à Huile (F.H) :</span> <strong>${v.details.fh.toLocaleString('fr-FR')} FCFA</strong></div>
+                    <div class="detail-ligne"><span>Filtre à Air (F.A) :</span> <strong>${v.details.fa.toLocaleString('fr-FR')} FCFA</strong></div>
+                    <div class="detail-ligne"><span>Filtre à Pollen (F.P) :</span> <strong>${v.details.fp.toLocaleString('fr-FR')} FCFA</strong></div>
+                    <div class="detail-ligne"><span>Main d'Œuvre (MOD) :</span> <strong>${v.details.mod.toLocaleString('fr-FR')} FCFA</strong></div>
+                    <hr>
+                    <div class="detail-total"><span>Total des pièces :</span> <strong>${(v.details.huile + v.details.fh + v.details.fa + v.details.fp + v.details.mod).toLocaleString('fr-FR')} FCFA</strong></div>
+                `;
+            } else {
+                contenu.innerHTML = `<p>Aucun détail disponible pour ce modèle.</p>`;
+            }
+            modal.style.display = "block";
+        }
+
+        // Fonction pour ouvrir le formulaire de modification
+        window.ouvrirModification = function(id) {
+            const v = vehicules.find(item => item.id === id);
+            document.getElementById('edit-id').value = v.id;
+            document.getElementById('edit-modele').value = v.modele;
+            document.getElementById('edit-montant').value = v.montant;
+            document.getElementById('edit-prestations').value = v.prestations || '';
+            
+            // Gestion des détails
+            if (v.details) {
+                document.getElementById('edit-huile').value = v.details.huile;
+                document.getElementById('edit-fh').value = v.details.fh;
+                document.getElementById('edit-fa').value = v.details.fa;
+                document.getElementById('edit-fp').value = v.details.fp;
+                document.getElementById('edit-mod').value = v.details.mod;
+            } else {
+                document.getElementById('edit-huile').value = '';
+                document.getElementById('edit-fh').value = '';
+                document.getElementById('edit-fa').value = '';
+                document.getElementById('edit-fp').value = '';
+                document.getElementById('edit-mod').value = '';
+            }
+
+            document.getElementById('modal-edit').style.display = "block";
+        }
+
+        // Fonction pour sauvegarder les modifications
+        window.sauvegarderModification = async function() {
+            const id = document.getElementById('edit-id').value;
+            const modele = document.getElementById('edit-modele').value;
+            const montant = parseInt(document.getElementById('edit-montant').value);
+            const prestations = document.getElementById('edit-prestations').value;
+
+            const huile = parseInt(document.getElementById('edit-huile').value) || 0;
+            const fh = parseInt(document.getElementById('edit-fh').value) || 0;
+            const fa = parseInt(document.getElementById('edit-fa').value) || 0;
+            const fp = parseInt(document.getElementById('edit-fp').value) || 0;
+            const mod = parseInt(document.getElementById('edit-mod').value) || 0;
+
+            let details = null;
+            if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || mod > 0) {
+                details = { huile, fh, fa, fp, mod };
+            }
+
+            const docRef = doc(db, "vehicules", id);
+            await updateDoc(docRef, {
+                modele: modele,
+                montant: montant,
+                prestations: prestations,
+                details: details
+            });
+
+            document.getElementById('modal-edit').style.display = "none";
+            chargerDonnees(); // Recharger le tableau
+        }
+
+        // Fonction pour ajouter un nouveau véhicule
+        window.ajouterVehicule = async function() {
+            const modele = document.getElementById('add-modele').value;
+            const montant = parseInt(document.getElementById('add-montant').value);
+            const prestations = document.getElementById('add-prestations').value;
+            
+            const huile = parseInt(document.getElementById('add-huile').value) || 0;
+            const fh = parseInt(document.getElementById('add-fh').value) || 0;
+            const fa = parseInt(document.getElementById('add-fa').value) || 0;
+            const fp = parseInt(document.getElementById('add-fp').value) || 0;
+            const mod = parseInt(document.getElementById('add-mod').value) || 0;
+
+            let details = null;
+            if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || mod > 0) {
+                details = { huile, fh, fa, fp, mod };
+            }
+
+            await addDoc(collectionRef, {
+                modele: modele,
+                montant: montant,
+                prestations: prestations,
+                details: details
+            });
+
+            document.getElementById('form-ajout').reset();
+            chargerDonnees();
+        }
+
+        // Fonction pour supprimer un véhicule
+        window.supprimerVehicule = async function(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) {
+                await deleteDoc(doc(db, "vehicules", id));
+                chargerDonnees();
+            }
+        }
+
+        // Fermer les modales
+        window.fermerModal = function(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Charger les données au démarrage
+        chargerDonnees();
+    </script>
+    <style>
+        /* Variables de couleurs pour un look pro */
+        :root {
+            --primary-color: #1a202c;
+            --secondary-color: #2d3748;
+            --accent-color: #3182ce;
+            --text-color: #2d3748;
+            --bg-color: #f7fafc;
+            --border-color: #e2e8f0;
+            --success-color: #38a169;
+            --warning-color: #d69e2e;
+            --danger-color: #e53e3e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container { 
+            max-width: 1100px; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 { 
+            font-size: 24px; 
+            font-weight: 600; 
+            color: var(--primary-color); 
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h3 { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: var(--primary-color); }
+        h4 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--secondary-color); }
+
+        /* Tableau */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 30px; 
+        }
+
+        th, td { 
+            padding: 14px 15px; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+
+        th { 
+            background-color: var(--primary-color); 
+            color: white; 
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: #f8fafc; }
+
+        .modele-cell { font-weight: 600; color: var(--primary-color); }
+        .montant-cell { font-weight: 600; color: var(--accent-color); }
+        .prestation-cell { font-size: 14px; color: #718096; }
+
+        /* Boutons */
+        button { 
+            padding: 8px 14px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            font-size: 13px;
+            transition: background-color 0.2s;
+            margin-right: 5px;
+        }
+
+        .btn-details { background-color: #edf2f7; color: var(--secondary-color); border: 1px solid var(--border-color); }
+        .btn-details:hover { background-color: #e2e8f0; }
+        
+        .btn-modifier { background-color: var(--accent-color); color: white; }
+        .btn-modifier:hover { background-color: #2b6cb0; }
+        
+        .btn-supprimer { background-color: #fff5f5; color: var(--danger-color); border: 1px solid #fed7d7; }
+        .btn-supprimer:hover { background-color: #fed7d7; }
+
+        .btn-ajouter { 
+            background-color: var(--success-color); 
+            color: white; 
+            padding: 12px 20px; 
+            font-size: 15px; 
+            width: 100%; 
+            margin-top: 15px; 
+            border-radius: 4px;
+        }
+        .btn-ajouter:hover { background-color: #2f855a; }
+
+        /* Modales */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.5); 
+            overflow-y: auto;
+        }
+
+        .modal-content { 
+            background-color: white; 
+            margin: 8% auto; 
+            padding: 30px; 
+            border-radius: 8px; 
+            width: 90%; 
+            max-width: 500px; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .close { 
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #a0aec0; 
+            font-size: 24px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            line-height: 1;
+        }
+        .close:hover { color: var(--primary-color); }
+
+        /* Formulaires */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; color: var(--secondary-color); }
+        .form-group input, .form-group select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px; 
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-group input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
+        
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 120px; }
+
+        .btn-save { 
+            background-color: var(--primary-color); 
+            color: white; 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 10px; 
+            font-size: 15px;
+        }
+        .btn-save:hover { background-color: #2d3748; }
+
+        /* Section Ajout */
+        .section-ajout { 
+            margin-top: 40px; 
+            padding: 25px; 
+            background: #f8fafc; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color);
+        }
+        .section-ajout h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+
+        /* Détails dans la modale */
+        .detail-ligne { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #edf2f7; }
+        .detail-ligne span { color: #718096; }
+        .detail-total { display: flex; justify-content: space-between; padding: 12px 0; font-size: 16px; color: var(--primary-color); }
+        .detail-total span { font-weight: 600; }
+        .detail-total strong { color: var(--accent-color); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            th, td { padding: 10px; font-size: 13px; }
+            .actions-cell { display: flex; flex-direction: column; gap: 5px; }
+            .actions-cell button { width: 100%; margin: 0; }
+            .form-row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Gestion des Tarifs de Révision</h1>
+    
+    <!-- Tableau principal -->
+    <table>
+        <thead>
+            <tr>
+                <th>Modèle</th>
+                <th>Montant Total</th>
+                <th>Prestations Associées</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- Les lignes seront insérées ici par JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Section d'ajout -->
+    <div class="section-ajout">
+        <h3>Ajouter un nouveau véhicule</h3>
+        <form id="form-ajout" onsubmit="event.preventDefault(); ajouterVehicule();">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Modèle</label>
+                    <input type="text" id="add-modele" required placeholder="Ex: CS 15">
+                </div>
+                <div class="form-group">
+                    <label>Montant Total (FCFA)</label>
+                    <input type="number" id="add-montant" required placeholder="Ex: 75000">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Prestations (Optionnel)</label>
+                <input type="text" id="add-prestations" placeholder="Ex: EQUILIBRAGE, PARALLELISME...">
+            </div>
+            <h4>Détails des pièces (Optionnel)</h4>
+            <div class="form-row">
+                <div class="form-group"><label>Huile</label><input type="number" id="add-huile" placeholder="0"></div>
+                <div class="form-group"><label>Filtre à Huile (F.H)</label><input type="number" id="add-fh" placeholder="0"></div>
+                <div class="form-group"><label>Filtre à Air (F.A)</label><input type="number" id="add-fa" placeholder="0"></div>
+                <div class="form-group"><label>Filtre à Pollen (F.P)</label><input type="number" id="add-fp" placeholder="0"></div>
+                <div class="form-group"><label>Main d'Œuvre (MOD)</label><input type="number" id="add-mod" placeholder="0"></div>
+            </div>
+            <button type="submit" class="btn-ajouter">Ajouter le véhicule</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modale Détails -->
+<div id="modal-details" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="fermerModal('modal-details')">&times;</span>
+        <div id="details-contenu"></div>
+    </div>
+</div>
+
+<!-- Modale Modification -->
+<div id="modal-edit" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="fermerModal('modal-edit')">&times;</span>
+        <h3>Modifier le véhicule</h3>
+        <input type="hidden" id="edit-id">
+        <div class="form-group"><label>Modèle</label><input type="text" id="edit-modele"></div>
+        <div class="form-group"><label>Montant Total</label><input type="number" id="edit-montant"></div>
+        <div class="form-group"><label>Prestations</label><input type="text" id="edit-prestations"></div>
+        <h4>Détails des pièces</h4>
+        <div class="form-row">
+            <div class="form-group"><label>Huile</label><input type="number" id="edit-huile"></div>
+            <div class="form-group"><label>F.H</label><input type="number" id="edit-fh"></div>
+            <div class="form-group"><label>F.A</label><input type="number" id="edit-fa"></div>
+            <div class="form-group"><label>F.P</label><input type="number" id="edit-fp"></div>
+            <div class="form-group"><label>MOD</label><input type="number" id="edit-mod"></div>
+        </div>
+        <button class="btn-save" onclick="sauvegarderModification()">Enregistrer les modifications</button>
+    </div>
+</div>
+
+</body>
+</html>
