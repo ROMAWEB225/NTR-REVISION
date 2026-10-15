@@ -4,31 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Tarifs de Révision</title>
-    <!-- Importation de Firebase (version modulaire via CDN) -->
+    
+    <!-- Firebase (optionnel, pour la sauvegarde cloud) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ==========================================
         // CONFIGURATION FIREBASE - REMPLACE CES VALEURS
         // ==========================================
         const firebaseConfig = {
-  apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
-  authDomain: "ntr-garage.firebaseapp.com",
-  databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ntr-garage",
-  storageBucket: "ntr-garage.firebasestorage.app",
-  messagingSenderId: "606167388967",
-  appId: "1:606167388967:web:7ad669fd353cdeeb7a8f02"
-};
+            apiKey: "TON_API_KEY",
+            authDomain: "TON_PROJECT_ID.firebaseapp.com",
+            projectId: "TON_PROJECT_ID",
+            storageBucket: "TON_PROJECT_ID.appspot.com",
+            messagingSenderId: "TON_SENDER_ID",
+            appId: "TON_APP_ID"
+        };
 
-        // Initialisation de Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const collectionRef = collection(db, "vehicules");
+        let db = null;
+        let collectionRef = null;
+        let firebaseDisponible = false;
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            collectionRef = collection(db, "vehicules");
+            firebaseDisponible = true;
+            console.log("Firebase connecté avec succès.");
+        } catch (e) {
+            console.warn("Firebase non disponible. Mode local activé.");
+        }
 
         // ==========================================
-        // DONNÉES INITIALES (Basées uniquement sur le tableau tapé)
+        // DONNÉES INITIALES (Toujours présentes)
         // ==========================================
         const donneesInitiales = [
             { modele: "CS 15", montant: 75000, details: { huile: 24000, fh: 12000, fa: 10559, fp: 12000, mod: 5000 }, prestations: "" },
@@ -71,40 +80,71 @@
         // ==========================================
         let vehicules = [];
 
-        // Fonction pour charger les données depuis Firebase
+        // Charger les données (local + Firebase si dispo)
         async function chargerDonnees() {
-            const q = query(collectionRef, orderBy("modele"));
-            const querySnapshot = await getDocs(q);
-            
-            if (querySnapshot.empty) {
-                // Si la base Firebase est vide, on injecte les données initiales
-                console.log("Base de données vide. Initialisation avec les tarifs de base...");
-                for (const item of donneesInitiales) {
-                    await addDoc(collectionRef, item);
+            // 1. Toujours charger les données locales d'abord
+            const localData = localStorage.getItem("vehiculesData");
+            if (localData) {
+                try {
+                    vehicules = JSON.parse(localData);
+                } catch (e) {
+                    vehicules = [...donneesInitiales];
                 }
-                // Recharger après initialisation
-                return chargerDonnees();
+            } else {
+                vehicules = [...donneesInitiales];
+                localStorage.setItem("vehiculesData", JSON.stringify(vehicules));
             }
 
-            vehicules = [];
-            querySnapshot.forEach((doc) => {
-                vehicules.push({ id: doc.id, ...doc.data() });
-            });
+            // 2. Si Firebase est dispo, on tente de récupérer les données cloud
+            if (firebaseDisponible && collectionRef) {
+                try {
+                    const querySnapshot = await getDocs(collectionRef);
+                    if (!querySnapshot.empty) {
+                        const cloudData = [];
+                        querySnapshot.forEach((doc) => {
+                            cloudData.push({ id: doc.id, ...doc.data() });
+                        });
+                        // On utilise les données cloud si elles existent
+                        vehicules = cloudData;
+                        localStorage.setItem("vehiculesData", JSON.stringify(vehicules));
+                    } else {
+                        // Si Firebase est vide, on y injecte les données locales
+                        for (const item of vehicules) {
+                            const { id, ...data } = item;
+                            await addDoc(collectionRef, data);
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Erreur Firebase, utilisation des données locales.", e);
+                }
+            }
+
             afficherTableau(vehicules);
         }
 
-        // Fonction pour afficher le tableau
+        // Afficher le tableau
         function afficherTableau(liste) {
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
 
+            if (liste.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#a0aec0;">Aucun véhicule trouvé.</td></tr>';
+                return;
+            }
+
             liste.forEach(v => {
                 const tr = document.createElement('tr');
+                tr.style.cursor = "pointer";
+                tr.onclick = (e) => {
+                    // Si on clique sur un bouton, on ne déclenche pas le détail
+                    if (e.target.tagName === 'BUTTON') return;
+                    voirDetails(v.id);
+                };
                 tr.innerHTML = `
                     <td class="modele-cell">${v.modele}</td>
                     <td class="montant-cell">${v.montant.toLocaleString('fr-FR')} FCFA</td>
                     <td class="prestation-cell">${v.prestations || '-'}</td>
-                    <td class="actions-cell">
+                    <td class="actions-cell" onclick="event.stopPropagation();">
                         <button class="btn-details" onclick="voirDetails('${v.id}')">Détails</button>
                         <button class="btn-modifier" onclick="ouvrirModification('${v.id}')">Modifier</button>
                         <button class="btn-supprimer" onclick="supprimerVehicule('${v.id}')">Supprimer</button>
@@ -114,13 +154,23 @@
             });
         }
 
-        // Fonction pour voir les détails (comme le post-it)
+        // Filtrer par recherche
+        window.filtrer = function() {
+            const terme = document.getElementById('search').value.toLowerCase();
+            const filtres = vehicules.filter(v => v.modele.toLowerCase().includes(terme));
+            afficherTableau(filtres);
+        }
+
+        // Voir les détails
         window.voirDetails = function(id) {
-            const v = vehicules.find(item => item.id === id);
+            const v = vehicules.find(item => item.id === id || item.modele === id);
+            if (!v) return;
+            
             const modal = document.getElementById('modal-details');
             const contenu = document.getElementById('details-contenu');
 
             if (v.details) {
+                const totalPieces = v.details.huile + v.details.fh + v.details.fa + v.details.fp + v.details.mod;
                 contenu.innerHTML = `
                     <h3>Détails pour ${v.modele}</h3>
                     <div class="detail-ligne"><span>Huile :</span> <strong>${v.details.huile.toLocaleString('fr-FR')} FCFA</strong></div>
@@ -129,23 +179,29 @@
                     <div class="detail-ligne"><span>Filtre à Pollen (F.P) :</span> <strong>${v.details.fp.toLocaleString('fr-FR')} FCFA</strong></div>
                     <div class="detail-ligne"><span>Main d'Œuvre (MOD) :</span> <strong>${v.details.mod.toLocaleString('fr-FR')} FCFA</strong></div>
                     <hr>
-                    <div class="detail-total"><span>Total des pièces :</span> <strong>${(v.details.huile + v.details.fh + v.details.fa + v.details.fp + v.details.mod).toLocaleString('fr-FR')} FCFA</strong></div>
+                    <div class="detail-total"><span>Total des pièces :</span> <strong>${totalPieces.toLocaleString('fr-FR')} FCFA</strong></div>
                 `;
             } else {
-                contenu.innerHTML = `<p>Aucun détail disponible pour ce modèle.</p>`;
+                contenu.innerHTML = `
+                    <h3>Détails pour ${v.modele}</h3>
+                    <p style="color:#718096; margin-top:10px;">Aucun détail de pièce n'est disponible pour ce modèle.</p>
+                    <div class="detail-ligne" style="margin-top:15px;"><span>Montant total :</span> <strong>${v.montant.toLocaleString('fr-FR')} FCFA</strong></div>
+                    ${v.prestations ? `<div class="detail-ligne"><span>Prestations :</span> <strong>${v.prestations}</strong></div>` : ''}
+                `;
             }
             modal.style.display = "block";
         }
 
-        // Fonction pour ouvrir le formulaire de modification
+        // Ouvrir le formulaire de modification
         window.ouvrirModification = function(id) {
-            const v = vehicules.find(item => item.id === id);
-            document.getElementById('edit-id').value = v.id;
+            const v = vehicules.find(item => item.id === id || item.modele === id);
+            if (!v) return;
+
+            document.getElementById('edit-id').value = v.id || v.modele;
             document.getElementById('edit-modele').value = v.modele;
             document.getElementById('edit-montant').value = v.montant;
             document.getElementById('edit-prestations').value = v.prestations || '';
             
-            // Gestion des détails
             if (v.details) {
                 document.getElementById('edit-huile').value = v.details.huile;
                 document.getElementById('edit-fh').value = v.details.fh;
@@ -163,7 +219,7 @@
             document.getElementById('modal-edit').style.display = "block";
         }
 
-        // Fonction pour sauvegarder les modifications
+        // Sauvegarder les modifications
         window.sauvegarderModification = async function() {
             const id = document.getElementById('edit-id').value;
             const modele = document.getElementById('edit-modele').value;
@@ -181,19 +237,25 @@
                 details = { huile, fh, fa, fp, mod };
             }
 
-            const docRef = doc(db, "vehicules", id);
-            await updateDoc(docRef, {
-                modele: modele,
-                montant: montant,
-                prestations: prestations,
-                details: details
-            });
+            const index = vehicules.findIndex(v => v.id === id || v.modele === id);
+            if (index !== -1) {
+                vehicules[index] = { ...vehicules[index], modele, montant, prestations, details };
+                localStorage.setItem("vehiculesData", JSON.stringify(vehicules));
+
+                // Mise à jour Firebase si dispo
+                if (firebaseDisponible && vehicules[index].id) {
+                    try {
+                        const docRef = doc(db, "vehicules", vehicules[index].id);
+                        await updateDoc(docRef, { modele, montant, prestations, details });
+                    } catch (e) { console.warn("Erreur Firebase update", e); }
+                }
+            }
 
             document.getElementById('modal-edit').style.display = "none";
-            chargerDonnees(); // Recharger le tableau
+            afficherTableau(vehicules);
         }
 
-        // Fonction pour ajouter un nouveau véhicule
+        // Ajouter un nouveau véhicule
         window.ajouterVehicule = async function() {
             const modele = document.getElementById('add-modele').value;
             const montant = parseInt(document.getElementById('add-montant').value);
@@ -210,23 +272,45 @@
                 details = { huile, fh, fa, fp, mod };
             }
 
-            await addDoc(collectionRef, {
-                modele: modele,
-                montant: montant,
-                prestations: prestations,
-                details: details
-            });
+            const nouveau = { modele, montant, prestations, details };
 
+            // Ajout Firebase
+            if (firebaseDisponible && collectionRef) {
+                try {
+                    const docRef = await addDoc(collectionRef, nouveau);
+                    nouveau.id = docRef.id;
+                } catch (e) { console.warn("Erreur Firebase add", e); }
+            }
+
+            // Si pas d'ID Firebase, on en génère un local
+            if (!nouveau.id) {
+                nouveau.id = 'local_' + Date.now();
+            }
+
+            vehicules.push(nouveau);
+            localStorage.setItem("vehiculesData", JSON.stringify(vehicules));
+            
             document.getElementById('form-ajout').reset();
-            chargerDonnees();
+            afficherTableau(vehicules);
         }
 
-        // Fonction pour supprimer un véhicule
+        // Supprimer un véhicule
         window.supprimerVehicule = async function(id) {
-            if (confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) {
-                await deleteDoc(doc(db, "vehicules", id));
-                chargerDonnees();
+            if (!confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) return;
+
+            const index = vehicules.findIndex(v => v.id === id || v.modele === id);
+            if (index !== -1) {
+                const v = vehicules[index];
+                vehicules.splice(index, 1);
+                localStorage.setItem("vehiculesData", JSON.stringify(vehicules));
+
+                if (firebaseDisponible && v.id && !v.id.startsWith('local_')) {
+                    try {
+                        await deleteDoc(doc(db, "vehicules", v.id));
+                    } catch (e) { console.warn("Erreur Firebase delete", e); }
+                }
             }
+            afficherTableau(vehicules);
         }
 
         // Fermer les modales
@@ -237,8 +321,8 @@
         // Charger les données au démarrage
         chargerDonnees();
     </script>
+    
     <style>
-        /* Variables de couleurs pour un look pro */
         :root {
             --primary-color: #1a202c;
             --secondary-color: #2d3748;
@@ -274,13 +358,41 @@
             font-size: 24px; 
             font-weight: 600; 
             color: var(--primary-color); 
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
         }
 
         h3 { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: var(--primary-color); }
         h4 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--secondary-color); }
+
+        /* Barre de recherche */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .search-container .status {
+            font-size: 13px;
+            color: #718096;
+            white-space: nowrap;
+        }
 
         /* Tableau */
         table { 
@@ -300,15 +412,17 @@
             color: white; 
             font-weight: 500;
             text-transform: uppercase;
-            font-size: 13px;
+            font-size: 12px;
             letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
         }
 
-        tr:hover { background-color: #f8fafc; }
+        tr:hover td { background-color: #f8fafc; }
 
         .modele-cell { font-weight: 600; color: var(--primary-color); }
         .montant-cell { font-weight: 600; color: var(--accent-color); }
-        .prestation-cell { font-size: 14px; color: #718096; }
+        .prestation-cell { font-size: 13px; color: #718096; }
 
         /* Boutons */
         button { 
@@ -317,9 +431,10 @@
             border-radius: 4px; 
             cursor: pointer; 
             font-weight: 500; 
-            font-size: 13px;
+            font-size: 12px;
             transition: background-color 0.2s;
             margin-right: 5px;
+            font-family: inherit;
         }
 
         .btn-details { background-color: #edf2f7; color: var(--secondary-color); border: 1px solid var(--border-color); }
@@ -381,7 +496,7 @@
         /* Formulaires */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; color: var(--secondary-color); }
-        .form-group input, .form-group select { 
+        .form-group input { 
             width: 100%; 
             padding: 10px; 
             border: 1px solid var(--border-color); 
@@ -401,6 +516,7 @@
             padding: 12px; 
             margin-top: 10px; 
             font-size: 15px;
+            border-radius: 4px;
         }
         .btn-save:hover { background-color: #2d3748; }
 
@@ -415,7 +531,7 @@
         .section-ajout h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
 
         /* Détails dans la modale */
-        .detail-ligne { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #edf2f7; }
+        .detail-ligne { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #edf2f7; }
         .detail-ligne span { color: #718096; }
         .detail-total { display: flex; justify-content: space-between; padding: 12px 0; font-size: 16px; color: var(--primary-color); }
         .detail-total span { font-weight: 600; }
@@ -423,11 +539,13 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            body { padding: 15px; }
             .container { padding: 15px; }
             th, td { padding: 10px; font-size: 13px; }
             .actions-cell { display: flex; flex-direction: column; gap: 5px; }
             .actions-cell button { width: 100%; margin: 0; }
             .form-row { flex-direction: column; gap: 0; }
+            .search-container { flex-direction: column; }
         }
     </style>
 </head>
@@ -436,6 +554,12 @@
 <div class="container">
     <h1>Gestion des Tarifs de Révision</h1>
     
+    <!-- Barre de recherche -->
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Rechercher un modèle (ex: CS 15, T70...)" oninput="filtrer()">
+        <span class="status" id="status">Chargement...</span>
+    </div>
+
     <!-- Tableau principal -->
     <table>
         <thead>
