@@ -27,6 +27,8 @@
             --danger: #e53e3e;
             --warning: #d69e2e;
             --warning-light: #fffaf0;
+            --purple: #805ad5;
+            --purple-light: #faf5ff;
             --white: #ffffff;
         }
 
@@ -141,7 +143,7 @@
 
         .table-wrapper.shrunk { flex: 0 0 50%; }
 
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
 
         th, td { padding: 13px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
 
@@ -159,7 +161,8 @@
         tr.selected td { background-color: var(--accent-light); }
 
         .modele-cell { font-weight: 600; color: var(--primary); }
-        .montant-cell { font-weight: 600; color: var(--accent); }
+        .montant-ht { font-weight: 500; color: var(--text-light); font-size: 13px; }
+        .montant-cell { font-weight: 700; color: var(--accent); }
         .montant-extras { font-weight: 600; color: var(--warning); }
         .prestation-cell { font-size: 12px; color: var(--text-light); }
 
@@ -264,6 +267,26 @@
         .sub-total.extras { background: var(--warning-light); }
         .sub-total strong { font-size: 16px; color: var(--accent); }
         .sub-total.extras strong { color: var(--warning); }
+
+        .sub-total.ttc {
+            background: var(--purple-light);
+            font-size: 15px;
+        }
+
+        .sub-total.ttc strong { color: var(--purple); font-size: 18px; }
+
+        .marge-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--text-light);
+            background: #f8fafc;
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .marge-info strong { color: var(--success); }
 
         .total-global {
             display: flex;
@@ -384,6 +407,13 @@
         }
         .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(49,130,206,0.1); }
 
+        .form-group .help-text {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+            display: block;
+        }
+
         .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 140px; }
 
@@ -397,6 +427,18 @@
         }
 
         .form-actions { display: flex; gap: 10px; margin-top: 25px; justify-content: flex-end; }
+
+        .info-box {
+            background: var(--accent-light);
+            border-left: 3px solid var(--accent);
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .info-box strong { color: var(--accent); }
 
         .recap-card {
             background: var(--white);
@@ -510,7 +552,8 @@
                     <thead>
                         <tr>
                             <th>Modèle</th>
-                            <th>Prix Révision</th>
+                            <th>Révision HT</th>
+                            <th>Révision TTC</th>
                             <th>Autres Pièces</th>
                             <th>Prestations</th>
                         </tr>
@@ -538,18 +581,26 @@
         <div class="form-card">
             <h3 style="margin-bottom: 20px; color: var(--primary);">Nouveau véhicule</h3>
             <form id="form-ajout" onsubmit="event.preventDefault(); ajouterVehicule();">
+                <div class="info-box">
+                    Le <strong>prix HT</strong> est calculé automatiquement à partir des pièces. Le <strong>prix TTC</strong> est le montant officiel facturé au client.
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Modèle *</label>
                         <input type="text" id="add-modele" required placeholder="Ex: CS 15">
                     </div>
                     <div class="form-group">
-                        <label>Prestations (Optionnel)</label>
-                        <input type="text" id="add-prestations" placeholder="Ex: EQUILIBRAGE, PARALLELISME...">
+                        <label>Prix Révision TTC (FCFA) *</label>
+                        <input type="number" id="add-prix-ttc" required placeholder="Ex: 75000">
+                        <span class="help-text">Montant facturé au client</span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Prestations (Optionnel)</label>
+                    <input type="text" id="add-prestations" placeholder="Ex: EQUILIBRAGE, PARALLELISME...">
+                </div>
 
-                <div class="form-section-title">Détails de la révision</div>
+                <div class="form-section-title">Détails de la révision (HT)</div>
                 <div class="form-row">
                     <div class="form-group"><label>Huile</label><input type="number" id="add-huile" placeholder="0"></div>
                     <div class="form-group"><label>Filtre à Huile (F.H)</label><input type="number" id="add-fh" placeholder="0"></div>
@@ -572,9 +623,12 @@
         <span class="close" onclick="fermerModal('modal-edit')">&times;</span>
         <h3>Modifier le véhicule</h3>
         <input type="hidden" id="edit-id">
-        <div class="form-group"><label>Modèle</label><input type="text" id="edit-modele"></div>
+        <div class="form-row">
+            <div class="form-group"><label>Modèle</label><input type="text" id="edit-modele"></div>
+            <div class="form-group"><label>Prix TTC (FCFA)</label><input type="number" id="edit-prix-ttc"></div>
+        </div>
         <div class="form-group"><label>Prestations</label><input type="text" id="edit-prestations"></div>
-        <div class="form-section-title">Détails de la révision</div>
+        <div class="form-section-title">Détails de la révision (HT)</div>
         <div class="form-row">
             <div class="form-group"><label>Huile</label><input type="number" id="edit-huile"></div>
             <div class="form-group"><label>F.H</label><input type="number" id="edit-fh"></div>
@@ -590,47 +644,55 @@
 </div>
 
 <script>
+    /* ==========================================
+       DONNÉES INITIALES
+       prixTTC = montant officiel facturé au client
+       details = décomposition HT des pièces
+       ========================================== */
     const donneesInitiales = [
-        { modele: "CS 15", details: { huile: 24000, fh: 12000, fa: 10559, fp: 12000, mod: 5000 }, custom: [], prestations: "" },
-        { modele: "CS 35", details: null, custom: [], prestations: "" },
-        { modele: "CS 35+", details: null, custom: [], prestations: "" },
-        { modele: "CS 55", details: null, custom: [], prestations: "" },
-        { modele: "CS 55+", details: null, custom: [], prestations: "" },
-        { modele: "CS 75", details: null, custom: [], prestations: "" },
-        { modele: "CS 75+", details: null, custom: [], prestations: "" },
-        { modele: "CS 85", details: null, custom: [], prestations: "" },
-        { modele: "CS 95", details: null, custom: [], prestations: "" },
-        { modele: "EADO", details: null, custom: [], prestations: "" },
-        { modele: "P201 ESSENCE", details: null, custom: [], prestations: "" },
-        { modele: "P201 GASOIL", details: null, custom: [], prestations: "" },
-        { modele: "UNI-K", details: null, custom: [], prestations: "" },
-        { modele: "UNI-T", details: null, custom: [], prestations: "" },
-        { modele: "V8", details: null, custom: [], prestations: "" },
-        { modele: "V7", details: null, custom: [], prestations: "" },
-        { modele: "X7+", details: null, custom: [], prestations: "" },
-        { modele: "MG5", details: null, custom: [], prestations: "EQUILIBRAGE" },
-        { modele: "MG6", details: null, custom: [], prestations: "PARALLELISME" },
-        { modele: "HS", details: null, custom: [], prestations: "REGLAGE DE PHARE" },
-        { modele: "ONE", details: null, custom: [], prestations: "MISE A NIVEAU DU FREINAGE" },
-        { modele: "WHALE", details: null, custom: [], prestations: "PREPARATION DE LA VISITE TECHNIQUE" },
-        { modele: "ZS", details: null, custom: [], prestations: "VIGNETTE" },
-        { modele: "RX5", details: null, custom: [], prestations: "VIST TECHN+RDV" },
-        { modele: "RX8", details: null, custom: [], prestations: "" },
-        { modele: "T70", details: null, custom: [], prestations: "" },
-        { modele: "RX9", details: null, custom: [], prestations: "" },
-        { modele: "T60 E", details: null, custom: [], prestations: "" },
-        { modele: "T60 G", details: null, custom: [], prestations: "" },
-        { modele: "DASHING", details: null, custom: [], prestations: "" },
-        { modele: "T2", details: null, custom: [], prestations: "" },
-        { modele: "X70", details: null, custom: [], prestations: "" },
-        { modele: "X70+", details: null, custom: [], prestations: "" }
+        { modele: "CS 15", prixTTC: 75000, details: { huile: 24000, fh: 12000, fa: 10559, fp: 12000, mod: 5000 }, custom: [], prestations: "" },
+        { modele: "CS 35", prixTTC: 75000, details: null, custom: [], prestations: "" },
+        { modele: "CS 35+", prixTTC: 80000, details: null, custom: [], prestations: "" },
+        { modele: "CS 55", prixTTC: 90000, details: null, custom: [], prestations: "" },
+        { modele: "CS 55+", prixTTC: 90000, details: null, custom: [], prestations: "" },
+        { modele: "CS 75", prixTTC: 90000, details: null, custom: [], prestations: "" },
+        { modele: "CS 75+", prixTTC: 90000, details: null, custom: [], prestations: "" },
+        { modele: "CS 85", prixTTC: 100000, details: null, custom: [], prestations: "" },
+        { modele: "CS 95", prixTTC: 100000, details: null, custom: [], prestations: "" },
+        { modele: "EADO", prixTTC: 110000, details: null, custom: [], prestations: "" },
+        { modele: "P201 ESSENCE", prixTTC: 120000, details: null, custom: [], prestations: "" },
+        { modele: "P201 GASOIL", prixTTC: 125000, details: null, custom: [], prestations: "" },
+        { modele: "UNI-K", prixTTC: 125000, details: null, custom: [], prestations: "" },
+        { modele: "UNI-T", prixTTC: 125000, details: null, custom: [], prestations: "" },
+        { modele: "V8", prixTTC: 75000, details: null, custom: [], prestations: "" },
+        { modele: "V7", prixTTC: 75000, details: null, custom: [], prestations: "" },
+        { modele: "X7+", prixTTC: 125000, details: null, custom: [], prestations: "" },
+        { modele: "MG5", prixTTC: 80000, details: null, custom: [], prestations: "EQUILIBRAGE" },
+        { modele: "MG6", prixTTC: 90000, details: null, custom: [], prestations: "PARALLELISME" },
+        { modele: "HS", prixTTC: 95000, details: null, custom: [], prestations: "REGLAGE DE PHARE" },
+        { modele: "ONE", prixTTC: 90000, details: null, custom: [], prestations: "MISE A NIVEAU DU FREINAGE" },
+        { modele: "WHALE", prixTTC: 115000, details: null, custom: [], prestations: "PREPARATION DE LA VISITE TECHNIQUE" },
+        { modele: "ZS", prixTTC: 90000, details: null, custom: [], prestations: "VIGNETTE" },
+        { modele: "RX5", prixTTC: 90000, details: null, custom: [], prestations: "VIST TECHN+RDV" },
+        { modele: "RX8", prixTTC: 110000, details: null, custom: [], prestations: "" },
+        { modele: "T70", prixTTC: 140000, details: null, custom: [], prestations: "" },
+        { modele: "RX9", prixTTC: 115000, details: null, custom: [], prestations: "" },
+        { modele: "T60 E", prixTTC: 110000, details: null, custom: [], prestations: "" },
+        { modele: "T60 G", prixTTC: 120000, details: null, custom: [], prestations: "" },
+        { modele: "DASHING", prixTTC: 110000, details: null, custom: [], prestations: "" },
+        { modele: "T2", prixTTC: 125000, details: null, custom: [], prestations: "" },
+        { modele: "X70", prixTTC: 100000, details: null, custom: [], prestations: "" },
+        { modele: "X70+", prixTTC: 100000, details: null, custom: [], prestations: "" }
     ];
 
     let vehicules = [];
     let selectedId = null;
-    const STORAGE_KEY = "tarifs_vehicules_v3";
+    const STORAGE_KEY = "tarifs_vehicules_v4";
 
-    function calculerPrixRevision(v) {
+    /* ==========================================
+       CALCULS
+       ========================================== */
+    function calculerPrixHT(v) {
         if (!v.details) return 0;
         const d = v.details;
         return (d.huile || 0) + (d.fh || 0) + (d.fa || 0) + (d.fp || 0) + (d.mod || 0);
@@ -641,6 +703,13 @@
         return v.custom.reduce((sum, p) => sum + (p.prix || 0), 0);
     }
 
+    function calculerMarge(v) {
+        return (v.prixTTC || 0) - calculerPrixHT(v);
+    }
+
+    /* ==========================================
+       INITIALISATION
+       ========================================== */
     function init() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -653,9 +722,15 @@
             vehicules = JSON.parse(JSON.stringify(donneesInitiales));
         }
 
+        // Migration : s'assurer que chaque véhicule a les bons champs
         vehicules.forEach((v, index) => {
             if (!v.id) v.id = 'id_' + index + '_' + Date.now() + Math.random().toString(36).substr(2, 5);
             if (!v.custom) v.custom = [];
+            if (v.prixTTC === undefined || v.prixTTC === null) {
+                // Ancien format : on récupère depuis donneesInitiales ou on met HT
+                const orig = donneesInitiales.find(d => d.modele === v.modele);
+                v.prixTTC = orig ? orig.prixTTC : calculerPrixHT(v);
+            }
         });
 
         sauvegarder();
@@ -667,6 +742,9 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicules));
     }
 
+    /* ==========================================
+       ONGLETS
+       ========================================== */
     function ouvrirOnglet(event, tabId) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -675,24 +753,28 @@
         if (tabId === 'tab-recap') afficherRecap();
     }
 
+    /* ==========================================
+       TABLEAU
+       ========================================== */
     function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
         tbody.innerHTML = '';
 
         if (liste.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#a0aec0;">Aucun véhicule trouvé.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#a0aec0;">Aucun véhicule trouvé.</td></tr>';
             return;
         }
 
         liste.forEach(v => {
-            const prixRevision = calculerPrixRevision(v);
+            const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
             const tr = document.createElement('tr');
             if (v.id === selectedId) tr.classList.add('selected');
             tr.onclick = () => ouvrirPanneau(v.id);
             tr.innerHTML = `
                 <td class="modele-cell">${v.modele}</td>
-                <td class="montant-cell">${prixRevision > 0 ? prixRevision.toLocaleString('fr-FR') + ' F' : '-'}</td>
+                <td class="montant-ht">${prixHT > 0 ? prixHT.toLocaleString('fr-FR') + ' F' : '-'}</td>
+                <td class="montant-cell">${v.prixTTC > 0 ? v.prixTTC.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="montant-extras">${prixExtras > 0 ? prixExtras.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="prestation-cell">${v.prestations || '-'}</td>
             `;
@@ -709,6 +791,9 @@
         afficherTableau(filtres);
     }
 
+    /* ==========================================
+       PANNEAU DÉTAILS
+       ========================================== */
     function ouvrirPanneau(id) {
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
@@ -730,9 +815,10 @@
     function afficherDetails(v) {
         const contenu = document.getElementById('panel-content');
         const d = v.details || { huile: 0, fh: 0, fa: 0, fp: 0, mod: 0 };
-        const prixRevision = calculerPrixRevision(v);
+        const prixHT = calculerPrixHT(v);
         const prixExtras = calculerPrixExtras(v);
-        const totalGeneral = prixRevision + prixExtras;
+        const marge = calculerMarge(v);
+        const totalGeneral = (v.prixTTC || 0) + prixExtras;
 
         let customHtml = '';
         if (v.custom && v.custom.length > 0) {
@@ -751,15 +837,25 @@
 
         contenu.innerHTML = `
             <div class="detail-section revision-section">
-                <h4>Détails de la révision</h4>
+                <h4>Détails de la révision (HT)</h4>
                 <div class="detail-row"><span>Huile</span><strong>${(d.huile || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="detail-row"><span>Filtre à Huile (F.H)</span><strong>${(d.fh || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="detail-row"><span>Filtre à Air (F.A)</span><strong>${(d.fa || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="detail-row"><span>Filtre à Pollen (F.P)</span><strong>${(d.fp || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="detail-row"><span>Main d'Œuvre (MOD)</span><strong>${(d.mod || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="sub-total">
-                    <span>Total Révision</span>
-                    <strong>${prixRevision.toLocaleString('fr-FR')} F</strong>
+                    <span>Total HT</span>
+                    <strong>${prixHT.toLocaleString('fr-FR')} F</strong>
+                </div>
+                ${marge !== 0 ? `
+                    <div class="marge-info">
+                        <span>Marge / Bénéfice</span>
+                        <strong>${marge > 0 ? '+' : ''}${marge.toLocaleString('fr-FR')} F</strong>
+                    </div>
+                ` : ''}
+                <div class="sub-total ttc">
+                    <span>Prix Révision TTC</span>
+                    <strong>${(v.prixTTC || 0).toLocaleString('fr-FR')} F</strong>
                 </div>
             </div>
 
@@ -787,7 +883,7 @@
             ` : ''}
 
             <div class="total-global">
-                <span>Total Général</span>
+                <span>Total Général (TTC + Extras)</span>
                 <strong>${totalGeneral.toLocaleString('fr-FR')} F</strong>
             </div>
 
@@ -798,6 +894,9 @@
         `;
     }
 
+    /* ==========================================
+       AJOUT / SUPPRESSION DE PIÈCE
+       ========================================== */
     function ajouterPiece(id) {
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
@@ -830,11 +929,16 @@
         afficherRecap();
     }
 
+    /* ==========================================
+       AJOUT VÉHICULE
+       ========================================== */
     function ajouterVehicule() {
         const modele = document.getElementById('add-modele').value.trim();
+        const prixTTC = parseInt(document.getElementById('add-prix-ttc').value);
         const prestations = document.getElementById('add-prestations').value.trim();
 
         if (!modele) { alert("Veuillez saisir le nom du modèle."); return; }
+        if (isNaN(prixTTC) || prixTTC <= 0) { alert("Veuillez saisir un prix TTC valide."); return; }
 
         const huile = parseInt(document.getElementById('add-huile').value) || 0;
         const fh = parseInt(document.getElementById('add-fh').value) || 0;
@@ -849,7 +953,11 @@
 
         vehicules.push({
             id: 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-            modele, prestations, details, custom: []
+            modele,
+            prixTTC,
+            prestations,
+            details,
+            custom: []
         });
 
         sauvegarder();
@@ -863,11 +971,15 @@
         document.getElementById('tab-liste').classList.add('active');
     }
 
+    /* ==========================================
+       MODIFICATION VÉHICULE
+       ========================================== */
     function ouvrirModification(id) {
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
         document.getElementById('edit-id').value = v.id;
         document.getElementById('edit-modele').value = v.modele;
+        document.getElementById('edit-prix-ttc').value = v.prixTTC || '';
         document.getElementById('edit-prestations').value = v.prestations || '';
         const d = v.details || { huile: 0, fh: 0, fa: 0, fp: 0, mod: 0 };
         document.getElementById('edit-huile').value = d.huile || '';
@@ -883,6 +995,7 @@
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
         v.modele = document.getElementById('edit-modele').value.trim() || v.modele;
+        v.prixTTC = parseInt(document.getElementById('edit-prix-ttc').value) || 0;
         v.prestations = document.getElementById('edit-prestations').value.trim();
         const huile = parseInt(document.getElementById('edit-huile').value) || 0;
         const fh = parseInt(document.getElementById('edit-fh').value) || 0;
@@ -905,6 +1018,9 @@
     function fermerModal(id) { document.getElementById(id).style.display = "none"; }
     window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = "none"; }
 
+    /* ==========================================
+       SUPPRESSION
+       ========================================== */
     function supprimerVehicule(id) {
         if (!confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) return;
         const index = vehicules.findIndex(v => v.id === id);
@@ -915,6 +1031,9 @@
         afficherRecap();
     }
 
+    /* ==========================================
+       RÉCAPITULATIF
+       ========================================== */
     function afficherRecap() {
         const container = document.getElementById('recap-container');
         container.innerHTML = '';
@@ -923,17 +1042,16 @@
             return;
         }
         vehicules.forEach(v => {
-            const prixRevision = calculerPrixRevision(v);
             const prixExtras = calculerPrixExtras(v);
-            const total = prixRevision + prixExtras;
+            const total = (v.prixTTC || 0) + prixExtras;
             const card = document.createElement('div');
             card.className = 'recap-card';
             card.innerHTML = `
                 <div class="recap-modele">${v.modele}</div>
                 <div class="recap-prices">
                     <div class="recap-price-item revision">
-                        <div class="label">Révision</div>
-                        <div class="value">${prixRevision > 0 ? prixRevision.toLocaleString('fr-FR') + ' F' : '-'}</div>
+                        <div class="label">Révision TTC</div>
+                        <div class="value">${v.prixTTC > 0 ? v.prixTTC.toLocaleString('fr-FR') + ' F' : '-'}</div>
                     </div>
                     <div class="recap-price-item extras">
                         <div class="label">Autres pièces</div>
@@ -949,6 +1067,9 @@
         });
     }
 
+    /* ==========================================
+       EXPORT / IMPORT
+       ========================================== */
     function exporterDonnees() {
         const dataStr = JSON.stringify(vehicules, null, 2);
         const blob = new Blob([dataStr], { type: "application/json" });
@@ -973,6 +1094,7 @@
                         vehicules.forEach((v, i) => {
                             if (!v.id) v.id = 'id_' + i + '_' + Date.now();
                             if (!v.custom) v.custom = [];
+                            if (v.prixTTC === undefined) v.prixTTC = calculerPrixHT(v);
                         });
                         sauvegarder();
                         afficherTableau(vehicules);
@@ -987,6 +1109,9 @@
         event.target.value = "";
     }
 
+    /* ==========================================
+       LANCEMENT
+       ========================================== */
     init();
 
     // === PWA : Enregistrement du Service Worker ===
