@@ -695,14 +695,13 @@
         addDoc, 
         updateDoc, 
         deleteDoc,
-        enableIndexedDbPersistence,
-        serverTimestamp
+        enableIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     /* ==========================================
        ⚠️ CONFIGURATION FIREBASE - REMPLACE CES VALEURS
        ========================================== */
-  const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
   authDomain: "ntr-garage.firebaseapp.com",
   databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
@@ -764,11 +763,10 @@
         try {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
-           collectionRef = collection(db, "tarifs_revision");
+            collectionRef = collection(db, "tarifs_revision");
             firebaseDisponible = true;
-            console.log("Firebase initialisé");
+            console.log("✅ Firebase initialisé sur la collection : tarifs_revision");
 
-            // Activation de la persistance hors ligne (IndexedDB)
             enableIndexedDbPersistence(db).catch((err) => {
                 if (err.code === 'failed-precondition') {
                     console.warn("Persistance hors ligne impossible : plusieurs onglets ouverts.");
@@ -826,7 +824,7 @@
     }
 
     /* ==========================================
-       CHARGEMENT DES DONNÉES
+       CHARGEMENT DES DONNÉES (CORRIGÉ)
        ========================================== */
     async function chargerDonnees() {
         if (!firebaseDisponible) {
@@ -850,18 +848,23 @@
 
         // Mode Firebase : écoute en temps réel
         majStatutSync('syncing');
-        
-        unsubscribe = onSnapshot(collectionRef, (snapshot) => {
+        console.log("🔌 Connexion à Firestore...");
+
+        unsubscribe = onSnapshot(collectionRef, async (snapshot) => {
             const cloudData = [];
             snapshot.forEach((doc) => {
                 cloudData.push({ id: doc.id, ...doc.data() });
             });
 
-            // Premier chargement : si vide, on injecte les données initiales
-            if (premierChargement && cloudData.length === 0) {
+            console.log("📥 Snapshot reçu : " + cloudData.length + " véhicules. premierChargement=" + premierChargement);
+
+            // Si la collection est vide ET qu'on est au premier chargement
+            if (cloudData.length === 0 && premierChargement) {
                 premierChargement = false;
-                console.log("Base Firebase vide, injection des données initiales...");
-                injecterDonneesInitiales();
+                console.log("📦 Base vide, injection des " + donneesInitiales.length + " données initiales...");
+                majStatutSync('syncing');
+                await injecterDonneesInitiales();
+                // onSnapshot va se redéclencher automatiquement après l'injection
                 return;
             }
 
@@ -872,14 +875,13 @@
             afficherTableau(vehicules);
             afficherRecap();
 
-            // Si le panneau est ouvert, rafraîchir les détails
             if (selectedId) {
                 const v = vehicules.find(x => x.id === selectedId);
                 if (v) afficherDetails(v);
                 else fermerPanneau();
             }
         }, (error) => {
-            console.error("Erreur Firestore :", error);
+            console.error("❌ Erreur Firestore :", error);
             majStatutSync('offline');
         });
     }
@@ -895,10 +897,18 @@
     }
 
     async function injecterDonneesInitiales() {
+        console.log("🚀 Début de l'injection...");
+        let count = 0;
         for (const item of donneesInitiales) {
-            const { id, ...data } = item;
-            await addDoc(collectionRef, data);
+            try {
+                const { id, ...data } = item;
+                await addDoc(collectionRef, data);
+                count++;
+            } catch (e) {
+                console.error("❌ Erreur ajout " + item.modele + " :", e);
+            }
         }
+        console.log("✅ " + count + "/" + donneesInitiales.length + " véhicules injectés.");
     }
 
     /* ==========================================
@@ -924,7 +934,6 @@
             return;
         }
 
-        // Tri alphabétique
         const triee = [...liste].sort((a, b) => a.modele.localeCompare(b.modele));
 
         triee.forEach(v => {
@@ -1082,7 +1091,7 @@
 
         if (firebaseDisponible) {
             try {
-                await updateDoc(doc(db, "vehicules", id), { custom });
+                await updateDoc(doc(db, "tarifs_revision", id), { custom });
             } catch (e) {
                 console.error("Erreur Firebase :", e);
                 alert("Erreur de synchronisation. Vérifie ta connexion.");
@@ -1106,7 +1115,7 @@
 
         if (firebaseDisponible) {
             try {
-                await updateDoc(doc(db, "vehicules", id), { custom });
+                await updateDoc(doc(db, "tarifs_revision", id), { custom });
             } catch (e) {
                 console.error("Erreur Firebase :", e);
                 alert("Erreur de synchronisation.");
@@ -1219,7 +1228,7 @@
 
         if (firebaseDisponible) {
             try {
-                await updateDoc(doc(db, "vehicules", id), updateData);
+                await updateDoc(doc(db, "tarifs_revision", id), updateData);
             } catch (e) {
                 console.error("Erreur Firebase :", e);
                 alert("Erreur de synchronisation.");
@@ -1252,7 +1261,7 @@
 
         if (firebaseDisponible) {
             try {
-                await deleteDoc(doc(db, "vehicules", id));
+                await deleteDoc(doc(db, "tarifs_revision", id));
             } catch (e) {
                 console.error("Erreur Firebase :", e);
                 alert("Erreur de synchronisation.");
@@ -1335,13 +1344,14 @@
                     // Suppression de tous les documents existants
                     for (const v of vehicules) {
                         if (v.id && !v.id.startsWith('local_')) {
-                            try { await deleteDoc(doc(db, "vehicules", v.id)); } catch(e) {}
+                            try { await deleteDoc(doc(db, "tarifs_revision", v.id)); } catch(e) {}
                         }
                     }
                     // Ajout des nouveaux
                     for (const item of data) {
                         const { id, ...rest } = item;
                         if (!rest.custom) rest.custom = [];
+                        if (rest.prixTTC === undefined) rest.prixTTC = calculerPrixHT(rest);
                         await addDoc(collectionRef, rest);
                     }
                 } else {
