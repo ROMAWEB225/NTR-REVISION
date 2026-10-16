@@ -31,6 +31,7 @@
             --warning-light: #fffaf0;
             --purple: #805ad5;
             --purple-light: #faf5ff;
+            --whatsapp: #25D366;
             --white: #ffffff;
         }
 
@@ -124,10 +125,38 @@
             border-right: none;
             font-family: inherit;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .tab:hover { color: var(--primary); background: #edf2f7; }
         .tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--white); }
+
+        /* ===== BADGE TYPE WHATSAPP ===== */
+        .tab-badge {
+            display: none;
+            background: var(--danger);
+            color: white;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: 700;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(229, 62, 62, 0.4);
+            animation: badge-pulse 2s infinite;
+        }
+
+        .tab-badge.visible { display: inline-flex; }
+
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(229, 62, 62, 0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 2px 12px rgba(229, 62, 62, 0.6); }
+        }
 
         .tab-content { display: none; padding: 25px 30px; }
         .tab-content.active { display: block; }
@@ -593,16 +622,17 @@
         }
 
         .service-card {
-            padding: 20px 15px;
+            padding: 18px 12px;
             background: var(--bg);
             border: 2px solid var(--border);
             border-radius: 10px;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--primary);
+            position: relative;
         }
 
         .service-card:hover {
@@ -617,10 +647,25 @@
             box-shadow: 0 0 0 3px rgba(49,130,206,0.15);
         }
 
+        .service-card.selected::after {
+            content: "";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+            background-size: 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
         .service-card-icon {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 10px;
+            width: 46px;
+            height: 46px;
+            margin: 0 auto 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -632,8 +677,8 @@
         }
 
         .service-card-icon svg {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             stroke-width: 2;
         }
 
@@ -642,6 +687,119 @@
             border-color: var(--accent);
             color: white;
         }
+
+        /* === Liste des services sélectionnés === */
+        .services-selectionnes {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px dashed var(--border);
+        }
+
+        .services-selectionnes-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .services-selectionnes-liste {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .service-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent);
+            color: white;
+            padding: 6px 10px 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .service-chip button {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .service-chip button:hover { background: rgba(255,255,255,0.4); }
+
+        .services-empty {
+            font-size: 12px;
+            color: var(--text-light);
+            font-style: italic;
+            padding: 4px 0;
+        }
+
+        /* === Ajout service personnalisé === */
+        .service-personnalise-box {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .service-personnalise-box label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .service-personnalise-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .service-personnalise-row input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .service-personnalise-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .service-personnalise-row button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .service-personnalise-row button:hover { background: #2b6cb0; }
 
         .client-btn {
             width: 100%;
@@ -866,7 +1024,8 @@
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            margin-left: 8px;
+            margin-right: 4px;
+            margin-bottom: 4px;
         }
 
         .demande-statut {
@@ -940,6 +1099,7 @@
             max-width: 350px;
             transform: translateX(400px);
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
         .notification-toast.show { transform: translateX(0); }
         .notification-toast h4 { color: var(--primary); margin-bottom: 5px; font-size: 15px; }
@@ -966,7 +1126,6 @@
             border-color: var(--accent);
         }
 
-        /* === AJOUT DE MODÈLE INLINE === */
         .modele-input-wrapper {
             display: flex;
             gap: 8px;
@@ -1017,6 +1176,38 @@
             display: block;
         }
 
+        /* Bannière d'autorisation notification */
+        .notif-permission-banner {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .notif-permission-banner .text { flex: 1; min-width: 200px; }
+        .notif-permission-banner h4 { font-size: 15px; margin-bottom: 4px; }
+        .notif-permission-banner p { font-size: 13px; opacity: 0.9; }
+
+        .notif-permission-banner button {
+            background: white;
+            color: var(--accent);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .notif-permission-banner button:hover { background: #f7fafc; }
+
         @media (max-width: 1000px) {
             .main-layout { flex-direction: column; }
             .table-wrapper.shrunk { flex: 1; }
@@ -1040,7 +1231,10 @@
             .voice-result-prix { font-size: 32px; }
             .voice-result-modele { font-size: 22px; }
             .voice-modal-content { padding: 30px 20px; }
-            .service-grid { grid-template-columns: 1fr; }
+            .service-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .service-card { padding: 14px 8px; font-size: 12px; }
+            .service-card-icon { width: 38px; height: 38px; }
+            .service-card-icon svg { width: 20px; height: 20px; }
             #client-view { padding: 10px; }
             .client-header { padding: 20px 15px; }
             .client-header h1 { font-size: 18px; }
@@ -1060,9 +1254,11 @@
     </div>
 
     <div class="client-step active" id="client-step-1">
-        <h2>Quel service souhaitez-vous ?</h2>
+        <h2>Quel(s) service(s) souhaitez-vous ?</h2>
+        <p style="font-size:13px; color:var(--text-light); margin-bottom:15px;">Vous pouvez sélectionner plusieurs services à la fois.</p>
+        
         <div class="service-grid" id="service-grid">
-            <div class="service-card" data-service="Première révision" onclick="choisirService(this)">
+            <div class="service-card" data-service="Première révision" onclick="toggleService(this)">
                 <div class="service-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/>
@@ -1070,7 +1266,7 @@
                 </div>
                 Première révision
             </div>
-            <div class="service-card" data-service="Révision" onclick="choisirService(this)">
+            <div class="service-card" data-service="Révision" onclick="toggleService(this)">
                 <div class="service-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
@@ -1078,7 +1274,7 @@
                 </div>
                 Révision
             </div>
-            <div class="service-card" data-service="Diagnostic" onclick="choisirService(this)">
+            <div class="service-card" data-service="Diagnostic" onclick="toggleService(this)">
                 <div class="service-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"/>
@@ -1087,7 +1283,7 @@
                 </div>
                 Diagnostic
             </div>
-            <div class="service-card" data-service="Sinistre" onclick="choisirService(this)">
+            <div class="service-card" data-service="Sinistre" onclick="toggleService(this)">
                 <div class="service-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
@@ -1097,7 +1293,7 @@
                 </div>
                 Sinistre
             </div>
-            <div class="service-card" data-service="Mise à jour" onclick="choisirService(this)">
+            <div class="service-card" data-service="Mise à jour" onclick="toggleService(this)">
                 <div class="service-card-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23 4 23 10 17 10"/>
@@ -1107,7 +1303,54 @@
                 </div>
                 Mise à jour
             </div>
+            <div class="service-card" data-service="Devis" onclick="toggleService(this)">
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                Devis
+            </div>
+            <div class="service-card" data-service="Tôlerie" onclick="toggleService(this)">
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                </div>
+                Tôlerie
+            </div>
+            <div class="service-card" data-service="Peinture" onclick="toggleService(this)">
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/>
+                        <circle cx="12" cy="12" r="4"/>
+                    </svg>
+                </div>
+                Peinture
+            </div>
         </div>
+
+        <!-- Service personnalisé -->
+        <div class="service-personnalise-box">
+            <label>Autre service (non listé)</label>
+            <div class="service-personnalise-row">
+                <input type="text" id="service-personnalise-input" placeholder="Ex: Carrosserie, Vitrage..." autocomplete="off">
+                <button type="button" onclick="ajouterServicePersonnalise()">Ajouter</button>
+            </div>
+        </div>
+
+        <!-- Services sélectionnés -->
+        <div class="services-selectionnes">
+            <div class="services-selectionnes-title">Services sélectionnés</div>
+            <div class="services-selectionnes-liste" id="services-selectionnes-liste">
+                <span class="services-empty">Aucun service sélectionné</span>
+            </div>
+        </div>
+
         <div class="client-actions">
             <button class="client-btn client-btn-primary" onclick="clientEtape2()" id="btn-step1-next" disabled>Continuer</button>
         </div>
@@ -1197,10 +1440,19 @@
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-recap')">Récapitulatif</button>
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-ajout')">Ajouter un véhicule</button>
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-demandes')">
-            Demandes <span id="badge-demandes" style="background:var(--danger);color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;display:none;">0</span>
+            Demandes <span id="badge-demandes" class="tab-badge">0</span>
         </button>
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-historique')">Historique</button>
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-stats')">Statistiques</button>
+    </div>
+
+    <!-- Bannière d'autorisation notification -->
+    <div id="notif-permission-banner" class="notif-permission-banner" style="display:none; margin: 15px 30px 0 30px;">
+        <div class="text">
+            <h4>Activer les notifications</h4>
+            <p>Recevez une alerte dès qu'une nouvelle demande arrive.</p>
+        </div>
+        <button onclick="demanderPermissionNotifications()">Activer</button>
     </div>
 
     <div id="tab-liste" class="tab-content active">
@@ -1364,7 +1616,7 @@
 </div>
 
 <!-- NOTIFICATION TOAST -->
-<div class="notification-toast" id="notification-toast">
+<div class="notification-toast" id="notification-toast" onclick="allerAuxDemandes()">
     <h4 id="notif-title">Nouvelle demande</h4>
     <p id="notif-message"></p>
 </div>
@@ -1428,7 +1680,7 @@
     /* ==========================================
        CONFIGURATION FIREBASE - REMPLACE PAR TES VALEURS
        ========================================== */
-   const firebaseConfig = {
+ const firebaseConfig = {
   apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
   authDomain: "ntr-garage.firebaseapp.com",
   databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
@@ -1439,7 +1691,7 @@
 };
 
     /* ==========================================
-       CONSEILLERS (email Firebase -> Nom affiché)
+       CONSEILLERS
        ========================================== */
     const CONSEILLERS = {
         "ngorantanohromaric@gmail.com": "Romaric TANOH"
@@ -1457,17 +1709,18 @@
     const PRIX_ADDITIF = 10000;
 
     /* ==========================================
-       SERVICES
+       SERVICES GRATUITS
        ========================================== */
     const SERVICES_GRATUITS = ['Première révision'];
-    const SERVICES_AVEC_TARIF = ['Révision'];
 
-    function estServiceGratuit(service) {
-        return SERVICES_GRATUITS.includes(service);
+    function estServiceGratuit(services) {
+        if (!services || !Array.isArray(services)) return false;
+        return services.some(s => SERVICES_GRATUITS.includes(s));
     }
 
-    function estServiceAvecTarif(service) {
-        return SERVICES_AVEC_TARIF.includes(service);
+    function contientRevision(services) {
+        if (!services || !Array.isArray(services)) return false;
+        return services.includes('Révision');
     }
 
     /* ==========================================
@@ -1665,6 +1918,8 @@
             if (anciennes.length > 0) {
                 const nouvelles = demandes.filter(d => !anciennes.includes(d.id) && d.statut === 'en_attente');
                 nouvelles.forEach(n => afficherNotification(n));
+            } else if (demandes.length > 0 && document.visibilityState === 'visible') {
+                // Premier chargement : pas de notification
             }
 
             afficherDemandes();
@@ -1681,24 +1936,33 @@
         if (!badge) return;
         const nb = demandes.filter(d => d.statut === 'en_attente').length;
         if (nb > 0) {
-            badge.textContent = nb;
-            badge.style.display = 'inline-block';
+            badge.textContent = nb > 99 ? '99+' : nb;
+            badge.classList.add('visible');
+            // Mettre à jour le titre de la page avec le compteur
+            document.title = '(' + nb + ') Service Réception - SAV';
         } else {
-            badge.style.display = 'none';
+            badge.classList.remove('visible');
+            document.title = 'Service Réception - SAV';
         }
     }
 
     /* ==========================================
-       NOTIFICATION
+       NOTIFICATIONS
        ========================================== */
     function afficherNotification(demande) {
+        // 1. Toast interne
         const toast = document.getElementById('notification-toast');
         document.getElementById('notif-title').textContent = "Nouvelle demande : " + demande.service;
         document.getElementById('notif-message').textContent = 
             demande.nom + (demande.modele ? ' - ' + demande.modele : '');
         toast.classList.add('show');
-        jouerSonNotification();
         setTimeout(() => toast.classList.remove('show'), 6000);
+
+        // 2. Son
+        jouerSonNotification();
+
+        // 3. Notification navigateur (type WhatsApp si permission accordée)
+        afficherNotificationSysteme(demande);
     }
 
     function jouerSonNotification() {
@@ -1725,6 +1989,64 @@
                 osc2.stop(ctx.currentTime + 0.4);
             }, 200);
         } catch(e) { console.warn("Son non disponible"); }
+    }
+
+    window.demanderPermissionNotifications = async function() {
+        if (!('Notification' in window)) {
+            alert("Les notifications ne sont pas supportées par ce navigateur.");
+            return;
+        }
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                document.getElementById('notif-permission-banner').style.display = 'none';
+                // Notification de confirmation
+                new Notification('Notifications activées', {
+                    body: 'Vous recevrez une alerte pour chaque nouvelle demande.',
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%231a202c"/><text x="50" y="68" font-size="60" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">S</text></svg>'
+                });
+            } else {
+                alert("Permission refusée. Vous pouvez l'activer dans les paramètres du navigateur.");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function afficherNotificationSysteme(demande) {
+        if (!('Notification' in window)) return;
+        if (Notification.permission !== 'granted') return;
+        if (document.visibilityState === 'visible') return; // Ne pas notifier si l'app est ouverte au premier plan
+
+        const titre = 'Nouvelle demande : ' + demande.service;
+        const corps = demande.nom + (demande.modele ? ' - ' + demande.modele : '') + 
+                      (demande.total > 0 ? ' - ' + demande.total.toLocaleString('fr-FR') + ' F' : '');
+
+        try {
+            const notif = new Notification(titre, {
+                body: corps,
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%231a202c"/><text x="50" y="68" font-size="60" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">S</text></svg>',
+                badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%23e53e3e"/><text x="50" y="68" font-size="60" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">S</text></svg>',
+                tag: 'demande-' + demande.id,
+                requireInteraction: true
+            });
+            notif.onclick = function() {
+                window.focus();
+                allerAuxDemandes();
+                notif.close();
+            };
+        } catch(e) {
+            console.error("Erreur notification système :", e);
+        }
+    }
+
+    window.allerAuxDemandes = function() {
+        // Ouvre l'onglet Demandes
+        const tabs = document.querySelectorAll('.tab');
+        const tabDemandes = Array.from(tabs).find(t => t.textContent.includes('Demandes'));
+        if (tabDemandes) {
+            tabDemandes.click();
+        }
     }
 
     /* ==========================================
@@ -2120,14 +2442,65 @@
     /* ================================================================
        VUE CLIENT
        ================================================================ */
-    let clientServiceChoisi = null;
+    let clientServicesChoisis = [];
     let clientAdditifChoisi = false;
 
-    window.choisirService = function(el) {
-        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-        el.classList.add('selected');
-        clientServiceChoisi = el.dataset.service;
-        document.getElementById('btn-step1-next').disabled = false;
+    window.toggleService = function(el) {
+        const service = el.dataset.service;
+        const index = clientServicesChoisis.indexOf(service);
+        
+        if (index > -1) {
+            // Retirer
+            clientServicesChoisis.splice(index, 1);
+            el.classList.remove('selected');
+        } else {
+            // Ajouter
+            clientServicesChoisis.push(service);
+            el.classList.add('selected');
+        }
+        
+        majServicesSelectionnes();
+        document.getElementById('btn-step1-next').disabled = clientServicesChoisis.length === 0;
+    }
+
+    function majServicesSelectionnes() {
+        const liste = document.getElementById('services-selectionnes-liste');
+        if (clientServicesChoisis.length === 0) {
+            liste.innerHTML = '<span class="services-empty">Aucun service sélectionné</span>';
+            return;
+        }
+        
+        liste.innerHTML = clientServicesChoisis.map((s, i) => `
+            <span class="service-chip">
+                ${s}
+                <button type="button" onclick="retirerService(${i})" title="Retirer">×</button>
+            </span>
+        `).join('');
+    }
+
+    window.retirerService = function(index) {
+        const service = clientServicesChoisis[index];
+        clientServicesChoisis.splice(index, 1);
+        // Désélectionner la carte correspondante
+        document.querySelectorAll('.service-card').forEach(card => {
+            if (card.dataset.service === service) {
+                card.classList.remove('selected');
+            }
+        });
+        majServicesSelectionnes();
+        document.getElementById('btn-step1-next').disabled = clientServicesChoisis.length === 0;
+    }
+
+    window.ajouterServicePersonnalise = function() {
+        const input = document.getElementById('service-personnalise-input');
+        const service = input.value.trim();
+        if (!service) { alert("Veuillez saisir un service."); return; }
+        if (clientServicesChoisis.includes(service)) { alert("Ce service est déjà sélectionné."); return; }
+        
+        clientServicesChoisis.push(service);
+        input.value = '';
+        majServicesSelectionnes();
+        document.getElementById('btn-step1-next').disabled = clientServicesChoisis.length === 0;
     }
 
     function remplirListeModelesClient() {
@@ -2153,17 +2526,16 @@
     }
 
     window.clientEtape2 = function() {
-        if (!clientServiceChoisi) return;
+        if (clientServicesChoisis.length === 0) return;
         
+        // Le modèle est maintenant demandé pour TOUS les services (sauf si 100% gratuit)
+        const toutesGratuites = clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s));
         const groupeModele = document.getElementById('client-modele-group');
         
-        if (estServiceAvecTarif(clientServiceChoisi)) {
-            groupeModele.style.display = 'block';
-        } else {
+        if (toutesGratuites) {
             groupeModele.style.display = 'none';
-            document.getElementById('client-modele').value = '';
-            document.getElementById('client-nouveau-modele-group').classList.remove('visible');
-            document.getElementById('client-nouveau-modele').value = '';
+        } else {
+            groupeModele.style.display = 'block';
         }
         
         document.getElementById('client-step-1').classList.remove('active');
@@ -2183,22 +2555,26 @@
         const conteneur = document.getElementById('client-tarif-container');
         conteneur.innerHTML = '';
 
-        if (estServiceGratuit(clientServiceChoisi)) {
+        // Vérifier si c'est un service avec tarif (Révision)
+        const contientRevisionService = contientRevision(clientServicesChoisis);
+        const toutesGratuites = clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s));
+
+        if (toutesGratuites) {
+            // 100% gratuit
             document.getElementById('client-step-3-title').textContent = "Service gratuit";
-            document.getElementById('client-tarif-info').textContent = 
-                "La première révision est offerte.";
+            document.getElementById('client-tarif-info').textContent = "Vos services sélectionnés sont gratuits.";
             conteneur.innerHTML = `
                 <div style="background:var(--success-light);padding:25px;border-radius:8px;text-align:center;color:#22543d;border:1px solid #9ae6b4;">
                     <div style="font-weight:700;font-size:20px;color:var(--success);margin-bottom:8px;">GRATUIT</div>
-                    <div style="font-size:14px;">Première révision offerte</div>
+                    <div style="font-size:14px;">${clientServicesChoisis.join(', ')}</div>
                     <div style="font-size:12px;margin-top:10px;opacity:0.8;">Aucun frais à régler</div>
                 </div>
             `;
-        } else if (estServiceAvecTarif(clientServiceChoisi)) {
+        } else if (contientRevisionService) {
+            // Contient "Révision" → afficher le tarif
             document.getElementById('client-step-3-title').textContent = "Tarif de la révision";
-            document.getElementById('client-tarif-info').textContent = 
-                "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC :";
-
+            document.getElementById('client-tarif-info').textContent = "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC.";
+            
             const modeleId = document.getElementById('client-modele').value;
             const modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
 
@@ -2208,13 +2584,13 @@
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
         } else {
+            // Autres services sans tarif
             document.getElementById('client-step-3-title').textContent = "Confirmation";
-            document.getElementById('client-tarif-info').textContent = 
-                "Aucun tarif à afficher pour ce service. Un conseiller vous prendra en charge dès que possible.";
+            document.getElementById('client-tarif-info').textContent = "Aucun tarif à afficher. Un conseiller vous prendra en charge.";
             conteneur.innerHTML = `
                 <div style="background:var(--accent-light);padding:25px;border-radius:8px;text-align:center;color:var(--secondary);">
-                    <div style="font-weight:600;font-size:18px;color:var(--accent);margin-bottom:8px;">${clientServiceChoisi}</div>
-                    <div style="font-size:13px;">Votre demande sera traitée dans l'ordre d'arrivée.</div>
+                    <div style="font-weight:600;font-size:16px;color:var(--accent);margin-bottom:12px;">Services demandés</div>
+                    <div style="font-size:14px;line-height:1.8;">${clientServicesChoisis.join('<br>')}</div>
                 </div>
             `;
         }
@@ -2279,19 +2655,19 @@
         const nouveauModele = document.getElementById('client-nouveau-modele').value.trim();
         const commentaire = document.getElementById('client-commentaire').value.trim();
 
-        // Déterminer le modèle : soit depuis la liste, soit nouveau
+        // Déterminer le modèle
         let modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
         let modeleNom = modeleChoisi ? modeleChoisi.modele : '';
         
-        // Si un nouveau modèle est saisi, on l'utilise en priorité
         if (nouveauModele) {
             modeleNom = nouveauModele;
             modeleChoisi = null;
         }
         
         let prixTTC = 0, fne = 0, additif = 0, total = 0;
+        const contientRevisionService = contientRevision(clientServicesChoisis);
         
-        if (estServiceAvecTarif(clientServiceChoisi) && modeleChoisi) {
+        if (contientRevisionService && modeleChoisi) {
             prixTTC = modeleChoisi.prixTTC || 0;
             fne = calculerFNE(prixTTC);
             additif = clientAdditifChoisi ? PRIX_ADDITIF : 0;
@@ -2304,13 +2680,14 @@
             modeleId: modeleChoisi ? modeleChoisi.id : null,
             modele: modeleNom,
             nouveauModeleSaisi: nouveauModele || null,
-            service: clientServiceChoisi,
+            services: [...clientServicesChoisis],
+            service: clientServicesChoisis.join(', '),
             commentaire,
             prixTTC: prixTTC,
             fne: fne,
             additif: additif,
             total: total,
-            estGratuit: estServiceGratuit(clientServiceChoisi),
+            estGratuit: clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s)),
             statut: 'en_attente',
             conseiller: null,
             conseillerNom: null,
@@ -2333,10 +2710,10 @@
             
             let ticketContent = `
                 <div><strong>Client :</strong> ${nom}</div>
-                <div><strong>Service :</strong> ${clientServiceChoisi}</div>
+                <div><strong>Services :</strong> ${clientServicesChoisis.join(', ')}</div>
             `;
 
-            if (estServiceGratuit(clientServiceChoisi)) {
+            if (demande.estGratuit) {
                 ticketContent += `
                     <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);text-align:center;">
                         <div style="font-weight:700;font-size:18px;color:var(--success);">GRATUIT</div>
@@ -2416,6 +2793,7 @@
             erreur.style.display = 'none';
             
             chargerDemandes();
+            verifierBanniereNotification();
             
         } catch (error) {
             console.error(error);
@@ -2431,6 +2809,15 @@
             }
             erreur.textContent = msg;
             erreur.style.display = 'block';
+        }
+    }
+
+    function verifierBanniereNotification() {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'default') {
+            document.getElementById('notif-permission-banner').style.display = 'flex';
+        } else {
+            document.getElementById('notif-permission-banner').style.display = 'none';
         }
     }
 
@@ -2464,7 +2851,8 @@
             liste = liste.filter(d => 
                 (d.nom || '').toLowerCase().includes(recherche) ||
                 (d.immatriculation || '').toLowerCase().includes(recherche) ||
-                (d.modele || '').toLowerCase().includes(recherche)
+                (d.modele || '').toLowerCase().includes(recherche) ||
+                (d.service || '').toLowerCase().includes(recherche)
             );
         }
 
@@ -2525,13 +2913,21 @@
             ? `<span style="background:var(--warning-light);color:#744210;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">NOUVEAU MODELE</span>` 
             : '';
 
+        // Afficher les services (nouveau format) ou service (ancien format)
+        let servicesHtml = '';
+        if (d.services && Array.isArray(d.services)) {
+            servicesHtml = d.services.map(s => `<span class="demande-service">${s}</span>`).join('');
+        } else if (d.service) {
+            servicesHtml = `<span class="demande-service">${d.service}</span>`;
+        }
+
         return `
             <div class="demande-card ${d.statut}">
                 <div class="demande-header">
                     <div>
                         <div class="demande-client">${d.nom}</div>
                         <div style="margin-top:6px;">
-                            <span class="demande-service">${d.service}</span>
+                            ${servicesHtml}
                             <span class="demande-statut ${d.statut}">${d.statut === 'en_attente' ? 'En attente' : d.statut === 'en_cours' ? 'En cours' : 'Terminé'}</span>
                             ${badgeGratuit}
                             ${badgeNouveauModele}
@@ -2703,9 +3099,13 @@
             </div>
         `;
 
+        // Répartition par service (gérer les services multiples)
         const parService = {};
         demandes.forEach(d => {
-            parService[d.service] = (parService[d.service] || 0) + 1;
+            const services = d.services && Array.isArray(d.services) ? d.services : (d.service ? [d.service] : []);
+            services.forEach(s => {
+                parService[s] = (parService[s] || 0) + 1;
+            });
         });
 
         servicesDiv.innerHTML = Object.entries(parService)
@@ -2995,6 +3395,9 @@
             const notifToast = document.getElementById('notification-toast');
             if (notifToast) notifToast.remove();
 
+            const notifBanner = document.getElementById('notif-permission-banner');
+            if (notifBanner) notifBanner.remove();
+
             document.getElementById('client-view').classList.add('active');
 
             await chargerDonnees();
@@ -3020,6 +3423,7 @@
                 document.getElementById('modal-login').style.display = 'none';
                 afficherInterfaceConseiller();
                 chargerDemandes();
+                verifierBanniereNotification();
             } else {
                 conseillerConnecte = null;
                 sessionStorage.removeItem('conseiller_sav');
