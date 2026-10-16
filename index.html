@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Tarifs - Révision Auto</title>
+    <title>Service Réception - SAV</title>
     
-    <!-- === PWA === -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a202c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Tarifs Auto">
+    <meta name="apple-mobile-web-app-title" content="SAV">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
     
     <style>
@@ -25,7 +24,9 @@
             --bg: #f7fafc;
             --border: #e2e8f0;
             --success: #38a169;
+            --success-light: #f0fff4;
             --danger: #e53e3e;
+            --danger-light: #fff5f5;
             --warning: #d69e2e;
             --warning-light: #fffaf0;
             --purple: #805ad5;
@@ -48,7 +49,7 @@
             margin: auto;
             background: var(--white);
             border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
@@ -63,8 +64,8 @@
             gap: 15px;
         }
 
-        .header h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.3px; }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
         .sync-status {
             font-size: 12px;
@@ -78,23 +79,16 @@
         }
 
         .sync-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            width: 8px; height: 8px; border-radius: 50%;
             background: #a0aec0;
-            transition: background 0.3s;
         }
-
         .sync-dot.online { background: #48bb78; box-shadow: 0 0 8px #48bb78; }
         .sync-dot.offline { background: #f56565; }
         .sync-dot.syncing { background: #ecc94b; animation: pulse 1s infinite; }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
-        .header-actions button {
+        .header-actions button, .btn-header {
             background: rgba(255,255,255,0.1);
             color: var(--white);
             border: 1px solid rgba(255,255,255,0.2);
@@ -147,7 +141,6 @@
             border-radius: 6px;
             font-size: 14px;
             font-family: inherit;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .search-container input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(49,130,206,0.1); }
@@ -155,21 +148,14 @@
         .search-container .status {
             font-size: 13px;
             color: var(--text-light);
-            white-space: nowrap;
             padding: 8px 12px;
             background: #f0f4f8;
             border-radius: 4px;
         }
 
-        .main-layout { display: flex; gap: 20px; position: relative; }
+        .main-layout { display: flex; gap: 20px; }
 
-        .table-wrapper {
-            flex: 1;
-            transition: all 0.3s ease;
-            min-width: 0;
-            overflow-x: auto;
-        }
-
+        .table-wrapper { flex: 1; transition: all 0.3s ease; min-width: 0; overflow-x: auto; }
         .table-wrapper.shrunk { flex: 0 0 50%; }
 
         table { width: 100%; border-collapse: collapse; min-width: 700px; }
@@ -185,7 +171,7 @@
             letter-spacing: 0.5px;
         }
 
-        tr { cursor: pointer; transition: background-color 0.15s; }
+        tr { cursor: pointer; }
         tr:hover td { background-color: #f8fafc; }
         tr.selected td { background-color: var(--accent-light); }
 
@@ -228,15 +214,9 @@
         .details-header h2 { font-size: 18px; color: var(--primary); }
 
         .details-header .close-btn {
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            color: var(--text-light);
-            line-height: 1;
-            padding: 0 5px;
+            background: none; border: none; font-size: 22px;
+            cursor: pointer; color: var(--text-light); line-height: 1; padding: 0 5px;
         }
-
         .details-header .close-btn:hover { color: var(--danger); }
 
         .detail-section {
@@ -251,12 +231,8 @@
         .detail-section.extras-section { border-left: 4px solid var(--warning); }
 
         .detail-section h4 {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-light);
-            margin-bottom: 10px;
-            font-weight: 600;
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-light); margin-bottom: 10px; font-weight: 600;
         }
 
         .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #edf2f7; font-size: 14px; }
@@ -265,157 +241,96 @@
         .detail-row strong { color: var(--text); }
 
         .detail-row.custom-piece {
-            background: var(--warning-light);
-            margin: 4px -8px;
-            padding: 8px;
-            border-radius: 4px;
-            border-bottom: none;
+            background: var(--warning-light); margin: 4px -8px; padding: 8px;
+            border-radius: 4px; border-bottom: none;
         }
 
         .detail-row.custom-piece button {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 16px;
-            padding: 0 5px;
-            line-height: 1;
+            background: none; border: none; color: var(--danger);
+            cursor: pointer; font-size: 16px; padding: 0 5px; line-height: 1;
         }
 
         .sub-total {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 12px;
-            background: var(--accent-light);
-            border-radius: 4px;
-            margin-top: 10px;
-            font-size: 14px;
-            font-weight: 600;
+            display: flex; justify-content: space-between; padding: 10px 12px;
+            background: var(--accent-light); border-radius: 4px; margin-top: 10px;
+            font-size: 14px; font-weight: 600;
         }
 
         .sub-total.extras { background: var(--warning-light); }
         .sub-total strong { font-size: 16px; color: var(--accent); }
         .sub-total.extras strong { color: var(--warning); }
 
-        .sub-total.ttc {
-            background: var(--purple-light);
-            font-size: 15px;
-        }
-
+        .sub-total.ttc { background: var(--purple-light); font-size: 15px; }
         .sub-total.ttc strong { color: var(--purple); font-size: 18px; }
 
         .marge-info {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 12px;
-            font-size: 12px;
-            color: var(--text-light);
-            background: #f8fafc;
-            border-radius: 4px;
-            margin-top: 6px;
+            display: flex; justify-content: space-between; padding: 6px 12px;
+            font-size: 12px; color: var(--text-light); background: #f8fafc;
+            border-radius: 4px; margin-top: 6px;
         }
-
         .marge-info strong { color: var(--success); }
 
         .total-global {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            background: var(--primary);
-            color: var(--white);
-            border-radius: 6px;
-            margin-top: 15px;
-            font-size: 16px;
-            font-weight: 600;
+            display: flex; justify-content: space-between; padding: 15px;
+            background: var(--primary); color: var(--white); border-radius: 6px;
+            margin-top: 15px; font-size: 16px; font-weight: 600;
         }
-
         .total-global strong { color: #90cdf4; font-size: 20px; }
 
         .add-piece-form {
-            background: var(--white);
-            border: 1px dashed var(--border);
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 10px;
+            background: var(--white); border: 1px dashed var(--border);
+            border-radius: 6px; padding: 12px; margin-top: 10px;
         }
-
         .add-piece-form .form-row { display: flex; gap: 8px; margin-bottom: 8px; }
-
         .add-piece-form input {
-            padding: 8px 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 13px;
-            font-family: inherit;
+            padding: 8px 10px; border: 1px solid var(--border);
+            border-radius: 4px; font-size: 13px; font-family: inherit;
         }
-
         .add-piece-form input:focus { outline: none; border-color: var(--warning); }
         .add-piece-form .piece-name { flex: 2; }
         .add-piece-form .piece-price { flex: 1; }
 
         .btn-add-piece {
-            background: var(--warning);
-            color: var(--white);
-            border: none;
-            padding: 8px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-family: inherit;
-            font-weight: 500;
-            width: 100%;
+            background: var(--warning); color: var(--white); border: none;
+            padding: 8px 14px; border-radius: 4px; cursor: pointer;
+            font-size: 12px; font-family: inherit; font-weight: 500; width: 100%;
         }
-
         .btn-add-piece:hover { background: #b7791f; }
 
         button { font-family: inherit; }
 
         .btn-primary {
-            background-color: var(--accent);
-            color: var(--white);
-            border: none;
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.2s;
+            background-color: var(--accent); color: var(--white); border: none;
+            padding: 10px 18px; border-radius: 4px; cursor: pointer;
+            font-size: 14px; font-weight: 500;
         }
         .btn-primary:hover { background-color: #2b6cb0; }
 
         .btn-success {
-            background-color: var(--success);
-            color: var(--white);
-            border: none;
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            background-color: var(--success); color: var(--white); border: none;
+            padding: 10px 18px; border-radius: 4px; cursor: pointer;
+            font-size: 14px; font-weight: 500;
         }
         .btn-success:hover { background-color: #2f855a; }
 
         .btn-danger {
-            background-color: var(--danger);
-            color: var(--white);
-            border: none;
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            background-color: var(--danger); color: var(--white); border: none;
+            padding: 10px 18px; border-radius: 4px; cursor: pointer;
+            font-size: 14px; font-weight: 500;
         }
         .btn-danger:hover { background-color: #c53030; }
 
+        .btn-warning {
+            background-color: var(--warning); color: var(--white); border: none;
+            padding: 10px 18px; border-radius: 4px; cursor: pointer;
+            font-size: 14px; font-weight: 500;
+        }
+        .btn-warning:hover { background-color: #b7791f; }
+
         .btn-secondary {
-            background-color: #edf2f7;
-            color: var(--secondary);
-            border: 1px solid var(--border);
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            background-color: #edf2f7; color: var(--secondary); border: 1px solid var(--border);
+            padding: 10px 18px; border-radius: 4px; cursor: pointer;
+            font-size: 14px; font-weight: 500;
         }
         .btn-secondary:hover { background-color: #e2e8f0; }
 
@@ -426,142 +341,84 @@
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: var(--secondary); }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: inherit;
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px; border: 1px solid var(--border);
+            border-radius: 4px; font-size: 14px; font-family: inherit;
         }
-        .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(49,130,206,0.1); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(49,130,206,0.1);
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
 
-        .form-group .help-text {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-top: 4px;
-            display: block;
-        }
+        .form-group .help-text { font-size: 11px; color: var(--text-light); margin-top: 4px; display: block; }
 
         .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 140px; }
 
         .form-section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--secondary);
-            margin: 25px 0 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
+            font-size: 14px; font-weight: 600; color: var(--secondary);
+            margin: 25px 0 15px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
         }
 
         .form-actions { display: flex; gap: 10px; margin-top: 25px; justify-content: flex-end; }
 
         .info-box {
-            background: var(--accent-light);
-            border-left: 3px solid var(--accent);
-            padding: 10px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            color: var(--secondary);
-            margin-bottom: 15px;
+            background: var(--accent-light); border-left: 3px solid var(--accent);
+            padding: 10px 12px; border-radius: 4px; font-size: 13px;
+            color: var(--secondary); margin-bottom: 15px;
         }
-
         .info-box strong { color: var(--accent); }
 
         .recap-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 8px; padding: 20px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px;
         }
-
         .recap-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
 
         .recap-modele { font-size: 18px; font-weight: 600; color: var(--primary); flex: 1; min-width: 150px; }
         .recap-prices { display: flex; gap: 25px; flex-wrap: wrap; }
         .recap-price-item { text-align: right; }
-        .recap-price-item .label { font-size: 11px; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.5px; }
+        .recap-price-item .label { font-size: 11px; text-transform: uppercase; color: var(--text-light); }
         .recap-price-item .value { font-size: 16px; font-weight: 600; }
         .recap-price-item.revision .value { color: var(--accent); }
         .recap-price-item.extras .value { color: var(--warning); }
         .recap-price-item.total .value { color: var(--primary); font-size: 18px; }
 
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            overflow-y: auto;
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); overflow-y: auto;
         }
 
         .modal-content {
-            background-color: var(--white);
-            margin: 8% auto;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 550px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-            position: relative;
+            background-color: var(--white); margin: 8% auto; padding: 30px;
+            border-radius: 8px; width: 90%; max-width: 550px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative;
         }
 
         .modal-content h3 { margin-bottom: 20px; color: var(--primary); }
 
         .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: #a0aec0;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
+            position: absolute; top: 15px; right: 20px;
+            color: #a0aec0; font-size: 24px; font-weight: bold;
+            cursor: pointer; line-height: 1;
         }
         .close:hover { color: var(--primary); }
 
-        /* ==========================================
-           ASSISTANT VOCAL
-           ========================================== */
+        /* ============ ASSISTANT VOCAL ============ */
         .voice-fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            border: none;
+            position: fixed; bottom: 30px; right: 30px;
+            width: 64px; height: 64px; border-radius: 50%;
+            background: var(--accent); color: white; border: none;
             box-shadow: 0 4px 20px rgba(49, 130, 206, 0.4);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 999;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; z-index: 999;
         }
-
-        .voice-fab:hover {
-            transform: scale(1.08);
-            box-shadow: 0 6px 25px rgba(49, 130, 206, 0.55);
-        }
-
-        .voice-fab.listening {
-            background: var(--danger);
-            animation: pulse-fab 1.2s infinite;
-        }
-
+        .voice-fab:hover { transform: scale(1.08); box-shadow: 0 6px 25px rgba(49, 130, 206, 0.55); }
+        .voice-fab.listening { background: var(--danger); animation: pulse-fab 1.2s infinite; }
         .voice-fab svg { width: 28px; height: 28px; }
 
         @keyframes pulse-fab {
@@ -571,27 +428,16 @@
         }
 
         .voice-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.75);
-            z-index: 1001;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); z-index: 1001; display: none;
+            justify-content: center; align-items: center; padding: 20px;
         }
-
         .voice-modal.open { display: flex; }
 
         .voice-modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 40px 30px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            background: white; border-radius: 16px; padding: 40px 30px;
+            max-width: 500px; width: 100%; text-align: center;
+            position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
             animation: slideUp 0.3s ease;
         }
 
@@ -601,186 +447,484 @@
         }
 
         .voice-modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: none;
-            border: none;
-            font-size: 28px;
-            color: #a0aec0;
-            cursor: pointer;
-            line-height: 1;
+            position: absolute; top: 15px; right: 20px;
+            background: none; border: none; font-size: 28px;
+            color: #a0aec0; cursor: pointer; line-height: 1;
         }
-
         .voice-modal-close:hover { color: var(--primary); }
 
         .voice-icon-big {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+            width: 100px; height: 100px; border-radius: 50%;
+            background: var(--accent-light); color: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .voice-icon-big.listening {
+            background: #fff5f5; color: var(--danger);
+            animation: pulse-icon 1.2s infinite;
+        }
+        .voice-icon-big svg { width: 48px; height: 48px; }
+
+        @keyframes pulse-icon { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+
+        .voice-transcript {
+            font-size: 22px; font-weight: 600; color: var(--primary);
+            margin: 20px 0; min-height: 40px; padding: 15px;
+            background: var(--bg); border-radius: 8px; font-style: italic;
+        }
+
+        .voice-hint { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
+        .voice-result { margin-top: 20px; display: none; }
+        .voice-result.open { display: block; }
+
+        .voice-result-modele { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+        .voice-result-prix { font-size: 42px; font-weight: 700; color: var(--accent); margin: 15px 0; }
+        .voice-result-prix small { font-size: 18px; color: var(--text-light); font-weight: 500; }
+
+        .voice-result-detail {
+            display: flex; justify-content: space-between;
+            padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+        }
+        .voice-result-detail:last-child { border-bottom: none; }
+        .voice-result-detail span { color: var(--text-light); }
+        .voice-result-detail strong { color: var(--text); }
+
+        .voice-suggestions { margin-top: 20px; text-align: left; }
+        .voice-suggestions-title {
+            font-size: 13px; text-transform: uppercase; color: var(--text-light);
+            margin-bottom: 10px; letter-spacing: 0.5px; font-weight: 600;
+        }
+
+        .voice-suggestion-btn {
+            display: block; width: 100%; padding: 12px 15px; margin-bottom: 8px;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            cursor: pointer; font-size: 15px; font-family: inherit; text-align: left;
+            font-weight: 500; color: var(--primary);
+        }
+        .voice-suggestion-btn:hover {
+            background: var(--accent-light); border-color: var(--accent); color: var(--accent);
+        }
+
+        .voice-actions { margin-top: 20px; display: flex; gap: 10px; }
+        .voice-actions button { flex: 1; }
+
+        .btn-voice-action {
+            background: var(--accent); color: white; border: none;
+            padding: 12px; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 500; font-family: inherit;
+        }
+        .btn-voice-action:hover { background: #2b6cb0; }
+
+        .btn-voice-retry {
+            background: var(--bg); color: var(--secondary);
+            border: 1px solid var(--border); padding: 12px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 500; font-family: inherit;
+        }
+        .btn-voice-retry:hover { background: #edf2f7; }
+
+        .voice-not-supported {
+            background: #fffaf0; border: 1px solid #fbd38d; color: #744210;
+            padding: 15px; border-radius: 8px; font-size: 14px;
+            margin-top: 20px; text-align: left;
+        }
+
+        /* ============ VUE CLIENT ============ */
+        #client-view {
+            display: none;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #client-view.active { display: block; }
+
+        .client-header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .client-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .client-header p {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        .client-step {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .client-step.active { display: block; }
+
+        .client-step h2 {
+            font-size: 18px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .service-card {
+            padding: 20px 15px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .service-card:hover {
             background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .service-card.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
             color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(49,130,206,0.15);
+        }
+
+        .service-card-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .client-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .client-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .client-btn-primary:hover { background: #2b6cb0; }
+
+        .client-btn-secondary {
+            background: var(--bg);
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
+        .client-btn-secondary:hover { background: #edf2f7; }
+
+        .client-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .client-actions button { flex: 1; }
+
+        /* === Tarifs client === */
+        .tarif-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tarif-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .tarif-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(49,130,206,0.15);
+        }
+
+        .tarif-modele {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .tarif-ligne {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .tarif-ligne.total {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            padding-top: 12px;
+            margin-top: 12px;
+            border-top: 2px solid var(--border);
+        }
+
+        .tarif-ligne.total span:last-child {
+            color: var(--accent);
+        }
+
+        .tarif-fne {
+            color: var(--warning);
+            font-size: 13px;
+        }
+
+        .additif-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: var(--warning-light);
+            border: 1px solid #fbd38d;
+            border-radius: 8px;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+
+        .additif-checkbox input {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+
+        .additif-checkbox label {
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #744210;
+            flex: 1;
+        }
+
+        /* === Confirmation === */
+        .confirmation-box {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .confirmation-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--success-light);
+            color: var(--success);
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            transition: all 0.3s;
+            font-size: 40px;
         }
 
-        .voice-icon-big.listening {
-            background: #fff5f5;
-            color: var(--danger);
-            animation: pulse-icon 1.2s infinite;
-        }
-
-        .voice-icon-big svg { width: 48px; height: 48px; }
-
-        @keyframes pulse-icon {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .voice-transcript {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--primary);
-            margin: 20px 0;
-            min-height: 40px;
-            padding: 15px;
-            background: var(--bg);
-            border-radius: 8px;
-            font-style: italic;
-        }
-
-        .voice-hint {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-
-        .voice-result {
-            margin-top: 20px;
-            display: none;
-        }
-
-        .voice-result.open { display: block; }
-
-        .voice-result-modele {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
+        .confirmation-box h2 {
+            color: var(--success);
+            border: none;
             margin-bottom: 10px;
         }
 
-        .voice-result-prix {
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--accent);
-            margin: 15px 0;
-        }
-
-        .voice-result-prix small {
-            font-size: 18px;
+        .confirmation-box p {
             color: var(--text-light);
-            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
         }
 
-        .voice-result-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
+        .confirmation-ticket {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
             font-size: 14px;
         }
 
-        .voice-result-detail:last-child { border-bottom: none; }
+        .confirmation-ticket strong { color: var(--primary); }
 
-        .voice-result-detail span { color: var(--text-light); }
-        .voice-result-detail strong { color: var(--text); }
-
-        .voice-suggestions {
-            margin-top: 20px;
-            text-align: left;
+        /* ============ VUE RÉCEPTION ============ */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .voice-suggestions-title {
-            font-size: 13px;
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1.2;
+        }
+
+        .stat-card .stat-label {
+            font-size: 12px;
             text-transform: uppercase;
             color: var(--text-light);
-            margin-bottom: 10px;
             letter-spacing: 0.5px;
-            font-weight: 600;
+            margin-top: 5px;
         }
 
-        .voice-suggestion-btn {
-            display: block;
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-family: inherit;
-            text-align: left;
+        .stat-card.warning .stat-value { color: var(--warning); }
+        .stat-card.success .stat-value { color: var(--success); }
+        .stat-card.danger .stat-value { color: var(--danger); }
+
+        /* === Cartes demandes === */
+        .demande-card {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border-left: 5px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             transition: all 0.2s;
-            font-weight: 500;
-            color: var(--primary);
         }
 
-        .voice-suggestion-btn:hover {
-            background: var(--accent-light);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        .demande-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .demande-card.en_attente { border-left-color: var(--warning); }
+        .demande-card.en_cours { border-left-color: var(--accent); }
+        .demande-card.termine { border-left-color: var(--success); opacity: 0.75; }
 
-        .voice-actions {
-            margin-top: 20px;
+        .demande-header {
             display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
             gap: 10px;
         }
 
-        .voice-actions button { flex: 1; }
+        .demande-client {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
 
-        .btn-voice-action {
-            background: var(--accent);
-            color: white;
+        .demande-service {
+            display: inline-block;
+            padding: 3px 10px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .demande-statut {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .demande-statut.en_attente { background: var(--warning-light); color: #744210; }
+        .demande-statut.en_cours { background: var(--accent-light); color: #2c5282; }
+        .demande-statut.termine { background: var(--success-light); color: #22543d; }
+
+        .demande-infos {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .demande-infos span { display: flex; align-items: center; gap: 5px; }
+
+        .demande-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .demande-actions button {
+            padding: 8px 14px;
+            font-size: 13px;
+            border-radius: 6px;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
             font-weight: 500;
             font-family: inherit;
         }
 
-        .btn-voice-action:hover { background: #2b6cb0; }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-light);
+        }
 
-        .btn-voice-retry {
-            background: var(--bg);
-            color: var(--secondary);
+        .empty-state-icon { font-size: 60px; margin-bottom: 15px; opacity: 0.5; }
+
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-left: 5px solid var(--accent);
+            padding: 18px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 2000;
+            max-width: 350px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .notification-toast.show { transform: translateX(0); }
+        .notification-toast h4 { color: var(--primary); margin-bottom: 5px; font-size: 15px; }
+        .notification-toast p { color: var(--text-light); font-size: 13px; }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar select, .filter-bar input {
+            padding: 10px 14px;
             border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: 6px;
             font-size: 14px;
-            font-weight: 500;
             font-family: inherit;
+            background: white;
         }
 
-        .btn-voice-retry:hover { background: #edf2f7; }
-
-        .voice-not-supported {
-            background: #fffaf0;
-            border: 1px solid #fbd38d;
-            color: #744210;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-top: 20px;
-            text-align: left;
+        .filter-bar select:focus, .filter-bar input:focus {
+            outline: none;
+            border-color: var(--accent);
         }
 
         @media (max-width: 1000px) {
@@ -800,29 +944,135 @@
             .header-actions { width: 100%; flex-wrap: wrap; }
             .header-actions button { flex: 1; }
             .recap-card { flex-direction: column; align-items: flex-start; }
-            .recap-prices { width: 100%; justify-content: space-between; }
             .sync-status { font-size: 11px; }
             .voice-fab { bottom: 20px; right: 20px; width: 56px; height: 56px; }
             .voice-fab svg { width: 24px; height: 24px; }
             .voice-result-prix { font-size: 32px; }
             .voice-result-modele { font-size: 22px; }
             .voice-modal-content { padding: 30px 20px; }
+            .service-grid { grid-template-columns: 1fr; }
+            #client-view { padding: 10px; }
+            .client-header { padding: 20px 15px; }
+            .client-header h1 { font-size: 18px; }
+            .notification-toast { max-width: calc(100% - 40px); right: 20px; }
         }
+
+      
     </style>
 </head>
 <body>
 
-<div class="container">
+<!-- ================================================================
+     VUE CLIENT (accessible via QR code ?client=1)
+     ================================================================ -->
+<div id="client-view">
+    <div class="client-header">
+        <h1>Service Réception</h1>
+        <p>Bienvenue, veuillez nous indiquer votre besoin</p>
+    </div>
+
+    <!-- ÉTAPE 1 : SERVICE -->
+    <div class="client-step active" id="client-step-1">
+        <h2>Quel service souhaitez-vous ?</h2>
+        <div class="service-grid" id="service-grid">
+            <div class="service-card" data-service="Première révision" onclick="choisirService(this)">
+                <div class="service-card-icon">🆕</div>
+                Première révision
+            </div>
+            <div class="service-card" data-service="Révision" onclick="choisirService(this)">
+                <div class="service-card-icon">🔧</div>
+                Révision
+            </div>
+            <div class="service-card" data-service="Diagnostic" onclick="choisirService(this)">
+                <div class="service-card-icon">🔍</div>
+                Diagnostic
+            </div>
+            <div class="service-card" data-service="Sinistre" onclick="choisirService(this)">
+                <div class="service-card-icon">⚠️</div>
+                Sinistre
+            </div>
+            <div class="service-card" data-service="Mise à jour" onclick="choisirService(this)">
+                <div class="service-card-icon">📱</div>
+                Mise à jour
+            </div>
+        </div>
+        <div class="client-actions">
+            <button class="client-btn client-btn-primary" onclick="clientEtape2()" id="btn-step1-next" disabled>Continuer →</button>
+        </div>
+    </div>
+
+    <!-- ÉTAPE 2 : INFOS -->
+    <div class="client-step" id="client-step-2">
+        <h2>Vos informations</h2>
+        <div class="form-group">
+            <label>Nom <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="client-nom" placeholder="Ex: DUPONT" required>
+        </div>
+        <div class="form-group">
+            <label>Prénom <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="client-prenom" placeholder="Ex: Jean" required>
+        </div>
+        <div class="form-group">
+            <label>Immatriculation (optionnel)</label>
+            <input type="text" id="client-immat" placeholder="Ex: AB-123-CD">
+        </div>
+        <div class="form-group">
+            <label>Modèle du véhicule (optionnel)</label>
+            <select id="client-modele">
+                <option value="">-- Sélectionner --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Commentaire (optionnel)</label>
+            <textarea id="client-commentaire" placeholder="Précisez votre demande si nécessaire..."></textarea>
+        </div>
+        <div class="client-actions">
+            <button class="client-btn client-btn-secondary" onclick="clientRetourEtape1()">← Retour</button>
+            <button class="client-btn client-btn-primary" onclick="clientEtape3()">Continuer →</button>
+        </div>
+    </div>
+
+    <!-- ÉTAPE 3 : TARIFS ET CONFIRMATION -->
+    <div class="client-step" id="client-step-3">
+        <h2>Tarif de la révision</h2>
+        <p style="color:var(--text-light);font-size:13px;margin-bottom:15px;" id="client-tarif-info">
+            Sélectionnez le modèle pour voir le tarif TTC.
+        </p>
+        <div id="client-tarif-container"></div>
+
+        <div class="client-actions" style="margin-top:25px;">
+            <button class="client-btn client-btn-secondary" onclick="clientRetourEtape2()">← Retour</button>
+            <button class="client-btn client-btn-primary" onclick="clientConfirmer()">Confirmer ma venue ✓</button>
+        </div>
+    </div>
+
+    <!-- ÉTAPE 4 : CONFIRMATION -->
+    <div class="client-step" id="client-step-4">
+        <div class="confirmation-box">
+            <div class="confirmation-icon">✓</div>
+            <h2>Demande envoyée !</h2>
+            <p>Un conseiller va vous prendre en charge.</p>
+            <div class="confirmation-ticket" id="client-ticket"></div>
+            <p style="margin-top:20px;font-size:12px;">
+                Vous pouvez fermer cette page. Merci de patienter en salle d'attente.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================
+     VUE CONSEILLER (normale)
+     ================================================================ -->
+<div class="container" id="conseiller-container">
     <div class="header">
-        <h1>Gestion des Tarifs - Révision Auto</h1>
+        <h1>Service Réception - SAV</h1>
         <div class="header-actions">
             <div class="sync-status" title="Statut de synchronisation">
                 <span class="sync-dot" id="sync-dot"></span>
                 <span id="sync-label">Connexion...</span>
             </div>
-            <button onclick="exporterDonnees()">Exporter</button>
-            <button onclick="document.getElementById('import-file').click()">Importer</button>
-            <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importerDonnees(event)">
+            <span id="conseiller-info" style="color:white;font-size:12px;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:12px;"></span>
+            <button onclick="deconnecterConseiller()">Déconnexion</button>
         </div>
     </div>
 
@@ -830,8 +1080,14 @@
         <button class="tab active" onclick="ouvrirOnglet(event, 'tab-liste')">Liste des véhicules</button>
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-recap')">Récapitulatif</button>
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-ajout')">Ajouter un véhicule</button>
+        <button class="tab" onclick="ouvrirOnglet(event, 'tab-demandes')">
+            Demandes <span id="badge-demandes" style="background:var(--danger);color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;display:none;">0</span>
+        </button>
+        <button class="tab" onclick="ouvrirOnglet(event, 'tab-historique')">Historique</button>
+        <button class="tab" onclick="ouvrirOnglet(event, 'tab-stats')">Statistiques</button>
     </div>
 
+    <!-- ONGLET LISTE -->
     <div id="tab-liste" class="tab-content active">
         <div class="search-container">
             <input type="text" id="search" placeholder="Rechercher un modèle..." oninput="filtrer()">
@@ -864,17 +1120,19 @@
         </div>
     </div>
 
+    <!-- ONGLET RÉCAP -->
     <div id="tab-recap" class="tab-content">
         <h3 style="margin-bottom: 20px; color: var(--primary);">Récapitulatif des prix</h3>
         <div id="recap-container"></div>
     </div>
 
+    <!-- ONGLET AJOUT -->
     <div id="tab-ajout" class="tab-content">
         <div class="form-card">
             <h3 style="margin-bottom: 20px; color: var(--primary);">Nouveau véhicule</h3>
             <form id="form-ajout" onsubmit="event.preventDefault(); ajouterVehicule();">
                 <div class="info-box">
-                    Le <strong>prix HT</strong> est calculé automatiquement. Le <strong>prix TTC</strong> est le montant facturé au client. Le <strong>filtre à gasoil</strong> est réservé aux véhicules diesel (laisser vide si non concerné).
+                    Le <strong>prix HT</strong> est calculé automatiquement. Le <strong>prix TTC</strong> est le montant facturé au client.
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -884,14 +1142,12 @@
                     <div class="form-group">
                         <label>Prix Révision TTC (FCFA) *</label>
                         <input type="number" id="add-prix-ttc" required placeholder="Ex: 125000">
-                        <span class="help-text">Montant facturé au client</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Prestations (Optionnel)</label>
                     <input type="text" id="add-prestations" placeholder="Ex: EQUILIBRAGE, PARALLELISME...">
                 </div>
-
                 <div class="form-section-title">Détails de la révision (HT)</div>
                 <div class="form-row">
                     <div class="form-group"><label>Huile</label><input type="number" id="add-huile" placeholder="0"></div>
@@ -900,14 +1156,9 @@
                     <div class="form-group"><label>Filtre à Pollen (F.P)</label><input type="number" id="add-fp" placeholder="0"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label>Filtre à Gasoil (F.G)</label>
-                        <input type="number" id="add-fg" placeholder="0">
-                        <span class="help-text">Véhicules diesel uniquement</span>
-                    </div>
+                    <div class="form-group"><label>Filtre à Gasoil (F.G)</label><input type="number" id="add-fg" placeholder="0"></div>
                     <div class="form-group"><label>Main d'Œuvre (MOD)</label><input type="number" id="add-mod" placeholder="0"></div>
                 </div>
-
                 <div class="form-actions">
                     <button type="reset" class="btn-secondary">Réinitialiser</button>
                     <button type="submit" class="btn-success">Ajouter le véhicule</button>
@@ -915,8 +1166,42 @@
             </form>
         </div>
     </div>
+
+    <!-- ONGLET DEMANDES -->
+    <div id="tab-demandes" class="tab-content">
+        <h3 style="margin-bottom: 20px; color: var(--primary);">Demandes en cours</h3>
+        <div class="filter-bar">
+            <select id="filter-statut" onchange="afficherDemandes()">
+                <option value="actives">Actives (En attente + En cours)</option>
+                <option value="en_attente">En attente uniquement</option>
+                <option value="en_cours">En cours uniquement</option>
+                <option value="toutes">Toutes</option>
+            </select>
+            <input type="text" id="filter-recherche" placeholder="Rechercher un client..." oninput="afficherDemandes()">
+        </div>
+        <div id="demandes-container"></div>
+    </div>
+
+    <!-- ONGLET HISTORIQUE -->
+    <div id="tab-historique" class="tab-content">
+        <h3 style="margin-bottom: 20px; color: var(--primary);">Historique complet</h3>
+        <div class="filter-bar">
+            <input type="date" id="hist-date" onchange="afficherHistorique()">
+            <button class="btn-secondary" onclick="document.getElementById('hist-date').value='';afficherHistorique();">Effacer</button>
+        </div>
+        <div id="historique-container"></div>
+    </div>
+
+    <!-- ONGLET STATS -->
+    <div id="tab-stats" class="tab-content">
+        <h3 style="margin-bottom: 20px; color: var(--primary);">Statistiques</h3>
+        <div class="stat-grid" id="stats-grid"></div>
+        <h4 style="margin: 30px 0 15px; color: var(--secondary); font-size: 14px; text-transform: uppercase;">Répartition par service</h4>
+        <div id="stats-services"></div>
+    </div>
 </div>
 
+<!-- MODAL MODIFICATION -->
 <div id="modal-edit" class="modal">
     <div class="modal-content">
         <span class="close" onclick="fermerModal('modal-edit')">&times;</span>
@@ -945,9 +1230,29 @@
     </div>
 </div>
 
-<!-- ==========================================
-     ASSISTANT VOCAL : BOUTON FLOTTANT
-     ========================================== -->
+<!-- MODAL LOGIN CONSEILLER -->
+<div id="modal-login" class="modal">
+    <div class="modal-content" style="max-width:400px;">
+        <h3>Connexion conseiller</h3>
+        <p style="color:var(--text-light);font-size:13px;margin-bottom:20px;">Entrez votre code personnel pour accéder à l'espace réception.</p>
+        <div class="form-group">
+            <label>Code conseiller</label>
+            <input type="password" id="login-code" placeholder="Ex: 1234" onkeydown="if(event.key==='Enter')validerLogin()">
+        </div>
+        <div class="form-actions">
+            <button class="btn-primary" onclick="validerLogin()" style="width:100%;">Se connecter</button>
+        </div>
+        <p id="login-error" style="color:var(--danger);font-size:13px;margin-top:10px;display:none;"></p>
+    </div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div class="notification-toast" id="notification-toast">
+    <h4 id="notif-title">Nouvelle demande</h4>
+    <p id="notif-message"></p>
+</div>
+
+<!-- BOUTON VOCAL (caché en mode client) -->
 <button class="voice-fab" id="voice-fab" onclick="ouvrirAssistantVocal()" title="Assistant vocal">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
@@ -957,13 +1262,10 @@
     </svg>
 </button>
 
-<!-- ==========================================
-     ASSISTANT VOCAL : MODALE
-     ========================================== -->
+<!-- MODAL VOCAL -->
 <div class="voice-modal" id="voice-modal">
     <div class="voice-modal-content">
         <button class="voice-modal-close" onclick="fermerAssistantVocal()">&times;</button>
-
         <div class="voice-icon-big" id="voice-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
@@ -972,16 +1274,12 @@
                 <line x1="8" y1="23" x2="16" y2="23"></line>
             </svg>
         </div>
-
         <div class="voice-transcript" id="voice-transcript">Appuyez sur le micro et dites un modèle...</div>
         <div class="voice-hint" id="voice-hint">Exemple : "CS 15", "P201 Gasoil", "T70"</div>
-
         <div id="voice-result" class="voice-result"></div>
-
         <div class="voice-actions" id="voice-actions" style="display:none;">
             <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
         </div>
-
         <div id="voice-not-supported" class="voice-not-supported" style="display:none;"></div>
     </div>
 </div>
@@ -997,11 +1295,14 @@
         onSnapshot, 
         addDoc, 
         updateDoc, 
-        deleteDoc
+        deleteDoc,
+        query,
+        orderBy,
+        serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     /* ==========================================
-       CONFIGURATION FIREBASE - REMPLACE CES VALEURS
+       CONFIGURATION FIREBASE
        ========================================== */
    const firebaseConfig = {
   apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
@@ -1012,6 +1313,27 @@
   messagingSenderId: "606167388967",
   appId: "1:606167388967:web:7ad669fd353cdeeb7a8f02"
 };
+    /* ==========================================
+       CONSEILLERS (CODE + NOM)
+       Modifie ici pour ajouter/retirer des conseillers
+       ========================================== */
+    const CONSEILLERS = {
+        "1234": "Conseiller 1",
+        "5678": "Conseiller 2"
+        // Ajoute d'autres lignes : "code": "Nom du conseiller"
+    };
+
+    /* ==========================================
+       TAXE FNE
+       ========================================== */
+    function calculerFNE(montant) {
+        if (montant >= 100 && montant <= 99000) return 100;
+        if (montant >= 100000 && montant <= 1000000) return 500;
+        return 0;
+    }
+
+    const PRIX_ADDITIF = 10000; // Additif carburant
+
     /* ==========================================
        DONNÉES INITIALES
        ========================================== */
@@ -1052,14 +1374,22 @@
     ];
 
     /* ==========================================
-       INITIALISATION FIREBASE
+       ÉTAT GLOBAL
        ========================================== */
     let db = null;
     let collectionRef = null;
+    let demandesRef = null;
     let firebaseDisponible = false;
     let premierChargement = true;
-    let unsubscribe = null;
+    let vehicules = [];
+    let demandes = [];
+    let selectedId = null;
+    let conseillerConnecte = null; // { code, nom }
+    let isModeClient = false;
 
+    /* ==========================================
+       INITIALISATION FIREBASE
+       ========================================== */
     function initFirebase() {
         try {
             const app = initializeApp(firebaseConfig);
@@ -1069,6 +1399,7 @@
                 })
             });
             collectionRef = collection(db, "tarifs_revision");
+            demandesRef = collection(db, "demandes_sav");
             firebaseDisponible = true;
             console.log("✅ Firebase initialisé");
             return true;
@@ -1080,26 +1411,28 @@
     }
 
     /* ==========================================
-       STATUT DE SYNCHRONISATION
+       DÉTECTION MODE CLIENT (?client=1)
+       ========================================== */
+    function estModeClient() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('client') === '1';
+    }
+
+    /* ==========================================
+       STATUT SYNC
        ========================================== */
     function majStatutSync(statut) {
         const dot = document.getElementById('sync-dot');
         const label = document.getElementById('sync-label');
+        if (!dot || !label) return;
         dot.className = 'sync-dot ' + statut;
         if (statut === 'online') label.textContent = 'Synchronisé';
         else if (statut === 'syncing') label.textContent = 'Synchronisation...';
         else if (statut === 'offline') label.textContent = 'Hors ligne';
-        else label.textContent = '...';
     }
 
     window.addEventListener('online', () => majStatutSync('syncing'));
     window.addEventListener('offline', () => majStatutSync('offline'));
-
-    /* ==========================================
-       VARIABLES GLOBALES
-       ========================================== */
-    let vehicules = [];
-    let selectedId = null;
 
     /* ==========================================
        CALCULS
@@ -1120,34 +1453,24 @@
     }
 
     /* ==========================================
-       CHARGEMENT DES DONNÉES
+       CHARGEMENT DES VÉHICULES
        ========================================== */
     async function chargerDonnees() {
         if (!firebaseDisponible) {
             const saved = localStorage.getItem("tarifs_vehicules_v5");
-            if (saved) {
-                try { vehicules = JSON.parse(saved); }
-                catch (e) { vehicules = JSON.parse(JSON.stringify(donneesInitiales)); }
-            } else {
-                vehicules = JSON.parse(JSON.stringify(donneesInitiales));
-            }
+            vehicules = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(donneesInitiales));
             preparerDonnees();
-            majStatutSync('offline');
             afficherTableau(vehicules);
             afficherRecap();
             return;
         }
 
         majStatutSync('syncing');
-
-        unsubscribe = onSnapshot(collectionRef, async (snapshot) => {
+        onSnapshot(collectionRef, async (snapshot) => {
             const cloudData = [];
-            snapshot.forEach((doc) => {
-                cloudData.push({ id: doc.id, ...doc.data() });
-            });
+            snapshot.forEach((doc) => cloudData.push({ id: doc.id, ...doc.data() }));
 
             if (cloudData.length === 0 && premierChargement) {
-                majStatutSync('syncing');
                 const succes = await injecterDonneesInitiales();
                 if (succes) premierChargement = false;
                 return;
@@ -1160,6 +1483,7 @@
                 majStatutSync('online');
                 afficherTableau(vehicules);
                 afficherRecap();
+                remplirListeModelesClient();
 
                 if (selectedId) {
                     const v = vehicules.find(x => x.id === selectedId);
@@ -1168,7 +1492,7 @@
                 }
             }
         }, (error) => {
-            console.error("❌ Erreur Firestore :", error);
+            console.error("❌ Firestore :", error);
             majStatutSync('offline');
         });
     }
@@ -1184,45 +1508,113 @@
     }
 
     async function injecterDonneesInitiales() {
-        let count = 0, erreurs = 0;
+        let erreurs = 0;
         for (const item of donneesInitiales) {
             try {
                 const { id, ...data } = item;
                 await addDoc(collectionRef, data);
-                count++;
-            } catch (e) {
-                erreurs++;
-                console.error("Erreur ajout :", e.message || e);
-            }
+            } catch (e) { erreurs++; }
         }
         return erreurs === 0;
     }
 
     /* ==========================================
-       ONGLETS
+       CHARGEMENT DES DEMANDES
        ========================================== */
-    window.ouvrirOnglet = function(event, tabId) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-        if (tabId === 'tab-recap') afficherRecap();
+    function chargerDemandes() {
+        if (!firebaseDisponible) return;
+        const q = query(demandesRef, orderBy("dateCreation", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const anciennes = demandes.map(d => d.id);
+            demandes = [];
+            snapshot.forEach((doc) => demandes.push({ id: doc.id, ...doc.data() }));
+
+            // Détection nouvelle demande pour notification
+            if (anciennes.length > 0) {
+                const nouvelles = demandes.filter(d => !anciennes.includes(d.id) && d.statut === 'en_attente');
+                nouvelles.forEach(n => afficherNotification(n));
+            }
+
+            afficherDemandes();
+            afficherHistorique();
+            afficherStats();
+            majBadgeDemandes();
+        });
     }
 
     /* ==========================================
-       TABLEAU
+       BADGE DEMANDES
+       ========================================== */
+    function majBadgeDemandes() {
+        const badge = document.getElementById('badge-demandes');
+        if (!badge) return;
+        const nb = demandes.filter(d => d.statut === 'en_attente').length;
+        if (nb > 0) {
+            badge.textContent = nb;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    /* ==========================================
+       NOTIFICATION
+       ========================================== */
+    function afficherNotification(demande) {
+        const toast = document.getElementById('notification-toast');
+        document.getElementById('notif-title').textContent = "🔔 Nouvelle demande : " + demande.service;
+        document.getElementById('notif-message').textContent = 
+            demande.nom + ' ' + demande.prenom + (demande.modele ? ' — ' + demande.modele : '');
+        toast.classList.add('show');
+
+        // Son de notification
+        jouerSonNotification();
+
+        setTimeout(() => toast.classList.remove('show'), 6000);
+    }
+
+    function jouerSonNotification() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.5);
+            
+            // Deuxième bip
+            setTimeout(() => {
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.frequency.value = 1100;
+                gain2.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc2.start(ctx.currentTime);
+                osc2.stop(ctx.currentTime + 0.4);
+            }, 200);
+        } catch(e) { console.warn("Son non disponible"); }
+    }
+
+    /* ==========================================
+       TABLEAU VÉHICULES
        ========================================== */
     function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
+        if (!tbody) return;
         tbody.innerHTML = '';
 
         if (liste.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#a0aec0;">Aucun véhicule trouvé.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#a0aec0;">Aucun véhicule.</td></tr>';
             return;
         }
 
         const triee = [...liste].sort((a, b) => a.modele.localeCompare(b.modele));
-
         triee.forEach(v => {
             const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
@@ -1238,7 +1630,6 @@
             `;
             tbody.appendChild(tr);
         });
-
         document.getElementById('status').textContent = liste.length + ' modèle(s)';
     }
 
@@ -1294,8 +1685,7 @@
         }
 
         const fgHtml = (d.fg && d.fg > 0) 
-            ? `<div class="detail-row"><span>Filtre à Gasoil (F.G)</span><strong>${d.fg.toLocaleString('fr-FR')} F</strong></div>`
-            : '';
+            ? `<div class="detail-row"><span>Filtre à Gasoil (F.G)</span><strong>${d.fg.toLocaleString('fr-FR')} F</strong></div>` : '';
 
         contenu.innerHTML = `
             <div class="detail-section revision-section">
@@ -1306,29 +1696,19 @@
                 <div class="detail-row"><span>Filtre à Pollen (F.P)</span><strong>${(d.fp || 0).toLocaleString('fr-FR')} F</strong></div>
                 ${fgHtml}
                 <div class="detail-row"><span>Main d'Œuvre (MOD)</span><strong>${(d.mod || 0).toLocaleString('fr-FR')} F</strong></div>
-                <div class="sub-total">
-                    <span>Total HT</span>
-                    <strong>${prixHT.toLocaleString('fr-FR')} F</strong>
-                </div>
-                ${marge !== 0 ? `
-                    <div class="marge-info">
-                        <span>Marge / Bénéfice</span>
-                        <strong>${marge > 0 ? '+' : ''}${marge.toLocaleString('fr-FR')} F</strong>
-                    </div>
-                ` : ''}
-                <div class="sub-total ttc">
-                    <span>Prix Révision TTC</span>
-                    <strong>${(v.prixTTC || 0).toLocaleString('fr-FR')} F</strong>
+                <div class="sub-total"><span>Total HT</span><strong>${prixHT.toLocaleString('fr-FR')} F</strong></div>
+                ${marge !== 0 ? `<div class="marge-info"><span>Marge / Bénéfice</span><strong>${marge > 0 ? '+' : ''}${marge.toLocaleString('fr-FR')} F</strong></div>` : ''}
+                <div class="sub-total ttc"><span>Prix Révision TTC</span><strong>${(v.prixTTC || 0).toLocaleString('fr-FR')} F</strong></div>
+                <div class="sub-total" style="background:#fff5f5;color:var(--danger);">
+                    <span>Taxe FNE (client)</span>
+                    <strong style="color:var(--danger);">+${calculerFNE(v.prixTTC || 0).toLocaleString('fr-FR')} F</strong>
                 </div>
             </div>
 
             <div class="detail-section extras-section">
                 <h4>Autres pièces (Extras)</h4>
                 ${customHtml}
-                <div class="sub-total extras">
-                    <span>Total Autres Pièces</span>
-                    <strong>${prixExtras.toLocaleString('fr-FR')} F</strong>
-                </div>
+                <div class="sub-total extras"><span>Total Autres Pièces</span><strong>${prixExtras.toLocaleString('fr-FR')} F</strong></div>
                 <div class="add-piece-form">
                     <div class="form-row">
                         <input type="text" class="piece-name" id="piece-name-${v.id}" placeholder="Nom de la pièce">
@@ -1358,30 +1738,21 @@
     }
 
     /* ==========================================
-       AJOUT / SUPPRESSION DE PIÈCE
+       AJOUT/SUPPRESSION PIÈCE
        ========================================== */
     window.ajouterPiece = async function(id) {
         const v = vehicules.find(item => item.id === id);
         if (!v) return;
-        const nomInput = document.getElementById('piece-name-' + id);
-        const prixInput = document.getElementById('piece-price-' + id);
-        const nom = nomInput.value.trim();
-        const prix = parseInt(prixInput.value);
-
-        if (!nom || isNaN(prix) || prix <= 0) {
-            alert("Veuillez saisir un nom et un prix valide.");
-            return;
-        }
+        const nom = document.getElementById('piece-name-' + id).value.trim();
+        const prix = parseInt(document.getElementById('piece-price-' + id).value);
+        if (!nom || isNaN(prix) || prix <= 0) { alert("Nom et prix valides requis."); return; }
 
         const custom = v.custom ? [...v.custom] : [];
         custom.push({ nom, prix });
 
         if (firebaseDisponible) {
-            try {
-                await updateDoc(doc(db, "tarifs_revision", id), { custom });
-            } catch (e) {
-                alert("Erreur de synchronisation.");
-            }
+            try { await updateDoc(doc(db, "tarifs_revision", id), { custom }); }
+            catch (e) { alert("Erreur de synchronisation."); }
         } else {
             v.custom = custom;
             localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
@@ -1395,16 +1766,11 @@
         const v = vehicules.find(item => item.id === id);
         if (!v || !v.custom) return;
         if (!confirm("Supprimer cette pièce ?")) return;
-        
         const custom = [...v.custom];
         custom.splice(index, 1);
-
         if (firebaseDisponible) {
-            try {
-                await updateDoc(doc(db, "tarifs_revision", id), { custom });
-            } catch (e) {
-                alert("Erreur de synchronisation.");
-            }
+            try { await updateDoc(doc(db, "tarifs_revision", id), { custom }); }
+            catch (e) { alert("Erreur de synchronisation."); }
         } else {
             v.custom = custom;
             localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
@@ -1421,9 +1787,7 @@
         const modele = document.getElementById('add-modele').value.trim();
         const prixTTC = parseInt(document.getElementById('add-prix-ttc').value);
         const prestations = document.getElementById('add-prestations').value.trim();
-
-        if (!modele) { alert("Veuillez saisir le nom du modèle."); return; }
-        if (isNaN(prixTTC) || prixTTC <= 0) { alert("Veuillez saisir un prix TTC valide."); return; }
+        if (!modele || isNaN(prixTTC) || prixTTC <= 0) { alert("Modèle et prix TTC valides requis."); return; }
 
         const huile = parseInt(document.getElementById('add-huile').value) || 0;
         const fh = parseInt(document.getElementById('add-fh').value) || 0;
@@ -1433,19 +1797,13 @@
         const mod = parseInt(document.getElementById('add-mod').value) || 0;
 
         let details = null;
-        if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || fg > 0 || mod > 0) {
-            details = { huile, fh, fa, fp, fg, mod };
-        }
+        if (huile || fh || fa || fp || fg || mod) details = { huile, fh, fa, fp, fg, mod };
 
         const nouveau = { modele, prixTTC, prestations, details, custom: [] };
 
         if (firebaseDisponible) {
-            try {
-                await addDoc(collectionRef, nouveau);
-            } catch (e) {
-                alert("Erreur de synchronisation.");
-                return;
-            }
+            try { await addDoc(collectionRef, nouveau); }
+            catch (e) { alert("Erreur de synchronisation."); return; }
         } else {
             nouveau.id = 'local_' + Date.now();
             vehicules.push(nouveau);
@@ -1455,7 +1813,7 @@
         }
 
         document.getElementById('form-ajout').reset();
-        alert("Véhicule ajouté avec succès !");
+        alert("Véhicule ajouté !");
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab')[0].classList.add('active');
@@ -1463,7 +1821,7 @@
     }
 
     /* ==========================================
-       MODIFICATION VÉHICULE
+       MODIFICATION
        ========================================== */
     window.ouvrirModification = function(id) {
         const v = vehicules.find(item => item.id === id);
@@ -1498,19 +1856,13 @@
         const mod = parseInt(document.getElementById('edit-mod').value) || 0;
 
         let details = null;
-        if (huile > 0 || fh > 0 || fa > 0 || fp > 0 || fg > 0 || mod > 0) {
-            details = { huile, fh, fa, fp, fg, mod };
-        }
+        if (huile || fh || fa || fp || fg || mod) details = { huile, fh, fa, fp, fg, mod };
 
         const updateData = { modele, prixTTC, prestations, details };
 
         if (firebaseDisponible) {
-            try {
-                await updateDoc(doc(db, "tarifs_revision", id), updateData);
-            } catch (e) {
-                alert("Erreur de synchronisation.");
-                return;
-            }
+            try { await updateDoc(doc(db, "tarifs_revision", id), updateData); }
+            catch (e) { alert("Erreur."); return; }
         } else {
             Object.assign(v, updateData);
             localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
@@ -1518,34 +1870,23 @@
             afficherRecap();
             if (selectedId === id) afficherDetails(v);
         }
-
         window.fermerModal('modal-edit');
     }
 
-    window.fermerModal = function(id) { 
-        document.getElementById(id).style.display = "none"; 
-    }
-
-    window.onclick = function(event) { 
-        if (event.target.classList.contains('modal')) event.target.style.display = "none"; 
-    }
+    window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
+    window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = "none"; }
 
     /* ==========================================
-       SUPPRESSION
+       SUPPRESSION VÉHICULE
        ========================================== */
     window.supprimerVehicule = async function(id) {
-        if (!confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) return;
-
+        if (!confirm("Supprimer ce véhicule ?")) return;
         if (firebaseDisponible) {
-            try {
-                await deleteDoc(doc(db, "tarifs_revision", id));
-            } catch (e) {
-                alert("Erreur de synchronisation.");
-                return;
-            }
+            try { await deleteDoc(doc(db, "tarifs_revision", id)); }
+            catch (e) { alert("Erreur."); return; }
         } else {
-            const index = vehicules.findIndex(v => v.id === id);
-            if (index !== -1) vehicules.splice(index, 1);
+            const i = vehicules.findIndex(v => v.id === id);
+            if (i !== -1) vehicules.splice(i, 1);
             localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
             afficherTableau(vehicules);
             afficherRecap();
@@ -1558,14 +1899,13 @@
        ========================================== */
     function afficherRecap() {
         const container = document.getElementById('recap-container');
+        if (!container) return;
         container.innerHTML = '';
         if (vehicules.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#a0aec0; padding:30px;">Aucun véhicule.</p>';
+            container.innerHTML = '<p style="text-align:center;color:#a0aec0;padding:30px;">Aucun véhicule.</p>';
             return;
         }
-
         const triee = [...vehicules].sort((a, b) => a.modele.localeCompare(b.modele));
-
         triee.forEach(v => {
             const prixExtras = calculerPrixExtras(v);
             const total = (v.prixTTC || 0) + prixExtras;
@@ -1574,18 +1914,9 @@
             card.innerHTML = `
                 <div class="recap-modele">${v.modele}</div>
                 <div class="recap-prices">
-                    <div class="recap-price-item revision">
-                        <div class="label">Révision TTC</div>
-                        <div class="value">${v.prixTTC > 0 ? v.prixTTC.toLocaleString('fr-FR') + ' F' : '-'}</div>
-                    </div>
-                    <div class="recap-price-item extras">
-                        <div class="label">Autres pièces</div>
-                        <div class="value">${prixExtras > 0 ? prixExtras.toLocaleString('fr-FR') + ' F' : '-'}</div>
-                    </div>
-                    <div class="recap-price-item total">
-                        <div class="label">Total</div>
-                        <div class="value">${total > 0 ? total.toLocaleString('fr-FR') + ' F' : '-'}</div>
-                    </div>
+                    <div class="recap-price-item revision"><div class="label">Révision TTC</div><div class="value">${v.prixTTC > 0 ? v.prixTTC.toLocaleString('fr-FR') + ' F' : '-'}</div></div>
+                    <div class="recap-price-item extras"><div class="label">Autres pièces</div><div class="value">${prixExtras > 0 ? prixExtras.toLocaleString('fr-FR') + ' F' : '-'}</div></div>
+                    <div class="recap-price-item total"><div class="label">Total</div><div class="value">${total > 0 ? total.toLocaleString('fr-FR') + ' F' : '-'}</div></div>
                 </div>
             `;
             container.appendChild(card);
@@ -1593,7 +1924,21 @@
     }
 
     /* ==========================================
-       EXPORT / IMPORT
+       ONGLETS
+       ========================================== */
+    window.ouvrirOnglet = function(event, tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+        if (tabId === 'tab-recap') afficherRecap();
+        if (tabId === 'tab-demandes') afficherDemandes();
+        if (tabId === 'tab-historique') afficherHistorique();
+        if (tabId === 'tab-stats') afficherStats();
+    }
+
+    /* ==========================================
+       EXPORT/IMPORT
        ========================================== */
     window.exporterDonnees = function() {
         const dataStr = JSON.stringify(vehicules, null, 2);
@@ -1614,7 +1959,7 @@
             try {
                 const data = JSON.parse(e.target.result);
                 if (!Array.isArray(data)) { alert("Fichier invalide."); return; }
-                if (!confirm("Cela va remplacer toutes vos données actuelles. Continuer ?")) return;
+                if (!confirm("Remplacer toutes vos données ?")) return;
 
                 if (firebaseDisponible) {
                     for (const v of vehicules) {
@@ -1638,113 +1983,528 @@
                     localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
                     afficherTableau(vehicules);
                     afficherRecap();
-                    window.fermerPanneau();
                 }
-                alert("Import réussi : " + data.length + " véhicules chargés.");
-            } catch (err) {
-                alert("Erreur lors de la lecture du fichier.");
-            }
+                alert("Import réussi : " + data.length + " véhicules.");
+            } catch (err) { alert("Erreur lecture fichier."); }
         };
         reader.readAsText(file);
         event.target.value = "";
     }
 
+    /* ================================================================
+       ================== VUE CLIENT ==================================
+       ================================================================ */
+    let clientServiceChoisi = null;
+    let clientAdditifChoisi = false;
+
+    window.choisirService = function(el) {
+        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        clientServiceChoisi = el.dataset.service;
+        document.getElementById('btn-step1-next').disabled = false;
+    }
+
+    function remplirListeModelesClient() {
+        const sel = document.getElementById('client-modele');
+        if (!sel) return;
+        const val = sel.value;
+        sel.innerHTML = '<option value="">-- Sélectionner --</option>';
+        [...vehicules].sort((a,b) => a.modele.localeCompare(b.modele)).forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v.id;
+            opt.textContent = v.modele;
+            sel.appendChild(opt);
+        });
+        sel.value = val;
+    }
+
+    window.clientEtape2 = function() {
+        if (!clientServiceChoisi) return;
+        document.getElementById('client-step-1').classList.remove('active');
+        document.getElementById('client-step-2').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.clientRetourEtape1 = function() {
+        document.getElementById('client-step-2').classList.remove('active');
+        document.getElementById('client-step-1').classList.add('active');
+    }
+
+    window.clientEtape3 = function() {
+        const nom = document.getElementById('client-nom').value.trim();
+        const prenom = document.getElementById('client-prenom').value.trim();
+        if (!nom || !prenom) { alert("Veuillez saisir votre nom et prénom."); return; }
+
+        // Si c'est un service de révision, afficher les tarifs
+        const servicesAvecTarif = ['Première révision', 'Révision'];
+        const conteneur = document.getElementById('client-tarif-container');
+        conteneur.innerHTML = '';
+
+        if (servicesAvecTarif.includes(clientServiceChoisi)) {
+            document.getElementById('client-tarif-info').textContent = 
+                "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC :";
+
+            const modeleId = document.getElementById('client-modele').value;
+            const modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
+
+            if (modeleChoisi) {
+                afficherTarifClient(modeleChoisi);
+            } else {
+                conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
+            }
+        } else {
+            document.getElementById('client-tarif-info').textContent = 
+                "Aucun tarif à afficher pour ce service. Un conseiller vous prendra en charge.";
+            conteneur.innerHTML = '';
+        }
+
+        document.getElementById('client-step-2').classList.remove('active');
+        document.getElementById('client-step-3').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.clientRetourEtape2 = function() {
+        document.getElementById('client-step-3').classList.remove('active');
+        document.getElementById('client-step-2').classList.add('active');
+    }
+
+    function afficherTarifClient(v) {
+        const conteneur = document.getElementById('client-tarif-container');
+        const prixTTC = v.prixTTC || 0;
+        const fne = calculerFNE(prixTTC);
+        const additif = clientAdditifChoisi ? PRIX_ADDITIF : 0;
+        const total = prixTTC + fne + additif;
+
+        conteneur.innerHTML = `
+            <div class="tarif-card selected">
+                <div class="tarif-modele">${v.modele}</div>
+                <div class="tarif-ligne">
+                    <span>Révision TTC</span>
+                    <span>${prixTTC.toLocaleString('fr-FR')} F</span>
+                </div>
+                <div class="tarif-ligne">
+                    <span class="tarif-fne">Taxe FNE</span>
+                    <span class="tarif-fne">+ ${fne.toLocaleString('fr-FR')} F</span>
+                </div>
+                ${clientAdditifChoisi ? `
+                    <div class="tarif-ligne">
+                        <span>Additif carburant</span>
+                        <span>+ ${PRIX_ADDITIF.toLocaleString('fr-FR')} F</span>
+                    </div>
+                ` : ''}
+                <div class="tarif-ligne total">
+                    <span>Total estimé</span>
+                    <span>${total.toLocaleString('fr-FR')} F</span>
+                </div>
+            </div>
+
+            <label class="additif-checkbox">
+                <input type="checkbox" ${clientAdditifChoisi ? 'checked' : ''} onchange="basculerAdditif(this, '${v.id}')">
+                <label>Ajouter un additif carburant (+${PRIX_ADDITIF.toLocaleString('fr-FR')} F)</label>
+            </label>
+        `;
+    }
+
+    window.basculerAdditif = function(checkbox, modeleId) {
+        clientAdditifChoisi = checkbox.checked;
+        const v = vehicules.find(x => x.id === modeleId);
+        if (v) afficherTarifClient(v);
+    }
+
+    window.clientConfirmer = async function() {
+        const nom = document.getElementById('client-nom').value.trim();
+        const prenom = document.getElementById('client-prenom').value.trim();
+        const immat = document.getElementById('client-immat').value.trim();
+        const modeleId = document.getElementById('client-modele').value;
+        const commentaire = document.getElementById('client-commentaire').value.trim();
+
+        const modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
+        const modeleNom = modeleChoisi ? modeleChoisi.modele : '';
+        const prixTTC = modeleChoisi ? (modeleChoisi.prixTTC || 0) : 0;
+        const fne = prixTTC > 0 ? calculerFNE(prixTTC) : 0;
+        const additif = clientAdditifChoisi ? PRIX_ADDITIF : 0;
+        const total = prixTTC + fne + additif;
+
+        const demande = {
+            nom, prenom,
+            immatriculation: immat,
+            modeleId: modeleId || null,
+            modele: modeleNom,
+            service: clientServiceChoisi,
+            commentaire,
+            prixTTC: prixTTC,
+            fne: fne,
+            additif: additif,
+            total: total,
+            statut: 'en_attente',
+            conseiller: null,
+            conseillerNom: null,
+            dateCreation: serverTimestamp(),
+            dateCreationISO: new Date().toISOString(),
+            datePriseEnCharge: null,
+            dateTermine: null
+        };
+
+        try {
+            if (firebaseDisponible) {
+                await addDoc(demandesRef, demande);
+            } else {
+                demande.id = 'local_' + Date.now();
+                const saved = localStorage.getItem("demandes_sav") || "[]";
+                const arr = JSON.parse(saved);
+                arr.push(demande);
+                localStorage.setItem("demandes_sav", JSON.stringify(arr));
+            }
+            
+            // Ticket de confirmation
+            document.getElementById('client-ticket').innerHTML = `
+                <div><strong>Client :</strong> ${prenom} ${nom}</div>
+                <div><strong>Service :</strong> ${clientServiceChoisi}</div>
+                ${modeleNom ? `<div><strong>Modèle :</strong> ${modeleNom}</div>` : ''}
+                ${prixTTC > 0 ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+                    <div style="display:flex;justify-content:space-between;"><span>Révision TTC</span><span>${prixTTC.toLocaleString('fr-FR')} F</span></div>
+                    <div style="display:flex;justify-content:space-between;color:var(--warning);"><span>Taxe FNE</span><span>+${fne.toLocaleString('fr-FR')} F</span></div>
+                    ${additif ? `<div style="display:flex;justify-content:space-between;"><span>Additif carburant</span><span>+${additif.toLocaleString('fr-FR')} F</span></div>` : ''}
+                    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;margin-top:8px;padding-top:8px;border-top:2px solid var(--border);">
+                        <span>Total</span><span style="color:var(--accent);">${total.toLocaleString('fr-FR')} F</span>
+                    </div>
+                </div>` : ''}
+                <div style="margin-top:12px;color:var(--text-light);font-size:12px;">
+                    Heure : ${new Date().toLocaleTimeString('fr-FR')}
+                </div>
+            `;
+
+            document.getElementById('client-step-3').classList.remove('active');
+            document.getElementById('client-step-4').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors de l'envoi. Veuillez réessayer.");
+        }
+    }
+
+    /* ================================================================
+       ================== VUE CONSEILLER ==============================
+       ================================================================ */
+
+    function verifierConnexionConseiller() {
+        const saved = sessionStorage.getItem('conseiller_sav');
+        if (saved) {
+            try {
+                conseillerConnecte = JSON.parse(saved);
+                afficherInterfaceConseiller();
+                return true;
+            } catch(e) {}
+        }
+        return false;
+    }
+
+    function afficherInterfaceConseiller() {
+        if (!conseillerConnecte) return;
+        document.getElementById('conseiller-info').textContent = '👤 ' + conseillerConnecte.nom;
+    }
+
+    window.validerLogin = function() {
+        const code = document.getElementById('login-code').value.trim();
+        const erreur = document.getElementById('login-error');
+        
+        if (CONSEILLERS[code]) {
+            conseillerConnecte = { code, nom: CONSEILLERS[code] };
+            sessionStorage.setItem('conseiller_sav', JSON.stringify(conseillerConnecte));
+            document.getElementById('modal-login').style.display = 'none';
+            afficherInterfaceConseiller();
+            erreur.style.display = 'none';
+        } else {
+            erreur.textContent = "Code incorrect. Réessayez.";
+            erreur.style.display = 'block';
+        }
+    }
+
+    window.deconnecterConseiller = function() {
+        if (!confirm("Se déconnecter ?")) return;
+        sessionStorage.removeItem('conseiller_sav');
+        conseillerConnecte = null;
+        location.reload();
+    }
+
     /* ==========================================
-       ASSISTANT VOCAL
+       AFFICHAGE DES DEMANDES
        ========================================== */
+    function afficherDemandes() {
+        const container = document.getElementById('demandes-container');
+        if (!container) return;
+
+        const filtre = document.getElementById('filter-statut')?.value || 'actives';
+        const recherche = (document.getElementById('filter-recherche')?.value || '').toLowerCase().trim();
+
+        let liste = [...demandes];
+        
+        if (filtre === 'actives') liste = liste.filter(d => d.statut === 'en_attente' || d.statut === 'en_cours');
+        else if (filtre === 'en_attente') liste = liste.filter(d => d.statut === 'en_attente');
+        else if (filtre === 'en_cours') liste = liste.filter(d => d.statut === 'en_cours');
+
+        if (recherche) {
+            liste = liste.filter(d => 
+                (d.nom || '').toLowerCase().includes(recherche) ||
+                (d.prenom || '').toLowerCase().includes(recherche) ||
+                (d.immatriculation || '').toLowerCase().includes(recherche) ||
+                (d.modele || '').toLowerCase().includes(recherche)
+            );
+        }
+
+        // Trier : en_attente d'abord, puis en_cours, par date
+        liste.sort((a, b) => {
+            const ordre = { 'en_attente': 0, 'en_cours': 1, 'termine': 2 };
+            if (ordre[a.statut] !== ordre[b.statut]) return ordre[a.statut] - ordre[b.statut];
+            return new Date(b.dateCreationISO || 0) - new Date(a.dateCreationISO || 0);
+        });
+
+        if (liste.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <p>Aucune demande pour le moment.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = liste.map(d => creerCarteDemande(d, false)).join('');
+    }
+
+    function creerCarteDemande(d, compacte) {
+        const dateStr = d.dateCreationISO ? new Date(d.dateCreationISO).toLocaleString('fr-FR', {
+            hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'
+        }) : '';
+
+        let actionsHtml = '';
+        if (d.statut === 'en_attente') {
+            actionsHtml = `
+                <button class="btn-primary" onclick="prendreEnCharge('${d.id}')">Prendre en charge</button>
+                <button class="btn-secondary" onclick="marquerTermine('${d.id}')">Marquer terminé</button>
+            `;
+        } else if (d.statut === 'en_cours') {
+            actionsHtml = `
+                <button class="btn-success" onclick="marquerTermine('${d.id}')">Marquer terminé</button>
+                ${d.conseiller === conseillerConnecte?.code ? `
+                    <button class="btn-secondary" onclick="relacherDemande('${d.id}')">Relâcher</button>
+                ` : ''}
+            `;
+        } else if (d.statut === 'termine') {
+            actionsHtml = `<span style="color:var(--text-light);font-size:13px;">Terminé le ${d.dateTermine ? new Date(d.dateTermine).toLocaleDateString('fr-FR') : 'N/A'}</span>`;
+        }
+
+        return `
+            <div class="demande-card ${d.statut}">
+                <div class="demande-header">
+                    <div>
+                        <div class="demande-client">${d.prenom} ${d.nom}</div>
+                        <span class="demande-service">${d.service}</span>
+                        <span class="demande-statut ${d.statut}">${d.statut === 'en_attente' ? 'En attente' : d.statut === 'en_cours' ? 'En cours' : 'Terminé'}</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-light);">${dateStr}</div>
+                </div>
+                <div class="demande-infos">
+                    ${d.modele ? `<span>🚗 ${d.modele}</span>` : ''}
+                    ${d.immatriculation ? `<span>🔖 ${d.immatriculation}</span>` : ''}
+                    ${d.total > 0 ? `<span>💰 ${d.total.toLocaleString('fr-FR')} F</span>` : ''}
+                    ${d.conseillerNom ? `<span>👤 ${d.conseillerNom}</span>` : ''}
+                </div>
+                ${d.commentaire ? `<div style="font-size:13px;color:var(--text-light);margin-bottom:12px;font-style:italic;">"${d.commentaire}"</div>` : ''}
+                <div class="demande-actions">${actionsHtml}</div>
+            </div>
+        `;
+    }
+
+    window.prendreEnCharge = async function(id) {
+        if (!conseillerConnecte) return;
+        const d = demandes.find(x => x.id === id);
+        if (!d) return;
+        if (d.statut === 'en_cours' && d.conseiller !== conseillerConnecte.code) {
+            alert("Ce client est déjà pris en charge par " + d.conseillerNom);
+            return;
+        }
+        try {
+            if (firebaseDisponible) {
+                await updateDoc(doc(db, "demandes_sav", id), {
+                    statut: 'en_cours',
+                    conseiller: conseillerConnecte.code,
+                    conseillerNom: conseillerConnecte.nom,
+                    datePriseEnCharge: new Date().toISOString()
+                });
+            }
+        } catch(e) { alert("Erreur : " + e.message); }
+    }
+
+    window.marquerTermine = async function(id) {
+        try {
+            if (firebaseDisponible) {
+                await updateDoc(doc(db, "demandes_sav", id), {
+                    statut: 'termine',
+                    dateTermine: new Date().toISOString()
+                });
+            }
+        } catch(e) { alert("Erreur."); }
+    }
+
+    window.relacherDemande = async function(id) {
+        if (!confirm("Relâcher cette demande ?")) return;
+        try {
+            if (firebaseDisponible) {
+                await updateDoc(doc(db, "demandes_sav", id), {
+                    statut: 'en_attente',
+                    conseiller: null,
+                    conseillerNom: null,
+                    datePriseEnCharge: null
+                });
+            }
+        } catch(e) { alert("Erreur."); }
+    }
+
+    /* ==========================================
+       HISTORIQUE
+       ========================================== */
+    function afficherHistorique() {
+        const container = document.getElementById('historique-container');
+        if (!container) return;
+
+        const filtreDate = document.getElementById('hist-date')?.value || '';
+        let liste = [...demandes];
+
+        if (filtreDate) {
+            liste = liste.filter(d => {
+                if (!d.dateCreationISO) return false;
+                return d.dateCreationISO.startsWith(filtreDate);
+            });
+        }
+
+        liste.sort((a, b) => new Date(b.dateCreationISO || 0) - new Date(a.dateCreationISO || 0));
+
+        if (liste.length === 0) {
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📚</div><p>Aucun historique.</p></div>`;
+            return;
+        }
+
+        container.innerHTML = liste.map(d => creerCarteDemande(d, true)).join('');
+    }
+
+    /* ==========================================
+       STATISTIQUES
+       ========================================== */
+    function afficherStats() {
+        const grid = document.getElementById('stats-grid');
+        const servicesDiv = document.getElementById('stats-services');
+        if (!grid) return;
+
+        const aujourdHui = new Date().toISOString().split('T')[0];
+        const demandesAujourdHui = demandes.filter(d => (d.dateCreationISO || '').startsWith(aujourdHui));
+        const enAttente = demandes.filter(d => d.statut === 'en_attente').length;
+        const enCours = demandes.filter(d => d.statut === 'en_cours').length;
+        const termines = demandes.filter(d => d.statut === 'termine').length;
+
+        grid.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-value">${demandesAujourdHui.length}</div>
+                <div class="stat-label">Aujourd'hui</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">${enAttente}</div>
+                <div class="stat-label">En attente</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${enCours}</div>
+                <div class="stat-label">En cours</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value">${termines}</div>
+                <div class="stat-label">Terminés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${demandes.length}</div>
+                <div class="stat-label">Total</div>
+            </div>
+        `;
+
+        // Répartition par service
+        const parService = {};
+        demandes.forEach(d => {
+            parService[d.service] = (parService[d.service] || 0) + 1;
+        });
+
+        servicesDiv.innerHTML = Object.entries(parService)
+            .sort((a,b) => b[1] - a[1])
+            .map(([service, nb]) => `
+                <div style="display:flex;justify-content:space-between;padding:10px 15px;background:white;border-radius:8px;margin-bottom:8px;border:1px solid var(--border);">
+                    <span>${service}</span>
+                    <strong>${nb}</strong>
+                </div>
+            `).join('') || '<p style="color:var(--text-light);">Aucune donnée.</p>';
+    }
+
+    /* ================================================================
+       ================== ASSISTANT VOCAL =============================
+       ================================================================ */
     let recognition = null;
     let isListening = false;
-    let derniereTranscription = "";
 
-    // Dictionnaire de conversion des nombres en lettres vers chiffres
     const nombresEnLettres = {
-        'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5,
-        'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9, 'dix': 10,
-        'onze': 11, 'douze': 12, 'treize': 13, 'quatorze': 14, 'quinze': 15,
-        'seize': 16, 'vingt': 20, 'trente': 30, 'quarante': 40, 'cinquante': 50,
-        'soixante': 60, 'soixante-dix': 70, 'quatre-vingt': 80, 'quatre-vingts': 80,
-        'quatre-vingt-dix': 90, 'cent': 100
+        'zero':0,'un':1,'deux':2,'trois':3,'quatre':4,'cinq':5,'six':6,'sept':7,'huit':8,'neuf':9,'dix':10,
+        'onze':11,'douze':12,'treize':13,'quatorze':14,'quinze':15,'seize':16,'vingt':20,'trente':30,
+        'quarante':40,'cinquante':50,'soixante':60,'soixante-dix':70,'quatre-vingt':80,'quatre-vingts':80,
+        'quatre-vingt-dix':90,'cent':100
     };
 
-    // Convertit "quinze" -> "15", "trente-cinq" -> "35", "soixante-quinze" -> "75"
     function convertirNombresEnLettres(texte) {
         let resultat = texte.toLowerCase();
-        // Remplace d'abord les nombres composés (trente-cinq, soixante-quinze, etc.)
         const composes = {
-            'trente-cinq': '35', 'trente-cinq': '35',
-            'quarante-cinq': '45', 'cinquante-cinq': '55',
-            'soixante-cinq': '65', 'soixante-quinze': '75',
-            'quatre-vingt-cinq': '85', 'quatre-vingt-quinze': '95',
-            'vingt-cinq': '25', 'quarante': '40', 'cinquante': '50',
-            'trente': '30'
+            'trente-cinq':'35','quarante-cinq':'45','cinquante-cinq':'55','soixante-cinq':'65',
+            'soixante-quinze':'75','quatre-vingt-cinq':'85','quatre-vingt-quinze':'95','vingt-cinq':'25',
+            'quarante':'40','cinquante':'50','trente':'30'
         };
-        Object.keys(composes).forEach(k => {
-            resultat = resultat.replace(new RegExp(k, 'g'), composes[k]);
-        });
-        // Puis les nombres simples
+        Object.keys(composes).forEach(k => { resultat = resultat.replace(new RegExp(k, 'g'), composes[k]); });
         Object.keys(nombresEnLettres).forEach(mot => {
             resultat = resultat.replace(new RegExp('\\b' + mot + '\\b', 'g'), nombresEnLettres[mot]);
         });
         return resultat;
     }
 
-    // Normalise le texte pour la recherche : enlève espaces, met en majuscules
     function normaliser(texte) {
         if (!texte) return "";
         let t = texte.toLowerCase();
-        // Convertit les nombres en lettres
         t = convertirNombresEnLettres(t);
-        // Remplace "changan" par "cs" (nom courant)
         t = t.replace(/changan/g, 'cs');
-        t = t.replace(/chang an/g, 'cs');
         t = t.replace(/changeant/g, 'cs');
-        // Enlève tous les espaces, tirets et caractères spéciaux
+        t = t.replace(/chang an/g, 'cs');
         t = t.replace(/[\s\-\.\,\']/g, '');
-        // Retire les mots parasites
         t = t.replace(/^(le|la|les|un|une|des|du|de|prix|combien|coute|coûte|tarif|revision|révision|pour|vehicule|véhicule|modele|modèle)/g, '');
         t = t.replace(/(le|la|les|un|une|des|du|de|prix|combien|coute|coûte|tarif|revision|révision|pour|vehicule|véhicule|modele|modèle)$/g, '');
-        // Gère les "+"
         t = t.replace(/plus/g, '+');
-        t = t.replace(/\+/g, '+');
         return t.toUpperCase();
     }
 
-    // Trouve les modèles correspondants avec tolérance aux fautes
     function trouverModeles(texte) {
         const normalise = normaliser(texte);
-        
         if (!normalise) return { exact: [], proches: [] };
 
-        // 1. Recherche exacte après normalisation
-        const exact = vehicules.filter(v => {
-            const vNorm = normaliser(v.modele);
-            return vNorm === normalise;
-        });
-
+        const exact = vehicules.filter(v => normaliser(v.modele) === normalise);
         if (exact.length > 0) return { exact, proches: [] };
 
-        // 2. Recherche par inclusion (le texte saisi est contenu dans le modèle)
         const proches = vehicules.filter(v => {
             const vNorm = normaliser(v.modele);
             return vNorm.includes(normalise) || normalise.includes(vNorm);
         });
 
-        // 3. Recherche par distance de Levenshtein (tolérance aux fautes de frappe)
         if (proches.length === 0 && normalise.length >= 3) {
-            const scores = vehicules.map(v => {
-                const vNorm = normaliser(v.modele);
-                return { v, distance: levenshtein(normalise, vNorm) };
-            });
+            const scores = vehicules.map(v => ({
+                v, distance: levenshtein(normalise, normaliser(v.modele))
+            }));
             scores.sort((a, b) => a.distance - b.distance);
-            // On garde les 5 meilleurs
-            const meilleurs = scores.slice(0, 5).filter(s => s.distance <= 3);
-            return { exact: [], proches: meilleurs.map(s => s.v) };
+            return { exact: [], proches: scores.slice(0, 5).filter(s => s.distance <= 3).map(s => s.v) };
         }
-
         return { exact: [], proches };
     }
 
-    // Distance de Levenshtein (nombre de caractères à changer pour passer de a à b)
     function levenshtein(a, b) {
         if (a.length === 0) return b.length;
         if (b.length === 0) return a.length;
@@ -1753,41 +2513,29 @@
         for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
         for (let i = 1; i <= b.length; i++) {
             for (let j = 1; j <= a.length; j++) {
-                if (b.charAt(i - 1) === a.charAt(j - 1)) {
-                    matrix[i][j] = matrix[i - 1][j - 1];
-                } else {
-                    matrix[i][j] = Math.min(
-                        matrix[i - 1][j - 1] + 1,
-                        matrix[i][j - 1] + 1,
-                        matrix[i - 1][j] + 1
-                    );
-                }
+                if (b.charAt(i-1) === a.charAt(j-1)) matrix[i][j] = matrix[i-1][j-1];
+                else matrix[i][j] = Math.min(matrix[i-1][j-1]+1, matrix[i][j-1]+1, matrix[i-1][j]+1);
             }
         }
         return matrix[b.length][a.length];
     }
 
-    // Synthèse vocale
     function parler(texte) {
         if (!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(texte);
-        utterance.lang = 'fr-FR';
-        utterance.rate = 0.95;
-        utterance.pitch = 1;
-        // Cherche une voix française
+        const u = new SpeechSynthesisUtterance(texte);
+        u.lang = 'fr-FR';
+        u.rate = 0.95;
         const voices = window.speechSynthesis.getVoices();
         const voixFr = voices.find(v => v.lang.startsWith('fr'));
-        if (voixFr) utterance.voice = voixFr;
-        window.speechSynthesis.speak(utterance);
+        if (voixFr) u.voice = voixFr;
+        window.speechSynthesis.speak(u);
     }
 
-    // Formate le prix en texte parlé
     function prixEnTexte(prix) {
         return prix.toLocaleString('fr-FR').replace(/\s/g, ' ') + " francs CFA";
     }
 
-    // Ouvre la modale de l'assistant vocal
     window.ouvrirAssistantVocal = function() {
         document.getElementById('voice-modal').classList.add('open');
         document.getElementById('voice-result').classList.remove('open');
@@ -1795,22 +2543,17 @@
         document.getElementById('voice-transcript').textContent = "Appuyez sur le micro et dites un modèle...";
         document.getElementById('voice-hint').textContent = 'Exemple : "CS 15", "P201 Gasoil", "T70"';
         document.getElementById('voice-actions').style.display = 'none';
-        
-        // Vérifier le support
+
         const supporte = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
         if (!supporte) {
             document.getElementById('voice-not-supported').style.display = 'block';
             document.getElementById('voice-not-supported').innerHTML = 
-                '<strong>⚠️ Reconnaissance vocale non supportée</strong><br>' +
-                'Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez <strong>Google Chrome</strong> ou <strong>Microsoft Edge</strong> sur Android ou PC.';
+                '<strong>⚠️ Reconnaissance vocale non supportée</strong><br>Utilisez <strong>Google Chrome</strong> ou <strong>Microsoft Edge</strong>.';
             document.getElementById('voice-icon').style.display = 'none';
             return;
-        } else {
-            document.getElementById('voice-not-supported').style.display = 'none';
-            document.getElementById('voice-icon').style.display = 'flex';
         }
-
-        // Lance l'écoute automatiquement
+        document.getElementById('voice-not-supported').style.display = 'none';
+        document.getElementById('voice-icon').style.display = 'flex';
         setTimeout(() => demarrerEcoute(), 300);
     }
 
@@ -1829,10 +2572,9 @@
     }
 
     function demarrerEcoute() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return;
-
-        recognition = new SpeechRecognition();
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return;
+        recognition = new SR();
         recognition.lang = 'fr-FR';
         recognition.continuous = false;
         recognition.interimResults = true;
@@ -1852,24 +2594,17 @@
                 transcription += event.results[i][0].transcript;
                 if (event.results[i].isFinal) final = true;
             }
-            
             document.getElementById('voice-transcript').textContent = '"' + transcription + '"';
-
-            if (final) {
-                derniereTranscription = transcription;
-                traiterTranscription(transcription);
-            }
+            if (final) traiterTranscription(transcription);
         };
 
         recognition.onerror = (event) => {
-            console.error("Erreur reconnaissance :", event.error);
             isListening = false;
             document.getElementById('voice-icon').classList.remove('listening');
             document.getElementById('voice-fab').classList.remove('listening');
-            
             if (event.error === 'not-allowed') {
                 document.getElementById('voice-transcript').textContent = "⚠️ Micro non autorisé";
-                document.getElementById('voice-hint').textContent = "Autorisez le micro dans les paramètres du navigateur.";
+                document.getElementById('voice-hint').textContent = "Autorisez le micro dans les paramètres.";
             } else if (event.error === 'no-speech') {
                 document.getElementById('voice-transcript').textContent = "Aucune parole détectée";
                 document.getElementById('voice-hint').textContent = "Réessayez en parlant plus fort.";
@@ -1884,12 +2619,7 @@
             document.getElementById('voice-icon').classList.remove('listening');
             document.getElementById('voice-fab').classList.remove('listening');
         };
-
-        try {
-            recognition.start();
-        } catch (e) {
-            console.error(e);
-        }
+        try { recognition.start(); } catch (e) {}
     }
 
     function arreterEcoute() {
@@ -1900,48 +2630,37 @@
         isListening = false;
     }
 
-    // Traite la transcription et affiche le résultat
     function traiterTranscription(texte) {
-        console.log("🎤 Transcription :", texte);
         const { exact, proches } = trouverModeles(texte);
-
-        if (exact.length === 1) {
-            afficherResultatVocal(exact[0]);
-        } else if (exact.length > 1) {
-            afficherSuggestions(exact, "Plusieurs correspondances exactes :");
-        } else if (proches.length === 1) {
-            afficherResultatVocal(proches[0]);
-        } else if (proches.length > 1) {
-            afficherSuggestions(proches, "Vouliez-vous dire :");
-        } else {
-            // Aucun résultat
-            document.getElementById('voice-transcript').textContent = '"' + texte + '"';
-            document.getElementById('voice-hint').innerHTML = 
-                "❌ Aucun modèle trouvé.<br>Réessayez ou vérifiez le nom.";
+        if (exact.length === 1) afficherResultatVocal(exact[0]);
+        else if (exact.length > 1) afficherSuggestions(exact, "Plusieurs correspondances exactes :");
+        else if (proches.length === 1) afficherResultatVocal(proches[0]);
+        else if (proches.length > 1) afficherSuggestions(proches, "Vouliez-vous dire :");
+        else {
+            document.getElementById('voice-hint').innerHTML = "❌ Aucun modèle trouvé.<br>Réessayez.";
             document.getElementById('voice-actions').style.display = 'flex';
             parler("Désolé, je n'ai pas trouvé ce modèle.");
         }
     }
 
-    // Affiche le résultat vocal d'un modèle
     function afficherResultatVocal(v) {
         const prixTTC = v.prixTTC || 0;
+        const fne = calculerFNE(prixTTC);
         const prixExtras = calculerPrixExtras(v);
-        const total = prixTTC + prixExtras;
         const prixHT = calculerPrixHT(v);
 
         const resultDiv = document.getElementById('voice-result');
         resultDiv.innerHTML = `
             <div class="voice-result-modele">${v.modele}</div>
             <div class="voice-result-prix">${prixTTC.toLocaleString('fr-FR')} <small>FCFA TTC</small></div>
+            <div class="voice-result-detail">
+                <span>Taxe FNE</span>
+                <strong>+${fne.toLocaleString('fr-FR')} F</strong>
+            </div>
             ${prixExtras > 0 ? `
                 <div class="voice-result-detail">
                     <span>Autres pièces</span>
                     <strong>+${prixExtras.toLocaleString('fr-FR')} F</strong>
-                </div>
-                <div class="voice-result-detail">
-                    <span>Total avec extras</span>
-                    <strong>${total.toLocaleString('fr-FR')} F</strong>
                 </div>
             ` : ''}
             ${prixHT > 0 ? `
@@ -1950,43 +2669,27 @@
                     <strong>${prixHT.toLocaleString('fr-FR')} F</strong>
                 </div>
             ` : ''}
-            ${v.prestations ? `
-                <div class="voice-result-detail">
-                    <span>Prestations</span>
-                    <strong>${v.prestations}</strong>
-                </div>
-            ` : ''}
         `;
         resultDiv.classList.add('open');
         document.getElementById('voice-hint').textContent = "";
         document.getElementById('voice-actions').style.display = 'flex';
 
-        // Réponse vocale
-        let phrase = v.modele + ", prix TTC, " + prixEnTexte(prixTTC);
-        if (prixExtras > 0) {
-            phrase += ". Avec les autres pièces, total : " + prixEnTexte(total);
-        }
+        let phrase = v.modele + ", prix TTC, " + prixEnTexte(prixTTC) + ". Taxe FNE : " + prixEnTexte(fne) + ".";
+        if (prixExtras > 0) phrase += " Avec les autres pièces : " + prixEnTexte(prixTTC + fne + prixExtras);
         parler(phrase);
     }
 
-    // Affiche des suggestions cliquables
     function afficherSuggestions(liste, titre) {
         const resultDiv = document.getElementById('voice-result');
-        let html = `
-            <div class="voice-suggestions">
-                <div class="voice-suggestions-title">${titre}</div>
-        `;
+        let html = `<div class="voice-suggestions"><div class="voice-suggestions-title">${titre}</div>`;
         liste.forEach(v => {
-            html += `
-                <button class="voice-suggestion-btn" onclick="choisirSuggestion('${v.id}')">
-                    ${v.modele} — ${(v.prixTTC || 0).toLocaleString('fr-FR')} F
-                </button>
-            `;
+            html += `<button class="voice-suggestion-btn" onclick="choisirSuggestion('${v.id}')">
+                ${v.modele} — ${(v.prixTTC || 0).toLocaleString('fr-FR')} F
+            </button>`;
         });
         html += '</div>';
         resultDiv.innerHTML = html;
         resultDiv.classList.add('open');
-        document.getElementById('voice-hint').textContent = "";
         document.getElementById('voice-actions').style.display = 'flex';
     }
 
@@ -1995,27 +2698,79 @@
         if (v) afficherResultatVocal(v);
     }
 
-    /* ==========================================
-       LANCEMENT
-       ========================================== */
-    initFirebase();
-    chargerDonnees();
+    /* ================================================================
+       ================== DÉMARRAGE ===================================
+       ================================================================ */
+       async function demarrer() {
+        initFirebase();
 
-    // Charge les voix pour la synthèse (nécessaire sur certains navigateurs)
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = () => {
-            window.speechSynthesis.getVoices();
-        };
+        // Détection du mode au démarrage
+        if (estModeClient()) {
+            // ========== MODE CLIENT ==========
+            isModeClient = true;
+
+            // 1. Supprimer COMPLÈTEMENT la partie conseiller du DOM
+            const conseillerContainer = document.getElementById('conseiller-container');
+            if (conseillerContainer) conseillerContainer.remove();
+
+            const voiceFab = document.getElementById('voice-fab');
+            if (voiceFab) voiceFab.remove();
+
+            const voiceModal = document.getElementById('voice-modal');
+            if (voiceModal) voiceModal.remove();
+
+            const modalEdit = document.getElementById('modal-edit');
+            if (modalEdit) modalEdit.remove();
+
+            const modalLogin = document.getElementById('modal-login');
+            if (modalLogin) modalLogin.remove();
+
+            const notifToast = document.getElementById('notification-toast');
+            if (notifToast) notifToast.remove();
+
+            // 2. Afficher uniquement la vue client
+            document.getElementById('client-view').classList.add('active');
+
+            // 3. Charger les données (nécessaires pour la liste des modèles + tarifs)
+            await chargerDonnees();
+
+            console.log("👤 Mode CLIENT activé — vue simplifiée");
+            return;
+        }
+
+        // ========== MODE CONSEILLER ==========
+        // Supprimer la vue client du DOM (inaccessible)
+        const clientView = document.getElementById('client-view');
+        if (clientView) clientView.remove();
+
+        document.getElementById('conseiller-container').style.display = 'block';
+
+        // Vérifier si déjà connecté
+        if (!verifierConnexionConseiller()) {
+            document.getElementById('modal-login').style.display = 'block';
+        }
+
+        await chargerDonnees();
+        chargerDemandes();
+
+        // Voix
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('✅ SW enregistré'))
+                    .catch(err => console.log('⚠️ SW :', err.message));
+            });
+        }
+
+        console.log("💼 Mode CONSEILLER activé");
     }
 
-    // === PWA : Enregistrement du Service Worker ===
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('✅ Service Worker enregistré'))
-                .catch(err => console.log('⚠️ Service Worker non enregistré :', err.message));
-        });
-    }
+    demarrer();
 </script>
 
 </body>
