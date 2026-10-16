@@ -51,6 +51,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             overflow: hidden;
+            display: none;
         }
 
         .header {
@@ -88,7 +89,7 @@
 
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
-        .header-actions button, .btn-header {
+        .header-actions button {
             background: rgba(255,255,255,0.1);
             color: var(--white);
             border: 1px solid rgba(255,255,255,0.2);
@@ -320,13 +321,6 @@
         }
         .btn-danger:hover { background-color: #c53030; }
 
-        .btn-warning {
-            background-color: var(--warning); color: var(--white); border: none;
-            padding: 10px 18px; border-radius: 4px; cursor: pointer;
-            font-size: 14px; font-weight: 500;
-        }
-        .btn-warning:hover { background-color: #b7791f; }
-
         .btn-secondary {
             background-color: #edf2f7; color: var(--secondary); border: 1px solid var(--border);
             padding: 10px 18px; border-radius: 4px; cursor: pointer;
@@ -408,7 +402,32 @@
         }
         .close:hover { color: var(--primary); }
 
-        /* ============ ASSISTANT VOCAL ============ */
+        /* === LOGIN MODAL === */
+        #modal-login {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+        #modal-login .modal-content {
+            margin: 10% auto;
+            max-width: 420px;
+        }
+        #modal-login .login-logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        #modal-login h3 {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        #modal-login .login-subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        /* === ASSISTANT VOCAL === */
         .voice-fab {
             position: fixed; bottom: 30px; right: 30px;
             width: 64px; height: 64px; border-radius: 50%;
@@ -417,7 +436,7 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all 0.3s ease; z-index: 999;
         }
-        .voice-fab:hover { transform: scale(1.08); box-shadow: 0 6px 25px rgba(49, 130, 206, 0.55); }
+        .voice-fab:hover { transform: scale(1.08); }
         .voice-fab.listening { background: var(--danger); animation: pulse-fab 1.2s infinite; }
         .voice-fab svg { width: 28px; height: 28px; }
 
@@ -438,12 +457,6 @@
             background: white; border-radius: 16px; padding: 40px 30px;
             max-width: 500px; width: 100%; text-align: center;
             position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
 
         .voice-modal-close {
@@ -508,13 +521,6 @@
         .voice-actions { margin-top: 20px; display: flex; gap: 10px; }
         .voice-actions button { flex: 1; }
 
-        .btn-voice-action {
-            background: var(--accent); color: white; border: none;
-            padding: 12px; border-radius: 8px; cursor: pointer;
-            font-size: 14px; font-weight: 500; font-family: inherit;
-        }
-        .btn-voice-action:hover { background: #2b6cb0; }
-
         .btn-voice-retry {
             background: var(--bg); color: var(--secondary);
             border: 1px solid var(--border); padding: 12px; border-radius: 8px;
@@ -553,10 +559,7 @@
             margin-bottom: 8px;
         }
 
-        .client-header p {
-            font-size: 14px;
-            opacity: 0.85;
-        }
+        .client-header p { font-size: 14px; opacity: 0.85; }
 
         .client-step {
             display: none;
@@ -625,11 +628,16 @@
             transition: all 0.2s;
         }
 
+        .client-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .client-btn-primary {
             background: var(--accent);
             color: white;
         }
-        .client-btn-primary:hover { background: #2b6cb0; }
+        .client-btn-primary:hover:not(:disabled) { background: #2b6cb0; }
 
         .client-btn-secondary {
             background: var(--bg);
@@ -646,18 +654,14 @@
 
         .client-actions button { flex: 1; }
 
-        /* === Tarifs client === */
         .tarif-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
             border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
         }
 
-        .tarif-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
         .tarif-card.selected {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(49,130,206,0.15);
@@ -687,9 +691,7 @@
             border-top: 2px solid var(--border);
         }
 
-        .tarif-ligne.total span:last-child {
-            color: var(--accent);
-        }
+        .tarif-ligne.total span:last-child { color: var(--accent); }
 
         .tarif-fne {
             color: var(--warning);
@@ -722,11 +724,7 @@
             flex: 1;
         }
 
-        /* === Confirmation === */
-        .confirmation-box {
-            text-align: center;
-            padding: 30px 20px;
-        }
+        .confirmation-box { text-align: center; padding: 30px 20px; }
 
         .confirmation-icon {
             width: 80px;
@@ -799,7 +797,6 @@
         .stat-card.success .stat-value { color: var(--success); }
         .stat-card.danger .stat-value { color: var(--danger); }
 
-        /* === Cartes demandes === */
         .demande-card {
             background: white;
             border-radius: 10px;
@@ -812,7 +809,10 @@
 
         .demande-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .demande-card.en_attente { border-left-color: var(--warning); }
-        .demande-card.en_cours { border-left-color: var(--accent); }
+        .demande-card.en_cours {
+            border-left-color: var(--accent);
+            background: linear-gradient(to right, var(--accent-light), white 30%);
+        }
         .demande-card.termine { border-left-color: var(--success); opacity: 0.75; }
 
         .demande-header {
@@ -839,6 +839,7 @@
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
+            margin-left: 8px;
         }
 
         .demande-statut {
@@ -855,14 +856,24 @@
 
         .demande-infos {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
             font-size: 13px;
             color: var(--text-light);
             margin-bottom: 12px;
+            align-items: center;
         }
 
         .demande-infos span { display: flex; align-items: center; gap: 5px; }
+
+        .badge-conseiller {
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 12px;
+        }
 
         .demande-actions {
             display: flex;
@@ -956,14 +967,12 @@
             .client-header h1 { font-size: 18px; }
             .notification-toast { max-width: calc(100% - 40px); right: 20px; }
         }
-
-      
     </style>
 </head>
 <body>
 
 <!-- ================================================================
-     VUE CLIENT (accessible via QR code ?client=1)
+     VUE CLIENT (accessible via ?client=1)
      ================================================================ -->
 <div id="client-view">
     <div class="client-header">
@@ -971,7 +980,7 @@
         <p>Bienvenue, veuillez nous indiquer votre besoin</p>
     </div>
 
-    <!-- ÉTAPE 1 : SERVICE -->
+    <!-- ÉTAPE 1 -->
     <div class="client-step active" id="client-step-1">
         <h2>Quel service souhaitez-vous ?</h2>
         <div class="service-grid" id="service-grid">
@@ -1001,7 +1010,7 @@
         </div>
     </div>
 
-    <!-- ÉTAPE 2 : INFOS -->
+    <!-- ÉTAPE 2 -->
     <div class="client-step" id="client-step-2">
         <h2>Vos informations</h2>
         <div class="form-group">
@@ -1016,7 +1025,7 @@
             <label>Immatriculation (optionnel)</label>
             <input type="text" id="client-immat" placeholder="Ex: AB-123-CD">
         </div>
-        <div class="form-group">
+        <div class="form-group" id="client-modele-group">
             <label>Modèle du véhicule (optionnel)</label>
             <select id="client-modele">
                 <option value="">-- Sélectionner --</option>
@@ -1032,11 +1041,11 @@
         </div>
     </div>
 
-    <!-- ÉTAPE 3 : TARIFS ET CONFIRMATION -->
+    <!-- ÉTAPE 3 -->
     <div class="client-step" id="client-step-3">
-        <h2>Tarif de la révision</h2>
+        <h2 id="client-step-3-title">Confirmation</h2>
         <p style="color:var(--text-light);font-size:13px;margin-bottom:15px;" id="client-tarif-info">
-            Sélectionnez le modèle pour voir le tarif TTC.
+            Chargement...
         </p>
         <div id="client-tarif-container"></div>
 
@@ -1046,7 +1055,7 @@
         </div>
     </div>
 
-    <!-- ÉTAPE 4 : CONFIRMATION -->
+    <!-- ÉTAPE 4 -->
     <div class="client-step" id="client-step-4">
         <div class="confirmation-box">
             <div class="confirmation-icon">✓</div>
@@ -1061,7 +1070,7 @@
 </div>
 
 <!-- ================================================================
-     VUE CONSEILLER (normale)
+     VUE CONSEILLER
      ================================================================ -->
 <div class="container" id="conseiller-container">
     <div class="header">
@@ -1087,7 +1096,6 @@
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-stats')">Statistiques</button>
     </div>
 
-    <!-- ONGLET LISTE -->
     <div id="tab-liste" class="tab-content active">
         <div class="search-container">
             <input type="text" id="search" placeholder="Rechercher un modèle..." oninput="filtrer()">
@@ -1120,13 +1128,11 @@
         </div>
     </div>
 
-    <!-- ONGLET RÉCAP -->
     <div id="tab-recap" class="tab-content">
         <h3 style="margin-bottom: 20px; color: var(--primary);">Récapitulatif des prix</h3>
         <div id="recap-container"></div>
     </div>
 
-    <!-- ONGLET AJOUT -->
     <div id="tab-ajout" class="tab-content">
         <div class="form-card">
             <h3 style="margin-bottom: 20px; color: var(--primary);">Nouveau véhicule</h3>
@@ -1167,7 +1173,6 @@
         </div>
     </div>
 
-    <!-- ONGLET DEMANDES -->
     <div id="tab-demandes" class="tab-content">
         <h3 style="margin-bottom: 20px; color: var(--primary);">Demandes en cours</h3>
         <div class="filter-bar">
@@ -1182,7 +1187,6 @@
         <div id="demandes-container"></div>
     </div>
 
-    <!-- ONGLET HISTORIQUE -->
     <div id="tab-historique" class="tab-content">
         <h3 style="margin-bottom: 20px; color: var(--primary);">Historique complet</h3>
         <div class="filter-bar">
@@ -1192,7 +1196,6 @@
         <div id="historique-container"></div>
     </div>
 
-    <!-- ONGLET STATS -->
     <div id="tab-stats" class="tab-content">
         <h3 style="margin-bottom: 20px; color: var(--primary);">Statistiques</h3>
         <div class="stat-grid" id="stats-grid"></div>
@@ -1230,19 +1233,25 @@
     </div>
 </div>
 
-<!-- MODAL LOGIN CONSEILLER -->
+<!-- MODAL LOGIN CONSEILLER (Firebase Auth) -->
 <div id="modal-login" class="modal">
-    <div class="modal-content" style="max-width:400px;">
-        <h3>Connexion conseiller</h3>
-        <p style="color:var(--text-light);font-size:13px;margin-bottom:20px;">Entrez votre code personnel pour accéder à l'espace réception.</p>
+    <div class="modal-content">
+        <div class="login-logo">🚗</div>
+        <h3>Service Réception</h3>
+        <p class="login-subtitle">Connexion conseiller</p>
+        
         <div class="form-group">
-            <label>Code conseiller</label>
-            <input type="password" id="login-code" placeholder="Ex: 1234" onkeydown="if(event.key==='Enter')validerLogin()">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="exemple@sav.local" onkeydown="if(event.key==='Enter')validerLogin()">
+        </div>
+        <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" id="login-code" placeholder="••••••••" onkeydown="if(event.key==='Enter')validerLogin()">
         </div>
         <div class="form-actions">
-            <button class="btn-primary" onclick="validerLogin()" style="width:100%;">Se connecter</button>
+            <button class="btn-primary" onclick="validerLogin()" style="width:100%;padding:14px;font-size:15px;">Se connecter</button>
         </div>
-        <p id="login-error" style="color:var(--danger);font-size:13px;margin-top:10px;display:none;"></p>
+        <p id="login-error" style="color:var(--danger);font-size:13px;margin-top:15px;display:none;text-align:center;"></p>
     </div>
 </div>
 
@@ -1252,7 +1261,7 @@
     <p id="notif-message"></p>
 </div>
 
-<!-- BOUTON VOCAL (caché en mode client) -->
+<!-- BOUTON VOCAL -->
 <button class="voice-fab" id="voice-fab" onclick="ouvrirAssistantVocal()" title="Assistant vocal">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
@@ -1301,10 +1310,17 @@
         serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    import { 
+        getAuth, 
+        signInWithEmailAndPassword, 
+        signOut,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
     /* ==========================================
        CONFIGURATION FIREBASE
        ========================================== */
-   const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
   authDomain: "ntr-garage.firebaseapp.com",
   databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
@@ -1313,14 +1329,18 @@
   messagingSenderId: "606167388967",
   appId: "1:606167388967:web:7ad669fd353cdeeb7a8f02"
 };
+
     /* ==========================================
-       CONSEILLERS (CODE + NOM)
-       Modifie ici pour ajouter/retirer des conseillers
+       CONSEILLERS (email Firebase -> Nom affiché)
+       ==========================================
+       Les emails doivent être EXACTEMENT ceux
+       créés dans Firebase Authentication.
        ========================================== */
     const CONSEILLERS = {
-        "1234": "Conseiller 1",
-        "5678": "Conseiller 2"
-        // Ajoute d'autres lignes : "code": "Nom du conseiller"
+           const CONSEILLERS = {
+        "ngorantanohromaric@gmail.com": "Romaric TANOH"
+        // Ajoute d'autres conseillers ici quand l'idée sera validée
+    };
     };
 
     /* ==========================================
@@ -1332,7 +1352,7 @@
         return 0;
     }
 
-    const PRIX_ADDITIF = 10000; // Additif carburant
+    const PRIX_ADDITIF = 10000;
 
     /* ==========================================
        DONNÉES INITIALES
@@ -1377,6 +1397,7 @@
        ÉTAT GLOBAL
        ========================================== */
     let db = null;
+    let auth = null;
     let collectionRef = null;
     let demandesRef = null;
     let firebaseDisponible = false;
@@ -1384,11 +1405,11 @@
     let vehicules = [];
     let demandes = [];
     let selectedId = null;
-    let conseillerConnecte = null; // { code, nom }
+    let conseillerConnecte = null;
     let isModeClient = false;
 
     /* ==========================================
-       INITIALISATION FIREBASE
+       INIT FIREBASE
        ========================================== */
     function initFirebase() {
         try {
@@ -1398,6 +1419,7 @@
                     tabManager: persistentMultipleTabManager()
                 })
             });
+            auth = getAuth(app);
             collectionRef = collection(db, "tarifs_revision");
             demandesRef = collection(db, "demandes_sav");
             firebaseDisponible = true;
@@ -1410,17 +1432,11 @@
         }
     }
 
-    /* ==========================================
-       DÉTECTION MODE CLIENT (?client=1)
-       ========================================== */
     function estModeClient() {
         const params = new URLSearchParams(window.location.search);
         return params.get('client') === '1';
     }
 
-    /* ==========================================
-       STATUT SYNC
-       ========================================== */
     function majStatutSync(statut) {
         const dot = document.getElementById('sync-dot');
         const label = document.getElementById('sync-label');
@@ -1453,7 +1469,7 @@
     }
 
     /* ==========================================
-       CHARGEMENT DES VÉHICULES
+       CHARGEMENT VÉHICULES
        ========================================== */
     async function chargerDonnees() {
         if (!firebaseDisponible) {
@@ -1519,17 +1535,16 @@
     }
 
     /* ==========================================
-       CHARGEMENT DES DEMANDES
+       CHARGEMENT DEMANDES
        ========================================== */
     function chargerDemandes() {
-        if (!firebaseDisponible) return;
-        const q = query(demandesRef, orderBy("dateCreation", "desc"));
+        if (!firebaseDisponible || !auth.currentUser) return;
+        const q = query(demandesRef, orderBy("dateCreationISO", "desc"));
         onSnapshot(q, (snapshot) => {
             const anciennes = demandes.map(d => d.id);
             demandes = [];
             snapshot.forEach((doc) => demandes.push({ id: doc.id, ...doc.data() }));
 
-            // Détection nouvelle demande pour notification
             if (anciennes.length > 0) {
                 const nouvelles = demandes.filter(d => !anciennes.includes(d.id) && d.statut === 'en_attente');
                 nouvelles.forEach(n => afficherNotification(n));
@@ -1539,12 +1554,11 @@
             afficherHistorique();
             afficherStats();
             majBadgeDemandes();
+        }, (error) => {
+            console.error("Erreur demandes :", error);
         });
     }
 
-    /* ==========================================
-       BADGE DEMANDES
-       ========================================== */
     function majBadgeDemandes() {
         const badge = document.getElementById('badge-demandes');
         if (!badge) return;
@@ -1566,10 +1580,7 @@
         document.getElementById('notif-message').textContent = 
             demande.nom + ' ' + demande.prenom + (demande.modele ? ' — ' + demande.modele : '');
         toast.classList.add('show');
-
-        // Son de notification
         jouerSonNotification();
-
         setTimeout(() => toast.classList.remove('show'), 6000);
     }
 
@@ -1585,8 +1596,6 @@
             gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime + 0.5);
-            
-            // Deuxième bip
             setTimeout(() => {
                 const osc2 = ctx.createOscillator();
                 const gain2 = ctx.createGain();
@@ -1602,7 +1611,7 @@
     }
 
     /* ==========================================
-       TABLEAU VÉHICULES
+       TABLEAU
        ========================================== */
     function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
@@ -1992,7 +2001,7 @@
     }
 
     /* ================================================================
-       ================== VUE CLIENT ==================================
+       VUE CLIENT
        ================================================================ */
     let clientServiceChoisi = null;
     let clientAdditifChoisi = false;
@@ -2020,6 +2029,18 @@
 
     window.clientEtape2 = function() {
         if (!clientServiceChoisi) return;
+        
+        // Masquer/afficher le champ modèle selon le service
+        const serviceAvecTarif = ['Première révision', 'Révision'].includes(clientServiceChoisi);
+        const groupeModele = document.getElementById('client-modele-group');
+        
+        if (serviceAvecTarif) {
+            groupeModele.style.display = 'block';
+        } else {
+            groupeModele.style.display = 'none';
+            document.getElementById('client-modele').value = '';
+        }
+        
         document.getElementById('client-step-1').classList.remove('active');
         document.getElementById('client-step-2').classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2035,12 +2056,12 @@
         const prenom = document.getElementById('client-prenom').value.trim();
         if (!nom || !prenom) { alert("Veuillez saisir votre nom et prénom."); return; }
 
-        // Si c'est un service de révision, afficher les tarifs
         const servicesAvecTarif = ['Première révision', 'Révision'];
         const conteneur = document.getElementById('client-tarif-container');
         conteneur.innerHTML = '';
 
         if (servicesAvecTarif.includes(clientServiceChoisi)) {
+            document.getElementById('client-step-3-title').textContent = "Tarif de la révision";
             document.getElementById('client-tarif-info').textContent = 
                 "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC :";
 
@@ -2053,9 +2074,17 @@
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
         } else {
+            // Pour les autres services : AUCUN tarif affiché
+            document.getElementById('client-step-3-title').textContent = "Confirmation";
             document.getElementById('client-tarif-info').textContent = 
-                "Aucun tarif à afficher pour ce service. Un conseiller vous prendra en charge.";
-            conteneur.innerHTML = '';
+                "Aucun tarif à afficher pour ce service. Un conseiller vous prendra en charge dès que possible.";
+            conteneur.innerHTML = `
+                <div style="background:var(--accent-light);padding:25px;border-radius:8px;text-align:center;color:var(--secondary);">
+                    <div style="font-size:48px;margin-bottom:10px;">📋</div>
+                    <div style="font-weight:600;font-size:18px;color:var(--accent);">${clientServiceChoisi}</div>
+                    <div style="font-size:13px;margin-top:10px;">Votre demande sera traitée dans l'ordre d'arrivée.</div>
+                </div>
+            `;
         }
 
         document.getElementById('client-step-2').classList.remove('active');
@@ -2156,7 +2185,6 @@
                 localStorage.setItem("demandes_sav", JSON.stringify(arr));
             }
             
-            // Ticket de confirmation
             document.getElementById('client-ticket').innerHTML = `
                 <div><strong>Client :</strong> ${prenom} ${nom}</div>
                 <div><strong>Service :</strong> ${clientServiceChoisi}</div>
@@ -2185,51 +2213,74 @@
     }
 
     /* ================================================================
-       ================== VUE CONSEILLER ==============================
+       VUE CONSEILLER - AUTH
        ================================================================ */
-
-    function verifierConnexionConseiller() {
-        const saved = sessionStorage.getItem('conseiller_sav');
-        if (saved) {
-            try {
-                conseillerConnecte = JSON.parse(saved);
-                afficherInterfaceConseiller();
-                return true;
-            } catch(e) {}
-        }
-        return false;
-    }
 
     function afficherInterfaceConseiller() {
         if (!conseillerConnecte) return;
-        document.getElementById('conseiller-info').textContent = '👤 ' + conseillerConnecte.nom;
+        const info = document.getElementById('conseiller-info');
+        if (info) info.textContent = '👤 ' + conseillerConnecte.nom;
     }
 
-    window.validerLogin = function() {
-        const code = document.getElementById('login-code').value.trim();
+    window.validerLogin = async function() {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-code').value.trim();
         const erreur = document.getElementById('login-error');
         
-        if (CONSEILLERS[code]) {
-            conseillerConnecte = { code, nom: CONSEILLERS[code] };
+        if (!email || !password) {
+            erreur.textContent = "Email et mot de passe requis.";
+            erreur.style.display = 'block';
+            return;
+        }
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            
+            let nomConseiller = CONSEILLERS[user.email] || user.email.split('@')[0];
+            
+            conseillerConnecte = { 
+                uid: user.uid, 
+                email: user.email, 
+                nom: nomConseiller 
+            };
+            
             sessionStorage.setItem('conseiller_sav', JSON.stringify(conseillerConnecte));
             document.getElementById('modal-login').style.display = 'none';
             afficherInterfaceConseiller();
             erreur.style.display = 'none';
-        } else {
-            erreur.textContent = "Code incorrect. Réessayez.";
+            
+            chargerDemandes();
+            
+        } catch (error) {
+            console.error(error);
+            let msg = "Erreur de connexion.";
+            if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                msg = "Email ou mot de passe incorrect.";
+            } else if (error.code === 'auth/user-not-found') {
+                msg = "Aucun compte avec cet email.";
+            } else if (error.code === 'auth/invalid-email') {
+                msg = "Format d'email invalide.";
+            } else if (error.code === 'auth/too-many-requests') {
+                msg = "Trop de tentatives. Réessayez plus tard.";
+            }
+            erreur.textContent = msg;
             erreur.style.display = 'block';
         }
     }
 
-    window.deconnecterConseiller = function() {
+    window.deconnecterConseiller = async function() {
         if (!confirm("Se déconnecter ?")) return;
+        try {
+            if (auth) await signOut(auth);
+        } catch(e) {}
         sessionStorage.removeItem('conseiller_sav');
         conseillerConnecte = null;
         location.reload();
     }
 
     /* ==========================================
-       AFFICHAGE DES DEMANDES
+       DEMANDES - AFFICHAGE
        ========================================== */
     function afficherDemandes() {
         const container = document.getElementById('demandes-container');
@@ -2253,7 +2304,6 @@
             );
         }
 
-        // Trier : en_attente d'abord, puis en_cours, par date
         liste.sort((a, b) => {
             const ordre = { 'en_attente': 0, 'en_cours': 1, 'termine': 2 };
             if (ordre[a.statut] !== ordre[b.statut]) return ordre[a.statut] - ordre[b.statut];
@@ -2270,10 +2320,10 @@
             return;
         }
 
-        container.innerHTML = liste.map(d => creerCarteDemande(d, false)).join('');
+        container.innerHTML = liste.map(d => creerCarteDemande(d)).join('');
     }
 
-    function creerCarteDemande(d, compacte) {
+    function creerCarteDemande(d) {
         const dateStr = d.dateCreationISO ? new Date(d.dateCreationISO).toLocaleString('fr-FR', {
             hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'
         }) : '';
@@ -2287,7 +2337,7 @@
         } else if (d.statut === 'en_cours') {
             actionsHtml = `
                 <button class="btn-success" onclick="marquerTermine('${d.id}')">Marquer terminé</button>
-                ${d.conseiller === conseillerConnecte?.code ? `
+                ${d.conseiller === conseillerConnecte?.uid ? `
                     <button class="btn-secondary" onclick="relacherDemande('${d.id}')">Relâcher</button>
                 ` : ''}
             `;
@@ -2295,13 +2345,19 @@
             actionsHtml = `<span style="color:var(--text-light);font-size:13px;">Terminé le ${d.dateTermine ? new Date(d.dateTermine).toLocaleDateString('fr-FR') : 'N/A'}</span>`;
         }
 
+        const badgeConseiller = d.conseillerNom 
+            ? `<span class="badge-conseiller">👤 Pris en charge par ${d.conseillerNom}</span>` 
+            : '';
+
         return `
             <div class="demande-card ${d.statut}">
                 <div class="demande-header">
                     <div>
                         <div class="demande-client">${d.prenom} ${d.nom}</div>
-                        <span class="demande-service">${d.service}</span>
-                        <span class="demande-statut ${d.statut}">${d.statut === 'en_attente' ? 'En attente' : d.statut === 'en_cours' ? 'En cours' : 'Terminé'}</span>
+                        <div style="margin-top:6px;">
+                            <span class="demande-service">${d.service}</span>
+                            <span class="demande-statut ${d.statut}">${d.statut === 'en_attente' ? 'En attente' : d.statut === 'en_cours' ? 'En cours' : 'Terminé'}</span>
+                        </div>
                     </div>
                     <div style="font-size:12px;color:var(--text-light);">${dateStr}</div>
                 </div>
@@ -2309,7 +2365,7 @@
                     ${d.modele ? `<span>🚗 ${d.modele}</span>` : ''}
                     ${d.immatriculation ? `<span>🔖 ${d.immatriculation}</span>` : ''}
                     ${d.total > 0 ? `<span>💰 ${d.total.toLocaleString('fr-FR')} F</span>` : ''}
-                    ${d.conseillerNom ? `<span>👤 ${d.conseillerNom}</span>` : ''}
+                    ${badgeConseiller}
                 </div>
                 ${d.commentaire ? `<div style="font-size:13px;color:var(--text-light);margin-bottom:12px;font-style:italic;">"${d.commentaire}"</div>` : ''}
                 <div class="demande-actions">${actionsHtml}</div>
@@ -2321,7 +2377,7 @@
         if (!conseillerConnecte) return;
         const d = demandes.find(x => x.id === id);
         if (!d) return;
-        if (d.statut === 'en_cours' && d.conseiller !== conseillerConnecte.code) {
+        if (d.statut === 'en_cours' && d.conseiller !== conseillerConnecte.uid) {
             alert("Ce client est déjà pris en charge par " + d.conseillerNom);
             return;
         }
@@ -2329,7 +2385,8 @@
             if (firebaseDisponible) {
                 await updateDoc(doc(db, "demandes_sav", id), {
                     statut: 'en_cours',
-                    conseiller: conseillerConnecte.code,
+                    conseiller: conseillerConnecte.uid,
+                    conseillerEmail: conseillerConnecte.email,
                     conseillerNom: conseillerConnecte.nom,
                     datePriseEnCharge: new Date().toISOString()
                 });
@@ -2386,7 +2443,7 @@
             return;
         }
 
-        container.innerHTML = liste.map(d => creerCarteDemande(d, true)).join('');
+        container.innerHTML = liste.map(d => creerCarteDemande(d)).join('');
     }
 
     /* ==========================================
@@ -2426,7 +2483,6 @@
             </div>
         `;
 
-        // Répartition par service
         const parService = {};
         demandes.forEach(d => {
             parService[d.service] = (parService[d.service] || 0) + 1;
@@ -2443,7 +2499,7 @@
     }
 
     /* ================================================================
-       ================== ASSISTANT VOCAL =============================
+       ASSISTANT VOCAL
        ================================================================ */
     let recognition = null;
     let isListening = false;
@@ -2604,10 +2660,8 @@
             document.getElementById('voice-fab').classList.remove('listening');
             if (event.error === 'not-allowed') {
                 document.getElementById('voice-transcript').textContent = "⚠️ Micro non autorisé";
-                document.getElementById('voice-hint').textContent = "Autorisez le micro dans les paramètres.";
             } else if (event.error === 'no-speech') {
                 document.getElementById('voice-transcript').textContent = "Aucune parole détectée";
-                document.getElementById('voice-hint').textContent = "Réessayez en parlant plus fort.";
             } else {
                 document.getElementById('voice-transcript').textContent = "Erreur : " + event.error;
             }
@@ -2657,18 +2711,8 @@
                 <span>Taxe FNE</span>
                 <strong>+${fne.toLocaleString('fr-FR')} F</strong>
             </div>
-            ${prixExtras > 0 ? `
-                <div class="voice-result-detail">
-                    <span>Autres pièces</span>
-                    <strong>+${prixExtras.toLocaleString('fr-FR')} F</strong>
-                </div>
-            ` : ''}
-            ${prixHT > 0 ? `
-                <div class="voice-result-detail">
-                    <span>Coût HT</span>
-                    <strong>${prixHT.toLocaleString('fr-FR')} F</strong>
-                </div>
-            ` : ''}
+            ${prixExtras > 0 ? `<div class="voice-result-detail"><span>Autres pièces</span><strong>+${prixExtras.toLocaleString('fr-FR')} F</strong></div>` : ''}
+            ${prixHT > 0 ? `<div class="voice-result-detail"><span>Coût HT</span><strong>${prixHT.toLocaleString('fr-FR')} F</strong></div>` : ''}
         `;
         resultDiv.classList.add('open');
         document.getElementById('voice-hint').textContent = "";
@@ -2699,17 +2743,15 @@
     }
 
     /* ================================================================
-       ================== DÉMARRAGE ===================================
+       DÉMARRAGE
        ================================================================ */
-       async function demarrer() {
+    async function demarrer() {
         initFirebase();
 
-        // Détection du mode au démarrage
+        // MODE CLIENT
         if (estModeClient()) {
-            // ========== MODE CLIENT ==========
             isModeClient = true;
 
-            // 1. Supprimer COMPLÈTEMENT la partie conseiller du DOM
             const conseillerContainer = document.getElementById('conseiller-container');
             if (conseillerContainer) conseillerContainer.remove();
 
@@ -2728,37 +2770,46 @@
             const notifToast = document.getElementById('notification-toast');
             if (notifToast) notifToast.remove();
 
-            // 2. Afficher uniquement la vue client
             document.getElementById('client-view').classList.add('active');
 
-            // 3. Charger les données (nécessaires pour la liste des modèles + tarifs)
             await chargerDonnees();
 
-            console.log("👤 Mode CLIENT activé — vue simplifiée");
+            console.log("👤 Mode CLIENT activé");
             return;
         }
 
-        // ========== MODE CONSEILLER ==========
-        // Supprimer la vue client du DOM (inaccessible)
+        // MODE CONSEILLER
         const clientView = document.getElementById('client-view');
         if (clientView) clientView.remove();
 
         document.getElementById('conseiller-container').style.display = 'block';
 
-        // Vérifier si déjà connecté
-        if (!verifierConnexionConseiller()) {
-            document.getElementById('modal-login').style.display = 'block';
-        }
+        // Écouter Firebase Auth
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const nomConseiller = CONSEILLERS[user.email] || user.email.split('@')[0];
+                conseillerConnecte = {
+                    uid: user.uid,
+                    email: user.email,
+                    nom: nomConseiller
+                };
+                sessionStorage.setItem('conseiller_sav', JSON.stringify(conseillerConnecte));
+                document.getElementById('modal-login').style.display = 'none';
+                afficherInterfaceConseiller();
+                chargerDemandes();
+            } else {
+                conseillerConnecte = null;
+                sessionStorage.removeItem('conseiller_sav');
+                document.getElementById('modal-login').style.display = 'block';
+            }
+        });
 
         await chargerDonnees();
-        chargerDemandes();
 
-        // Voix
         if ('speechSynthesis' in window) {
             window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
         }
 
-        // Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
