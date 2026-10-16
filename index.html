@@ -11,7 +11,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SAV">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%231a202c'/><text x='50' y='68' font-size='60' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>S</text></svg>">
     
     <style>
         :root {
@@ -411,8 +411,17 @@
         }
         #modal-login .login-logo {
             text-align: center;
-            font-size: 48px;
-            margin-bottom: 10px;
+            width: 60px;
+            height: 60px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
         }
         #modal-login h3 {
             text-align: center;
@@ -609,8 +618,24 @@
         }
 
         .service-card-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .service-card.selected .service-card-icon {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
         }
 
         .client-btn {
@@ -734,6 +759,7 @@
             justify-content: center;
             margin: 0 auto 20px;
             font-size: 40px;
+            font-weight: 700;
         }
 
         .confirmation-box h2 {
@@ -979,28 +1005,28 @@
         <h2>Quel service souhaitez-vous ?</h2>
         <div class="service-grid" id="service-grid">
             <div class="service-card" data-service="Première révision" onclick="choisirService(this)">
-                <div class="service-card-icon">🆕</div>
+                <div class="service-card-icon">1</div>
                 Première révision
             </div>
             <div class="service-card" data-service="Révision" onclick="choisirService(this)">
-                <div class="service-card-icon">🔧</div>
+                <div class="service-card-icon">2</div>
                 Révision
             </div>
             <div class="service-card" data-service="Diagnostic" onclick="choisirService(this)">
-                <div class="service-card-icon">🔍</div>
+                <div class="service-card-icon">3</div>
                 Diagnostic
             </div>
             <div class="service-card" data-service="Sinistre" onclick="choisirService(this)">
-                <div class="service-card-icon">⚠️</div>
+                <div class="service-card-icon">4</div>
                 Sinistre
             </div>
             <div class="service-card" data-service="Mise à jour" onclick="choisirService(this)">
-                <div class="service-card-icon">📱</div>
+                <div class="service-card-icon">5</div>
                 Mise à jour
             </div>
         </div>
         <div class="client-actions">
-            <button class="client-btn client-btn-primary" onclick="clientEtape2()" id="btn-step1-next" disabled>Continuer →</button>
+            <button class="client-btn client-btn-primary" onclick="clientEtape2()" id="btn-step1-next" disabled>Continuer</button>
         </div>
     </div>
 
@@ -1009,10 +1035,6 @@
         <div class="form-group">
             <label>Nom <span style="color:var(--danger)">*</span></label>
             <input type="text" id="client-nom" placeholder="Ex: DUPONT" required autocomplete="off">
-        </div>
-        <div class="form-group">
-            <label>Prénom <span style="color:var(--danger)">*</span></label>
-            <input type="text" id="client-prenom" placeholder="Ex: Jean" required autocomplete="off">
         </div>
         <div class="form-group">
             <label>Immatriculation (optionnel)</label>
@@ -1029,8 +1051,8 @@
             <textarea id="client-commentaire" placeholder="Précisez votre demande si nécessaire..."></textarea>
         </div>
         <div class="client-actions">
-            <button class="client-btn client-btn-secondary" onclick="clientRetourEtape1()">← Retour</button>
-            <button class="client-btn client-btn-primary" onclick="clientEtape3()">Continuer →</button>
+            <button class="client-btn client-btn-secondary" onclick="clientRetourEtape1()">Retour</button>
+            <button class="client-btn client-btn-primary" onclick="clientEtape3()">Continuer</button>
         </div>
     </div>
 
@@ -1042,15 +1064,15 @@
         <div id="client-tarif-container"></div>
 
         <div class="client-actions" style="margin-top:25px;">
-            <button class="client-btn client-btn-secondary" onclick="clientRetourEtape2()">← Retour</button>
-            <button class="client-btn client-btn-primary" onclick="clientConfirmer()">Confirmer ma venue ✓</button>
+            <button class="client-btn client-btn-secondary" onclick="clientRetourEtape2()">Retour</button>
+            <button class="client-btn client-btn-primary" onclick="clientConfirmer()">Confirmer ma venue</button>
         </div>
     </div>
 
     <div class="client-step" id="client-step-4">
         <div class="confirmation-box">
-            <div class="confirmation-icon">✓</div>
-            <h2>Demande envoyée !</h2>
+            <div class="confirmation-icon">OK</div>
+            <h2>Demande envoyée</h2>
             <p>Un conseiller va vous prendre en charge.</p>
             <div class="confirmation-ticket" id="client-ticket"></div>
             <p style="margin-top:20px;font-size:12px;">
@@ -1181,7 +1203,7 @@
         <div class="filter-bar">
             <input type="date" id="hist-date" onchange="afficherHistorique()">
             <button class="btn-secondary" onclick="document.getElementById('hist-date').value='';afficherHistorique();">Effacer le filtre</button>
-            <button class="btn-danger" onclick="supprimerToutHistorique()">🗑️ Supprimer les demandes terminées</button>
+            <button class="btn-danger" onclick="supprimerToutHistorique()">Supprimer les demandes terminées</button>
         </div>
         <div id="historique-container"></div>
     </div>
@@ -1226,7 +1248,7 @@
 <!-- MODAL LOGIN -->
 <div id="modal-login" class="modal">
     <div class="modal-content">
-        <div class="login-logo">🚗</div>
+        <div class="login-logo">S</div>
         <h3>Service Réception</h3>
         <p class="login-subtitle">Connexion conseiller</p>
         
@@ -1310,7 +1332,7 @@
     /* ==========================================
        CONFIGURATION FIREBASE - REMPLACE PAR TES VALEURS
        ========================================== */
-    const firebaseConfig = {
+   const firebaseConfig = {
   apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
   authDomain: "ntr-garage.firebaseapp.com",
   databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
@@ -1322,7 +1344,6 @@
 
     /* ==========================================
        CONSEILLERS (email Firebase -> Nom affiché)
-       REMPLACE par ton email réel
        ========================================== */
     const CONSEILLERS = {
         "ngorantanohromaric@gmail.com": "Romaric TANOH"
@@ -1338,6 +1359,20 @@
     }
 
     const PRIX_ADDITIF = 10000;
+
+    /* ==========================================
+       SERVICES GRATUITS
+       ========================================== */
+    const SERVICES_GRATUITS = ['Première révision'];
+    const SERVICES_AVEC_TARIF = ['Révision'];
+
+    function estServiceGratuit(service) {
+        return SERVICES_GRATUITS.includes(service);
+    }
+
+    function estServiceAvecTarif(service) {
+        return SERVICES_AVEC_TARIF.includes(service);
+    }
 
     /* ==========================================
        DONNÉES INITIALES
@@ -1408,7 +1443,7 @@
             collectionRef = collection(db, "tarifs_revision");
             demandesRef = collection(db, "demandes_sav");
             firebaseDisponible = true;
-            console.log("✅ Firebase initialisé");
+            console.log("Firebase initialisé");
             return true;
         } catch (e) {
             console.warn("Firebase non disponible.", e);
@@ -1493,7 +1528,7 @@
                 }
             }
         }, (error) => {
-            console.error("❌ Firestore :", error);
+            console.error("Firestore :", error);
             majStatutSync('offline');
         });
     }
@@ -1561,9 +1596,9 @@
        ========================================== */
     function afficherNotification(demande) {
         const toast = document.getElementById('notification-toast');
-        document.getElementById('notif-title').textContent = "🔔 Nouvelle demande : " + demande.service;
+        document.getElementById('notif-title').textContent = "Nouvelle demande : " + demande.service;
         document.getElementById('notif-message').textContent = 
-            demande.nom + ' ' + demande.prenom + (demande.modele ? ' — ' + demande.modele : '');
+            demande.nom + (demande.modele ? ' - ' + demande.modele : '');
         toast.classList.add('show');
         jouerSonNotification();
         setTimeout(() => toast.classList.remove('show'), 6000);
@@ -2015,10 +2050,9 @@
     window.clientEtape2 = function() {
         if (!clientServiceChoisi) return;
         
-        const serviceAvecTarif = ['Première révision', 'Révision'].includes(clientServiceChoisi);
         const groupeModele = document.getElementById('client-modele-group');
         
-        if (serviceAvecTarif) {
+        if (estServiceAvecTarif(clientServiceChoisi)) {
             groupeModele.style.display = 'block';
         } else {
             groupeModele.style.display = 'none';
@@ -2037,14 +2071,25 @@
 
     window.clientEtape3 = function() {
         const nom = document.getElementById('client-nom').value.trim();
-        const prenom = document.getElementById('client-prenom').value.trim();
-        if (!nom || !prenom) { alert("Veuillez saisir votre nom et prénom."); return; }
+        if (!nom) { alert("Veuillez saisir votre nom."); return; }
 
-        const servicesAvecTarif = ['Première révision', 'Révision'];
         const conteneur = document.getElementById('client-tarif-container');
         conteneur.innerHTML = '';
 
-        if (servicesAvecTarif.includes(clientServiceChoisi)) {
+        if (estServiceGratuit(clientServiceChoisi)) {
+            // Service GRATUIT : Première révision
+            document.getElementById('client-step-3-title').textContent = "Service gratuit";
+            document.getElementById('client-tarif-info').textContent = 
+                "La première révision est offerte.";
+            conteneur.innerHTML = `
+                <div style="background:var(--success-light);padding:25px;border-radius:8px;text-align:center;color:#22543d;border:1px solid #9ae6b4;">
+                    <div style="font-weight:700;font-size:20px;color:var(--success);margin-bottom:8px;">GRATUIT</div>
+                    <div style="font-size:14px;">Première révision offerte</div>
+                    <div style="font-size:12px;margin-top:10px;opacity:0.8;">Aucun frais à régler</div>
+                </div>
+            `;
+        } else if (estServiceAvecTarif(clientServiceChoisi)) {
+            // Service AVEC TARIF : Révision
             document.getElementById('client-step-3-title').textContent = "Tarif de la révision";
             document.getElementById('client-tarif-info').textContent = 
                 "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC :";
@@ -2058,14 +2103,14 @@
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
         } else {
+            // Autres services : aucun tarif
             document.getElementById('client-step-3-title').textContent = "Confirmation";
             document.getElementById('client-tarif-info').textContent = 
                 "Aucun tarif à afficher pour ce service. Un conseiller vous prendra en charge dès que possible.";
             conteneur.innerHTML = `
                 <div style="background:var(--accent-light);padding:25px;border-radius:8px;text-align:center;color:var(--secondary);">
-                    <div style="font-size:48px;margin-bottom:10px;">📋</div>
-                    <div style="font-weight:600;font-size:18px;color:var(--accent);">${clientServiceChoisi}</div>
-                    <div style="font-size:13px;margin-top:10px;">Votre demande sera traitée dans l'ordre d'arrivée.</div>
+                    <div style="font-weight:600;font-size:18px;color:var(--accent);margin-bottom:8px;">${clientServiceChoisi}</div>
+                    <div style="font-size:13px;">Votre demande sera traitée dans l'ordre d'arrivée.</div>
                 </div>
             `;
         }
@@ -2125,20 +2170,24 @@
 
     window.clientConfirmer = async function() {
         const nom = document.getElementById('client-nom').value.trim();
-        const prenom = document.getElementById('client-prenom').value.trim();
         const immat = document.getElementById('client-immat').value.trim();
         const modeleId = document.getElementById('client-modele').value;
         const commentaire = document.getElementById('client-commentaire').value.trim();
 
         const modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
         const modeleNom = modeleChoisi ? modeleChoisi.modele : '';
-        const prixTTC = modeleChoisi ? (modeleChoisi.prixTTC || 0) : 0;
-        const fne = prixTTC > 0 ? calculerFNE(prixTTC) : 0;
-        const additif = clientAdditifChoisi ? PRIX_ADDITIF : 0;
-        const total = prixTTC + fne + additif;
+        
+        let prixTTC = 0, fne = 0, additif = 0, total = 0;
+        
+        if (estServiceAvecTarif(clientServiceChoisi) && modeleChoisi) {
+            prixTTC = modeleChoisi.prixTTC || 0;
+            fne = calculerFNE(prixTTC);
+            additif = clientAdditifChoisi ? PRIX_ADDITIF : 0;
+            total = prixTTC + fne + additif;
+        }
 
         const demande = {
-            nom, prenom,
+            nom,
             immatriculation: immat,
             modeleId: modeleId || null,
             modele: modeleNom,
@@ -2148,6 +2197,7 @@
             fne: fne,
             additif: additif,
             total: total,
+            estGratuit: estServiceGratuit(clientServiceChoisi),
             statut: 'en_attente',
             conseiller: null,
             conseillerNom: null,
@@ -2168,22 +2218,39 @@
                 localStorage.setItem("demandes_sav", JSON.stringify(arr));
             }
             
-            document.getElementById('client-ticket').innerHTML = `
-                <div><strong>Client :</strong> ${prenom} ${nom}</div>
+            let ticketContent = `
+                <div><strong>Client :</strong> ${nom}</div>
                 <div><strong>Service :</strong> ${clientServiceChoisi}</div>
-                ${modeleNom ? `<div><strong>Modèle :</strong> ${modeleNom}</div>` : ''}
-                ${prixTTC > 0 ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-                    <div style="display:flex;justify-content:space-between;"><span>Révision TTC</span><span>${prixTTC.toLocaleString('fr-FR')} F</span></div>
-                    <div style="display:flex;justify-content:space-between;color:var(--warning);"><span>Taxe FNE</span><span>+${fne.toLocaleString('fr-FR')} F</span></div>
-                    ${additif ? `<div style="display:flex;justify-content:space-between;"><span>Additif carburant</span><span>+${additif.toLocaleString('fr-FR')} F</span></div>` : ''}
-                    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;margin-top:8px;padding-top:8px;border-top:2px solid var(--border);">
-                        <span>Total</span><span style="color:var(--accent);">${total.toLocaleString('fr-FR')} F</span>
+            `;
+
+            if (estServiceGratuit(clientServiceChoisi)) {
+                ticketContent += `
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);text-align:center;">
+                        <div style="font-weight:700;font-size:18px;color:var(--success);">GRATUIT</div>
+                        <div style="font-size:12px;color:var(--text-light);margin-top:4px;">Aucun frais à régler</div>
                     </div>
-                </div>` : ''}
+                `;
+            } else if (prixTTC > 0) {
+                ticketContent += `
+                    ${modeleNom ? `<div><strong>Modèle :</strong> ${modeleNom}</div>` : ''}
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+                        <div style="display:flex;justify-content:space-between;"><span>Révision TTC</span><span>${prixTTC.toLocaleString('fr-FR')} F</span></div>
+                        <div style="display:flex;justify-content:space-between;color:var(--warning);"><span>Taxe FNE</span><span>+${fne.toLocaleString('fr-FR')} F</span></div>
+                        ${additif ? `<div style="display:flex;justify-content:space-between;"><span>Additif carburant</span><span>+${additif.toLocaleString('fr-FR')} F</span></div>` : ''}
+                        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;margin-top:8px;padding-top:8px;border-top:2px solid var(--border);">
+                            <span>Total</span><span style="color:var(--accent);">${total.toLocaleString('fr-FR')} F</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            ticketContent += `
                 <div style="margin-top:12px;color:var(--text-light);font-size:12px;">
                     Heure : ${new Date().toLocaleTimeString('fr-FR')}
                 </div>
             `;
+
+            document.getElementById('client-ticket').innerHTML = ticketContent;
 
             document.getElementById('client-step-3').classList.remove('active');
             document.getElementById('client-step-4').classList.add('active');
@@ -2202,7 +2269,7 @@
     function afficherInterfaceConseiller() {
         if (!conseillerConnecte) return;
         const info = document.getElementById('conseiller-info');
-        if (info) info.textContent = '👤 ' + conseillerConnecte.nom;
+        if (info) info.textContent = conseillerConnecte.nom;
     }
 
     window.validerLogin = async function() {
@@ -2281,7 +2348,6 @@
         if (recherche) {
             liste = liste.filter(d => 
                 (d.nom || '').toLowerCase().includes(recherche) ||
-                (d.prenom || '').toLowerCase().includes(recherche) ||
                 (d.immatriculation || '').toLowerCase().includes(recherche) ||
                 (d.modele || '').toLowerCase().includes(recherche)
             );
@@ -2296,7 +2362,7 @@
         if (liste.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-icon">-</div>
                     <p>Aucune demande pour le moment.</p>
                 </div>
             `;
@@ -2334,25 +2400,30 @@
         }
 
         const badgeConseiller = d.conseillerNom 
-            ? `<span class="badge-conseiller">👤 Pris en charge par ${d.conseillerNom}</span>` 
+            ? `<span class="badge-conseiller">Pris en charge par ${d.conseillerNom}</span>` 
+            : '';
+
+        const badgeGratuit = d.estGratuit 
+            ? `<span style="background:var(--success-light);color:var(--success);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">GRATUIT</span>` 
             : '';
 
         return `
             <div class="demande-card ${d.statut}">
                 <div class="demande-header">
                     <div>
-                        <div class="demande-client">${d.prenom} ${d.nom}</div>
+                        <div class="demande-client">${d.nom}</div>
                         <div style="margin-top:6px;">
                             <span class="demande-service">${d.service}</span>
                             <span class="demande-statut ${d.statut}">${d.statut === 'en_attente' ? 'En attente' : d.statut === 'en_cours' ? 'En cours' : 'Terminé'}</span>
+                            ${badgeGratuit}
                         </div>
                     </div>
                     <div style="font-size:12px;color:var(--text-light);">${dateStr}</div>
                 </div>
                 <div class="demande-infos">
-                    ${d.modele ? `<span>🚗 ${d.modele}</span>` : ''}
-                    ${d.immatriculation ? `<span>🔖 ${d.immatriculation}</span>` : ''}
-                    ${d.total > 0 ? `<span>💰 ${d.total.toLocaleString('fr-FR')} F</span>` : ''}
+                    ${d.modele ? `<span>Modèle : ${d.modele}</span>` : ''}
+                    ${d.immatriculation ? `<span>Immat : ${d.immatriculation}</span>` : ''}
+                    ${d.total > 0 ? `<span>Total : ${d.total.toLocaleString('fr-FR')} F</span>` : ''}
                     ${badgeConseiller}
                 </div>
                 ${d.commentaire ? `<div style="font-size:13px;color:var(--text-light);margin-bottom:12px;font-style:italic;">"${d.commentaire}"</div>` : ''}
@@ -2443,9 +2514,9 @@
         }
         
         if (erreurs === 0) {
-            alert(`✅ ${termines.length} demande(s) terminée(s) supprimée(s).`);
+            alert(`${termines.length} demande(s) terminée(s) supprimée(s).`);
         } else {
-            alert(`⚠️ ${erreurs} erreur(s) lors de la suppression.`);
+            alert(`${erreurs} erreur(s) lors de la suppression.`);
         }
     }
 
@@ -2469,7 +2540,7 @@
         liste.sort((a, b) => new Date(b.dateCreationISO || 0) - new Date(a.dateCreationISO || 0));
 
         if (liste.length === 0) {
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📚</div><p>Aucun historique.</p></div>`;
+            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">-</div><p>Aucun historique.</p></div>`;
             return;
         }
 
@@ -2634,7 +2705,7 @@
         if (!supporte) {
             document.getElementById('voice-not-supported').style.display = 'block';
             document.getElementById('voice-not-supported').innerHTML = 
-                '<strong>⚠️ Reconnaissance vocale non supportée</strong><br>Utilisez <strong>Google Chrome</strong> ou <strong>Microsoft Edge</strong>.';
+                '<strong>Reconnaissance vocale non supportée</strong><br>Utilisez <strong>Google Chrome</strong> ou <strong>Microsoft Edge</strong>.';
             document.getElementById('voice-icon').style.display = 'none';
             return;
         }
@@ -2689,7 +2760,7 @@
             document.getElementById('voice-icon').classList.remove('listening');
             document.getElementById('voice-fab').classList.remove('listening');
             if (event.error === 'not-allowed') {
-                document.getElementById('voice-transcript').textContent = "⚠️ Micro non autorisé";
+                document.getElementById('voice-transcript').textContent = "Micro non autorisé";
             } else if (event.error === 'no-speech') {
                 document.getElementById('voice-transcript').textContent = "Aucune parole détectée";
             } else {
@@ -2721,7 +2792,7 @@
         else if (proches.length === 1) afficherResultatVocal(proches[0]);
         else if (proches.length > 1) afficherSuggestions(proches, "Vouliez-vous dire :");
         else {
-            document.getElementById('voice-hint').innerHTML = "❌ Aucun modèle trouvé.<br>Réessayez.";
+            document.getElementById('voice-hint').innerHTML = "Aucun modèle trouvé. Réessayez.";
             document.getElementById('voice-actions').style.display = 'flex';
             parler("Désolé, je n'ai pas trouvé ce modèle.");
         }
@@ -2778,7 +2849,6 @@
     async function demarrer() {
         initFirebase();
 
-        // Nettoyage du champ de recherche au démarrage
         setTimeout(() => {
             const searchField = document.getElementById('search');
             if (searchField) searchField.value = '';
@@ -2810,7 +2880,7 @@
 
             await chargerDonnees();
 
-            console.log("👤 Mode CLIENT activé");
+            console.log("Mode CLIENT activé");
             return;
         }
 
@@ -2847,12 +2917,12 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('✅ SW enregistré'))
-                    .catch(err => console.log('⚠️ SW :', err.message));
+                    .then(reg => console.log('SW enregistré'))
+                    .catch(err => console.log('SW :', err.message));
             });
         }
 
-        console.log("💼 Mode CONSEILLER activé");
+        console.log("Mode CONSEILLER activé");
     }
 
     demarrer();
