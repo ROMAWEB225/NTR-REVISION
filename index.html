@@ -402,7 +402,6 @@
         }
         .close:hover { color: var(--primary); }
 
-        /* === LOGIN MODAL === */
         #modal-login {
             background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
         }
@@ -427,7 +426,6 @@
             margin-bottom: 25px;
         }
 
-        /* === ASSISTANT VOCAL === */
         .voice-fab {
             position: fixed; bottom: 30px; right: 30px;
             width: 64px; height: 64px; border-radius: 50%;
@@ -534,7 +532,6 @@
             margin-top: 20px; text-align: left;
         }
 
-        /* ============ VUE CLIENT ============ */
         #client-view {
             display: none;
             max-width: 500px;
@@ -762,7 +759,6 @@
 
         .confirmation-ticket strong { color: var(--primary); }
 
-        /* ============ VUE RÉCEPTION ============ */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -879,6 +875,7 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .demande-actions button {
@@ -971,16 +968,13 @@
 </head>
 <body>
 
-<!-- ================================================================
-     VUE CLIENT (accessible via ?client=1)
-     ================================================================ -->
+<!-- VUE CLIENT -->
 <div id="client-view">
     <div class="client-header">
         <h1>Service Réception</h1>
         <p>Bienvenue, veuillez nous indiquer votre besoin</p>
     </div>
 
-    <!-- ÉTAPE 1 -->
     <div class="client-step active" id="client-step-1">
         <h2>Quel service souhaitez-vous ?</h2>
         <div class="service-grid" id="service-grid">
@@ -1010,20 +1004,19 @@
         </div>
     </div>
 
-    <!-- ÉTAPE 2 -->
     <div class="client-step" id="client-step-2">
         <h2>Vos informations</h2>
         <div class="form-group">
             <label>Nom <span style="color:var(--danger)">*</span></label>
-            <input type="text" id="client-nom" placeholder="Ex: DUPONT" required>
+            <input type="text" id="client-nom" placeholder="Ex: DUPONT" required autocomplete="off">
         </div>
         <div class="form-group">
             <label>Prénom <span style="color:var(--danger)">*</span></label>
-            <input type="text" id="client-prenom" placeholder="Ex: Jean" required>
+            <input type="text" id="client-prenom" placeholder="Ex: Jean" required autocomplete="off">
         </div>
         <div class="form-group">
             <label>Immatriculation (optionnel)</label>
-            <input type="text" id="client-immat" placeholder="Ex: AB-123-CD">
+            <input type="text" id="client-immat" placeholder="Ex: AB-123-CD" autocomplete="off">
         </div>
         <div class="form-group" id="client-modele-group">
             <label>Modèle du véhicule (optionnel)</label>
@@ -1041,7 +1034,6 @@
         </div>
     </div>
 
-    <!-- ÉTAPE 3 -->
     <div class="client-step" id="client-step-3">
         <h2 id="client-step-3-title">Confirmation</h2>
         <p style="color:var(--text-light);font-size:13px;margin-bottom:15px;" id="client-tarif-info">
@@ -1055,7 +1047,6 @@
         </div>
     </div>
 
-    <!-- ÉTAPE 4 -->
     <div class="client-step" id="client-step-4">
         <div class="confirmation-box">
             <div class="confirmation-icon">✓</div>
@@ -1069,9 +1060,7 @@
     </div>
 </div>
 
-<!-- ================================================================
-     VUE CONSEILLER
-     ================================================================ -->
+<!-- VUE CONSEILLER -->
 <div class="container" id="conseiller-container">
     <div class="header">
         <h1>Service Réception - SAV</h1>
@@ -1098,7 +1087,7 @@
 
     <div id="tab-liste" class="tab-content active">
         <div class="search-container">
-            <input type="text" id="search" placeholder="Rechercher un modèle..." oninput="filtrer()">
+            <input type="text" id="search" placeholder="Rechercher un modèle..." oninput="filtrer()" autocomplete="off" name="search-vehicules">
             <span class="status" id="status">Chargement...</span>
         </div>
 
@@ -1143,27 +1132,27 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Modèle *</label>
-                        <input type="text" id="add-modele" required placeholder="Ex: P201 GASOIL">
+                        <input type="text" id="add-modele" required placeholder="Ex: P201 GASOIL" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label>Prix Révision TTC (FCFA) *</label>
-                        <input type="number" id="add-prix-ttc" required placeholder="Ex: 125000">
+                        <input type="number" id="add-prix-ttc" required placeholder="Ex: 125000" autocomplete="off">
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Prestations (Optionnel)</label>
-                    <input type="text" id="add-prestations" placeholder="Ex: EQUILIBRAGE, PARALLELISME...">
+                    <input type="text" id="add-prestations" placeholder="Ex: EQUILIBRAGE, PARALLELISME..." autocomplete="off">
                 </div>
                 <div class="form-section-title">Détails de la révision (HT)</div>
                 <div class="form-row">
-                    <div class="form-group"><label>Huile</label><input type="number" id="add-huile" placeholder="0"></div>
-                    <div class="form-group"><label>Filtre à Huile (F.H)</label><input type="number" id="add-fh" placeholder="0"></div>
-                    <div class="form-group"><label>Filtre à Air (F.A)</label><input type="number" id="add-fa" placeholder="0"></div>
-                    <div class="form-group"><label>Filtre à Pollen (F.P)</label><input type="number" id="add-fp" placeholder="0"></div>
+                    <div class="form-group"><label>Huile</label><input type="number" id="add-huile" placeholder="0" autocomplete="off"></div>
+                    <div class="form-group"><label>Filtre à Huile (F.H)</label><input type="number" id="add-fh" placeholder="0" autocomplete="off"></div>
+                    <div class="form-group"><label>Filtre à Air (F.A)</label><input type="number" id="add-fa" placeholder="0" autocomplete="off"></div>
+                    <div class="form-group"><label>Filtre à Pollen (F.P)</label><input type="number" id="add-fp" placeholder="0" autocomplete="off"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Filtre à Gasoil (F.G)</label><input type="number" id="add-fg" placeholder="0"></div>
-                    <div class="form-group"><label>Main d'Œuvre (MOD)</label><input type="number" id="add-mod" placeholder="0"></div>
+                    <div class="form-group"><label>Filtre à Gasoil (F.G)</label><input type="number" id="add-fg" placeholder="0" autocomplete="off"></div>
+                    <div class="form-group"><label>Main d'Œuvre (MOD)</label><input type="number" id="add-mod" placeholder="0" autocomplete="off"></div>
                 </div>
                 <div class="form-actions">
                     <button type="reset" class="btn-secondary">Réinitialiser</button>
@@ -1182,7 +1171,7 @@
                 <option value="en_cours">En cours uniquement</option>
                 <option value="toutes">Toutes</option>
             </select>
-            <input type="text" id="filter-recherche" placeholder="Rechercher un client..." oninput="afficherDemandes()">
+            <input type="text" id="filter-recherche" placeholder="Rechercher un client..." oninput="afficherDemandes()" autocomplete="off" name="filter-client">
         </div>
         <div id="demandes-container"></div>
     </div>
@@ -1191,7 +1180,8 @@
         <h3 style="margin-bottom: 20px; color: var(--primary);">Historique complet</h3>
         <div class="filter-bar">
             <input type="date" id="hist-date" onchange="afficherHistorique()">
-            <button class="btn-secondary" onclick="document.getElementById('hist-date').value='';afficherHistorique();">Effacer</button>
+            <button class="btn-secondary" onclick="document.getElementById('hist-date').value='';afficherHistorique();">Effacer le filtre</button>
+            <button class="btn-danger" onclick="supprimerToutHistorique()">🗑️ Supprimer les demandes terminées</button>
         </div>
         <div id="historique-container"></div>
     </div>
@@ -1233,7 +1223,7 @@
     </div>
 </div>
 
-<!-- MODAL LOGIN CONSEILLER (Firebase Auth) -->
+<!-- MODAL LOGIN -->
 <div id="modal-login" class="modal">
     <div class="modal-content">
         <div class="login-logo">🚗</div>
@@ -1242,11 +1232,11 @@
         
         <div class="form-group">
             <label>Email</label>
-            <input type="email" id="login-email" placeholder="exemple@sav.local" onkeydown="if(event.key==='Enter')validerLogin()">
+            <input type="email" id="login-email" placeholder="exemple@sav.local" onkeydown="if(event.key==='Enter')validerLogin()" autocomplete="off">
         </div>
         <div class="form-group">
             <label>Mot de passe</label>
-            <input type="password" id="login-code" placeholder="••••••••" onkeydown="if(event.key==='Enter')validerLogin()">
+            <input type="password" id="login-code" placeholder="••••••••" onkeydown="if(event.key==='Enter')validerLogin()" autocomplete="new-password">
         </div>
         <div class="form-actions">
             <button class="btn-primary" onclick="validerLogin()" style="width:100%;padding:14px;font-size:15px;">Se connecter</button>
@@ -1318,30 +1308,24 @@
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     /* ==========================================
-       CONFIGURATION FIREBASE
+       CONFIGURATION FIREBASE - REMPLACE PAR TES VALEURS
        ========================================== */
-  const firebaseConfig = {
-  apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
-  authDomain: "ntr-garage.firebaseapp.com",
-  databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ntr-garage",
-  storageBucket: "ntr-garage.firebasestorage.app",
-  messagingSenderId: "606167388967",
-  appId: "1:606167388967:web:7ad669fd353cdeeb7a8f02"
-};
+    const firebaseConfig = {
+        apiKey: "TON_API_KEY",
+        authDomain: "TON_PROJECT_ID.firebaseapp.com",
+        projectId: "TON_PROJECT_ID",
+        storageBucket: "TON_PROJECT_ID.appspot.com",
+        messagingSenderId: "TON_SENDER_ID",
+        appId: "TON_APP_ID"
+    };
 
     /* ==========================================
        CONSEILLERS (email Firebase -> Nom affiché)
-       ==========================================
-       Les emails doivent être EXACTEMENT ceux
-       créés dans Firebase Authentication.
+       REMPLACE par ton email réel
        ========================================== */
-  
-           const CONSEILLERS = {
-        "ngorantanohromaric@gmail.com": "Romaric TANOH"
-        // Ajoute d'autres conseillers ici quand l'idée sera validée
+    const CONSEILLERS = {
+        "romaric@sav.local": "Romaric TANOH"
     };
-    
 
     /* ==========================================
        TAXE FNE
@@ -1720,8 +1704,8 @@
                 <div class="sub-total extras"><span>Total Autres Pièces</span><strong>${prixExtras.toLocaleString('fr-FR')} F</strong></div>
                 <div class="add-piece-form">
                     <div class="form-row">
-                        <input type="text" class="piece-name" id="piece-name-${v.id}" placeholder="Nom de la pièce">
-                        <input type="number" class="piece-price" id="piece-price-${v.id}" placeholder="Prix">
+                        <input type="text" class="piece-name" id="piece-name-${v.id}" placeholder="Nom de la pièce" autocomplete="off">
+                        <input type="number" class="piece-price" id="piece-price-${v.id}" placeholder="Prix" autocomplete="off">
                     </div>
                     <button class="btn-add-piece" onclick="ajouterPiece('${v.id}')">+ Ajouter la pièce</button>
                 </div>
@@ -2030,7 +2014,6 @@
     window.clientEtape2 = function() {
         if (!clientServiceChoisi) return;
         
-        // Masquer/afficher le champ modèle selon le service
         const serviceAvecTarif = ['Première révision', 'Révision'].includes(clientServiceChoisi);
         const groupeModele = document.getElementById('client-modele-group');
         
@@ -2074,7 +2057,6 @@
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
         } else {
-            // Pour les autres services : AUCUN tarif affiché
             document.getElementById('client-step-3-title').textContent = "Confirmation";
             document.getElementById('client-tarif-info').textContent = 
                 "Aucun tarif à afficher pour ce service. Un conseiller vous prendra en charge dès que possible.";
@@ -2213,7 +2195,7 @@
     }
 
     /* ================================================================
-       VUE CONSEILLER - AUTH
+       VUE CONSEILLER
        ================================================================ */
 
     function afficherInterfaceConseiller() {
@@ -2280,7 +2262,7 @@
     }
 
     /* ==========================================
-       DEMANDES - AFFICHAGE
+       AFFICHAGE DEMANDES
        ========================================== */
     function afficherDemandes() {
         const container = document.getElementById('demandes-container');
@@ -2333,6 +2315,7 @@
             actionsHtml = `
                 <button class="btn-primary" onclick="prendreEnCharge('${d.id}')">Prendre en charge</button>
                 <button class="btn-secondary" onclick="marquerTermine('${d.id}')">Marquer terminé</button>
+                <button class="btn-danger" onclick="supprimerDemande('${d.id}')">Supprimer</button>
             `;
         } else if (d.statut === 'en_cours') {
             actionsHtml = `
@@ -2340,9 +2323,13 @@
                 ${d.conseiller === conseillerConnecte?.uid ? `
                     <button class="btn-secondary" onclick="relacherDemande('${d.id}')">Relâcher</button>
                 ` : ''}
+                <button class="btn-danger" onclick="supprimerDemande('${d.id}')">Supprimer</button>
             `;
         } else if (d.statut === 'termine') {
-            actionsHtml = `<span style="color:var(--text-light);font-size:13px;">Terminé le ${d.dateTermine ? new Date(d.dateTermine).toLocaleDateString('fr-FR') : 'N/A'}</span>`;
+            actionsHtml = `
+                <span style="color:var(--text-light);font-size:13px;flex:1;">Terminé le ${d.dateTermine ? new Date(d.dateTermine).toLocaleDateString('fr-FR') : 'N/A'}</span>
+                <button class="btn-danger" onclick="supprimerDemande('${d.id}')">Supprimer</button>
+            `;
         }
 
         const badgeConseiller = d.conseillerNom 
@@ -2406,7 +2393,7 @@
     }
 
     window.relacherDemande = async function(id) {
-        if (!confirm("Relâcher cette demande ?")) return;
+        if (!confirm("Relâcher cette demande ? Elle retournera en attente pour un autre conseiller.")) return;
         try {
             if (firebaseDisponible) {
                 await updateDoc(doc(db, "demandes_sav", id), {
@@ -2416,7 +2403,49 @@
                     datePriseEnCharge: null
                 });
             }
-        } catch(e) { alert("Erreur."); }
+        } catch(e) { 
+            console.error(e);
+            alert("Erreur : " + e.message); 
+        }
+    }
+
+    window.supprimerDemande = async function(id) {
+        if (!confirm("Supprimer définitivement cette demande ? Cette action est irréversible.")) return;
+        try {
+            if (firebaseDisponible) {
+                await deleteDoc(doc(db, "demandes_sav", id));
+            }
+        } catch(e) { 
+            console.error(e);
+            alert("Erreur lors de la suppression : " + e.message); 
+        }
+    }
+
+    window.supprimerToutHistorique = async function() {
+        const termines = demandes.filter(d => d.statut === 'termine');
+        if (termines.length === 0) {
+            alert("Aucune demande terminée à supprimer.");
+            return;
+        }
+        if (!confirm(`Supprimer définitivement les ${termines.length} demandes terminées ? Cette action est irréversible.`)) return;
+        
+        let erreurs = 0;
+        for (const d of termines) {
+            try {
+                if (firebaseDisponible) {
+                    await deleteDoc(doc(db, "demandes_sav", d.id));
+                }
+            } catch(e) { 
+                erreurs++;
+                console.error(e);
+            }
+        }
+        
+        if (erreurs === 0) {
+            alert(`✅ ${termines.length} demande(s) terminée(s) supprimée(s).`);
+        } else {
+            alert(`⚠️ ${erreurs} erreur(s) lors de la suppression.`);
+        }
     }
 
     /* ==========================================
@@ -2748,7 +2777,13 @@
     async function demarrer() {
         initFirebase();
 
-        // MODE CLIENT
+        // Nettoyage du champ de recherche au démarrage
+        setTimeout(() => {
+            const searchField = document.getElementById('search');
+            if (searchField) searchField.value = '';
+            if (typeof filtrer === 'function' && vehicules.length > 0) filtrer();
+        }, 300);
+
         if (estModeClient()) {
             isModeClient = true;
 
@@ -2778,13 +2813,11 @@
             return;
         }
 
-        // MODE CONSEILLER
         const clientView = document.getElementById('client-view');
         if (clientView) clientView.remove();
 
         document.getElementById('conseiller-container').style.display = 'block';
 
-        // Écouter Firebase Auth
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const nomConseiller = CONSEILLERS[user.email] || user.email.split('@')[0];
