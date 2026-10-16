@@ -627,9 +627,14 @@
             background: white;
             border-radius: 50%;
             border: 2px solid var(--border);
-            font-size: 22px;
-            font-weight: 700;
             color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .service-card-icon svg {
+            width: 26px;
+            height: 26px;
+            stroke-width: 2;
         }
 
         .service-card.selected .service-card-icon {
@@ -758,9 +763,9 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            font-size: 40px;
-            font-weight: 700;
         }
+
+        .confirmation-icon svg { width: 40px; height: 40px; stroke-width: 3; }
 
         .confirmation-box h2 {
             color: var(--success);
@@ -961,6 +966,57 @@
             border-color: var(--accent);
         }
 
+        /* === AJOUT DE MODÈLE INLINE === */
+        .modele-input-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .modele-input-wrapper select,
+        .modele-input-wrapper input {
+            flex: 1;
+        }
+
+        .btn-toggle-new-modele {
+            background: var(--accent-light);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 10px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .btn-toggle-new-modele:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        #client-nouveau-modele-group {
+            display: none;
+            margin-top: 8px;
+        }
+
+        #client-nouveau-modele-group.visible { display: block; }
+
+        .nouveau-modele-box {
+            background: var(--accent-light);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .nouveau-modele-box .help-text {
+            font-size: 12px;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            display: block;
+        }
+
         @media (max-width: 1000px) {
             .main-layout { flex-direction: column; }
             .table-wrapper.shrunk { flex: 1; }
@@ -989,6 +1045,8 @@
             .client-header { padding: 20px 15px; }
             .client-header h1 { font-size: 18px; }
             .notification-toast { max-width: calc(100% - 40px); right: 20px; }
+            .modele-input-wrapper { flex-direction: column; }
+            .btn-toggle-new-modele { width: 100%; }
         }
     </style>
 </head>
@@ -1005,23 +1063,48 @@
         <h2>Quel service souhaitez-vous ?</h2>
         <div class="service-grid" id="service-grid">
             <div class="service-card" data-service="Première révision" onclick="choisirService(this)">
-                <div class="service-card-icon">1</div>
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/>
+                    </svg>
+                </div>
                 Première révision
             </div>
             <div class="service-card" data-service="Révision" onclick="choisirService(this)">
-                <div class="service-card-icon">2</div>
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                </div>
                 Révision
             </div>
             <div class="service-card" data-service="Diagnostic" onclick="choisirService(this)">
-                <div class="service-card-icon">3</div>
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                </div>
                 Diagnostic
             </div>
             <div class="service-card" data-service="Sinistre" onclick="choisirService(this)">
-                <div class="service-card-icon">4</div>
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
                 Sinistre
             </div>
             <div class="service-card" data-service="Mise à jour" onclick="choisirService(this)">
-                <div class="service-card-icon">5</div>
+                <div class="service-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <polyline points="1 20 1 14 7 14"/>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                </div>
                 Mise à jour
             </div>
         </div>
@@ -1042,9 +1125,18 @@
         </div>
         <div class="form-group" id="client-modele-group">
             <label>Modèle du véhicule (optionnel)</label>
-            <select id="client-modele">
-                <option value="">-- Sélectionner --</option>
-            </select>
+            <div class="modele-input-wrapper">
+                <select id="client-modele">
+                    <option value="">-- Sélectionner --</option>
+                </select>
+                <button type="button" class="btn-toggle-new-modele" onclick="toggleNouveauModele()">+ Nouveau</button>
+            </div>
+            <div id="client-nouveau-modele-group">
+                <div class="nouveau-modele-box">
+                    <span class="help-text">Ajoutez un modèle qui n'existe pas dans la liste :</span>
+                    <input type="text" id="client-nouveau-modele" placeholder="Ex: CS 100" autocomplete="off">
+                </div>
+            </div>
         </div>
         <div class="form-group">
             <label>Commentaire (optionnel)</label>
@@ -1065,13 +1157,17 @@
 
         <div class="client-actions" style="margin-top:25px;">
             <button class="client-btn client-btn-secondary" onclick="clientRetourEtape2()">Retour</button>
-            <button class="client-btn client-btn-primary" onclick="clientConfirmer()">Confirmer ma venue</button>
+            <button class="client-btn client-btn-primary" onclick="clientConfirmer()">Confirmer</button>
         </div>
     </div>
 
     <div class="client-step" id="client-step-4">
         <div class="confirmation-box">
-            <div class="confirmation-icon">OK</div>
+            <div class="confirmation-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
             <h2>Demande envoyée</h2>
             <p>Un conseiller va vous prendre en charge.</p>
             <div class="confirmation-ticket" id="client-ticket"></div>
@@ -1361,7 +1457,7 @@
     const PRIX_ADDITIF = 10000;
 
     /* ==========================================
-       SERVICES GRATUITS
+       SERVICES
        ========================================== */
     const SERVICES_GRATUITS = ['Première révision'];
     const SERVICES_AVEC_TARIF = ['Révision'];
@@ -1498,6 +1594,7 @@
             preparerDonnees();
             afficherTableau(vehicules);
             afficherRecap();
+            remplirListeModelesClient();
             return;
         }
 
@@ -2047,6 +2144,14 @@
         sel.value = val;
     }
 
+    window.toggleNouveauModele = function() {
+        const groupe = document.getElementById('client-nouveau-modele-group');
+        groupe.classList.toggle('visible');
+        if (!groupe.classList.contains('visible')) {
+            document.getElementById('client-nouveau-modele').value = '';
+        }
+    }
+
     window.clientEtape2 = function() {
         if (!clientServiceChoisi) return;
         
@@ -2057,6 +2162,8 @@
         } else {
             groupeModele.style.display = 'none';
             document.getElementById('client-modele').value = '';
+            document.getElementById('client-nouveau-modele-group').classList.remove('visible');
+            document.getElementById('client-nouveau-modele').value = '';
         }
         
         document.getElementById('client-step-1').classList.remove('active');
@@ -2077,7 +2184,6 @@
         conteneur.innerHTML = '';
 
         if (estServiceGratuit(clientServiceChoisi)) {
-            // Service GRATUIT : Première révision
             document.getElementById('client-step-3-title').textContent = "Service gratuit";
             document.getElementById('client-tarif-info').textContent = 
                 "La première révision est offerte.";
@@ -2089,7 +2195,6 @@
                 </div>
             `;
         } else if (estServiceAvecTarif(clientServiceChoisi)) {
-            // Service AVEC TARIF : Révision
             document.getElementById('client-step-3-title').textContent = "Tarif de la révision";
             document.getElementById('client-tarif-info').textContent = 
                 "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC :";
@@ -2103,7 +2208,6 @@
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
         } else {
-            // Autres services : aucun tarif
             document.getElementById('client-step-3-title').textContent = "Confirmation";
             document.getElementById('client-tarif-info').textContent = 
                 "Aucun tarif à afficher pour ce service. Un conseiller vous prendra en charge dès que possible.";
@@ -2172,10 +2276,18 @@
         const nom = document.getElementById('client-nom').value.trim();
         const immat = document.getElementById('client-immat').value.trim();
         const modeleId = document.getElementById('client-modele').value;
+        const nouveauModele = document.getElementById('client-nouveau-modele').value.trim();
         const commentaire = document.getElementById('client-commentaire').value.trim();
 
-        const modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
-        const modeleNom = modeleChoisi ? modeleChoisi.modele : '';
+        // Déterminer le modèle : soit depuis la liste, soit nouveau
+        let modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
+        let modeleNom = modeleChoisi ? modeleChoisi.modele : '';
+        
+        // Si un nouveau modèle est saisi, on l'utilise en priorité
+        if (nouveauModele) {
+            modeleNom = nouveauModele;
+            modeleChoisi = null;
+        }
         
         let prixTTC = 0, fne = 0, additif = 0, total = 0;
         
@@ -2189,8 +2301,9 @@
         const demande = {
             nom,
             immatriculation: immat,
-            modeleId: modeleId || null,
+            modeleId: modeleChoisi ? modeleChoisi.id : null,
             modele: modeleNom,
+            nouveauModeleSaisi: nouveauModele || null,
             service: clientServiceChoisi,
             commentaire,
             prixTTC: prixTTC,
@@ -2242,6 +2355,8 @@
                         </div>
                     </div>
                 `;
+            } else if (modeleNom) {
+                ticketContent += `<div><strong>Modèle :</strong> ${modeleNom}</div>`;
             }
 
             ticketContent += `
@@ -2362,7 +2477,6 @@
         if (liste.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">-</div>
                     <p>Aucune demande pour le moment.</p>
                 </div>
             `;
@@ -2407,6 +2521,10 @@
             ? `<span style="background:var(--success-light);color:var(--success);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">GRATUIT</span>` 
             : '';
 
+        const badgeNouveauModele = d.nouveauModeleSaisi 
+            ? `<span style="background:var(--warning-light);color:#744210;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">NOUVEAU MODELE</span>` 
+            : '';
+
         return `
             <div class="demande-card ${d.statut}">
                 <div class="demande-header">
@@ -2416,6 +2534,7 @@
                             <span class="demande-service">${d.service}</span>
                             <span class="demande-statut ${d.statut}">${d.statut === 'en_attente' ? 'En attente' : d.statut === 'en_cours' ? 'En cours' : 'Terminé'}</span>
                             ${badgeGratuit}
+                            ${badgeNouveauModele}
                         </div>
                     </div>
                     <div style="font-size:12px;color:var(--text-light);">${dateStr}</div>
@@ -2540,7 +2659,7 @@
         liste.sort((a, b) => new Date(b.dateCreationISO || 0) - new Date(a.dateCreationISO || 0));
 
         if (liste.length === 0) {
-            container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">-</div><p>Aucun historique.</p></div>`;
+            container.innerHTML = `<div class="empty-state"><p>Aucun historique.</p></div>`;
             return;
         }
 
