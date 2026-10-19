@@ -2855,7 +2855,7 @@
         }
     }
 
-    function genererDocumentsPreparation() {
+     function genererDocumentsPreparation() {
         const container = document.getElementById('docs-preparation-container');
         if (!container) return;
 
@@ -2863,23 +2863,18 @@
         const aRevision = services.includes('Révision') || services.includes('Première révision');
         const aSinistre = services.includes('Sinistre');
 
-        // Si aucun document pertinent, ne rien afficher
-        if (!aRevision && !aSinistre) {
-            container.innerHTML = '';
-            return;
-        }
+        // On affiche toujours ce bloc, car les pièces du véhicule sont toujours demandées
+        let documentsList = '<li><strong>Les pièces du véhicule</strong> (carte grise, etc.)</li>';
 
-        let documentsList = '';
-
+        // Ajouts spécifiques selon le service
         if (aRevision) {
             documentsList += '<li><strong>Carnet de suivi</strong> du véhicule</li>';
         }
 
         if (aSinistre) {
+            documentsList += '<li><strong>Bon de prise en charge</strong></li>';
             documentsList += '<li><strong>Fiche d\'expertise</strong> et constat amiable</li>';
         }
-
-        documentsList += '<li><strong>Bon de prise en charge</strong> (si vous en avez un)</li>';
 
         container.innerHTML = `
             <div class="docs-preparation">
@@ -2893,7 +2888,7 @@
                     </svg>
                     Préparez votre arrivée
                 </h4>
-                <p>Pour nous permettre de vous servir plus rapidement, merci de vous munir des documents suivants :</p>
+                <p>Pour nous permettre de vous servir plus rapidement, merci de vous munir des éléments suivants :</p>
                 <ul>${documentsList}</ul>
             </div>
         `;
