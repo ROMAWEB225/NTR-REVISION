@@ -31,7 +31,6 @@
             --warning-light: #fffaf0;
             --purple: #805ad5;
             --purple-light: #faf5ff;
-            --whatsapp: #25D366;
             --white: #ffffff;
         }
 
@@ -133,7 +132,6 @@
         .tab:hover { color: var(--primary); background: #edf2f7; }
         .tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--white); }
 
-        /* ===== BADGE TYPE WHATSAPP ===== */
         .tab-badge {
             display: none;
             background: var(--danger);
@@ -688,7 +686,6 @@
             color: white;
         }
 
-        /* === Liste des services sélectionnés === */
         .services-selectionnes {
             background: var(--bg);
             border-radius: 8px;
@@ -749,7 +746,6 @@
             padding: 4px 0;
         }
 
-        /* === Ajout service personnalisé === */
         .service-personnalise-box {
             background: white;
             border: 1px solid var(--border);
@@ -909,7 +905,17 @@
             flex: 1;
         }
 
-        .confirmation-box { text-align: center; padding: 30px 20px; }
+        /* === ANIMATION DE CONFIRMATION === */
+        .confirmation-box {
+            text-align: center;
+            padding: 30px 20px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .confirmation-icon {
             width: 80px;
@@ -921,9 +927,15 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
+            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .confirmation-icon svg { width: 40px; height: 40px; stroke-width: 3; }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
 
         .confirmation-box h2 {
             color: var(--success);
@@ -944,9 +956,109 @@
             margin-top: 20px;
             text-align: left;
             font-size: 14px;
+            animation: fadeInUp 0.7s ease 0.2s both;
         }
 
         .confirmation-ticket strong { color: var(--primary); }
+
+        /* === BLOC DOCUMENTS À PRÉPARER === */
+        .docs-preparation {
+            margin-top: 25px;
+            padding: 20px;
+            background: var(--accent-light);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+            text-align: left;
+            animation: fadeInUp 0.7s ease 0.4s both;
+        }
+
+        .docs-preparation h4 {
+            color: #2c5282;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+
+        .docs-preparation h4 svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .docs-preparation > p {
+            font-size: 13px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .docs-preparation ul {
+            font-size: 13px;
+            color: var(--text);
+            margin-left: 20px;
+            margin-bottom: 0;
+            line-height: 1.8;
+        }
+
+        .docs-preparation li {
+            margin-bottom: 6px;
+        }
+
+        .docs-preparation li strong {
+            color: var(--primary);
+        }
+
+        /* === MESSAGE FINAL === */
+        .message-fermeture {
+            margin-top: 25px;
+            animation: fadeInUp 0.7s ease 0.6s both;
+        }
+
+        .message-fermeture .fermer-page {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .message-fermeture .patienter {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* === SPINNER DE CHARGEMENT === */
+        .spinner-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner-overlay.active { display: flex; }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner-overlay p {
+            font-size: 15px;
+            color: var(--secondary);
+            font-weight: 500;
+        }
 
         .stat-grid {
             display: grid;
@@ -1084,8 +1196,6 @@
             color: var(--text-light);
         }
 
-        .empty-state-icon { font-size: 60px; margin-bottom: 15px; opacity: 0.5; }
-
         .notification-toast {
             position: fixed;
             top: 20px;
@@ -1176,7 +1286,6 @@
             display: block;
         }
 
-        /* Bannière d'autorisation notification */
         .notif-permission-banner {
             background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
             color: white;
@@ -1245,6 +1354,12 @@
     </style>
 </head>
 <body>
+
+<!-- SPINNER OVERLAY -->
+<div class="spinner-overlay" id="spinner-overlay">
+    <div class="spinner"></div>
+    <p>Envoi de votre demande en cours...</p>
+</div>
 
 <!-- VUE CLIENT -->
 <div id="client-view">
@@ -1334,7 +1449,6 @@
             </div>
         </div>
 
-        <!-- Service personnalisé -->
         <div class="service-personnalise-box">
             <label>Autre service (non listé)</label>
             <div class="service-personnalise-row">
@@ -1343,7 +1457,6 @@
             </div>
         </div>
 
-        <!-- Services sélectionnés -->
         <div class="services-selectionnes">
             <div class="services-selectionnes-title">Services sélectionnés</div>
             <div class="services-selectionnes-liste" id="services-selectionnes-liste">
@@ -1411,12 +1524,18 @@
                     <polyline points="20 6 9 17 4 12"/>
                 </svg>
             </div>
-            <h2>Demande envoyée</h2>
+            <h2>Demande envoyée !</h2>
             <p>Un conseiller va vous prendre en charge.</p>
             <div class="confirmation-ticket" id="client-ticket"></div>
-            <p style="margin-top:20px;font-size:12px;">
-                Vous pouvez fermer cette page. Merci de patienter en salle d'attente.
-            </p>
+
+            <!-- BLOC DOCUMENTS À PRÉPARER (généré dynamiquement) -->
+            <div id="docs-preparation-container"></div>
+
+            <!-- MESSAGE FINAL -->
+            <div class="message-fermeture">
+                <p class="fermer-page">Vous pouvez maintenant fermer cette page.</p>
+                <p class="patienter">Merci de patienter en salle d'attente. Un conseiller vous appellera dès que possible.</p>
+            </div>
         </div>
     </div>
 </div>
@@ -1446,7 +1565,6 @@
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-stats')">Statistiques</button>
     </div>
 
-    <!-- Bannière d'autorisation notification -->
     <div id="notif-permission-banner" class="notif-permission-banner" style="display:none; margin: 15px 30px 0 30px;">
         <div class="text">
             <h4>Activer les notifications</h4>
@@ -1680,21 +1798,20 @@
     /* ==========================================
        CONFIGURATION FIREBASE - REMPLACE PAR TES VALEURS
        ========================================== */
- const firebaseConfig = {
-  apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
-  authDomain: "ntr-garage.firebaseapp.com",
-  databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ntr-garage",
-  storageBucket: "ntr-garage.firebasestorage.app",
-  messagingSenderId: "606167388967",
-  appId: "1:606167388967:web:7ad669fd353cdeeb7a8f02"
-};
+    const firebaseConfig = {
+        apiKey: "TON_API_KEY",
+        authDomain: "TON_PROJECT_ID.firebaseapp.com",
+        projectId: "TON_PROJECT_ID",
+        storageBucket: "TON_PROJECT_ID.appspot.com",
+        messagingSenderId: "TON_SENDER_ID",
+        appId: "TON_APP_ID"
+    };
 
     /* ==========================================
        CONSEILLERS
        ========================================== */
     const CONSEILLERS = {
-        "ngorantanohromaric@gmail.com": "Romaric TANOH"
+        "romaric@sav.local": "Romaric TANOH"
     };
 
     /* ==========================================
@@ -1715,7 +1832,7 @@
 
     function estServiceGratuit(services) {
         if (!services || !Array.isArray(services)) return false;
-        return services.some(s => SERVICES_GRATUITS.includes(s));
+        return services.every(s => SERVICES_GRATUITS.includes(s));
     }
 
     function contientRevision(services) {
@@ -1918,8 +2035,6 @@
             if (anciennes.length > 0) {
                 const nouvelles = demandes.filter(d => !anciennes.includes(d.id) && d.statut === 'en_attente');
                 nouvelles.forEach(n => afficherNotification(n));
-            } else if (demandes.length > 0 && document.visibilityState === 'visible') {
-                // Premier chargement : pas de notification
             }
 
             afficherDemandes();
@@ -1938,7 +2053,6 @@
         if (nb > 0) {
             badge.textContent = nb > 99 ? '99+' : nb;
             badge.classList.add('visible');
-            // Mettre à jour le titre de la page avec le compteur
             document.title = '(' + nb + ') Service Réception - SAV';
         } else {
             badge.classList.remove('visible');
@@ -1950,7 +2064,6 @@
        NOTIFICATIONS
        ========================================== */
     function afficherNotification(demande) {
-        // 1. Toast interne
         const toast = document.getElementById('notification-toast');
         document.getElementById('notif-title').textContent = "Nouvelle demande : " + demande.service;
         document.getElementById('notif-message').textContent = 
@@ -1958,10 +2071,7 @@
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 6000);
 
-        // 2. Son
         jouerSonNotification();
-
-        // 3. Notification navigateur (type WhatsApp si permission accordée)
         afficherNotificationSysteme(demande);
     }
 
@@ -2000,7 +2110,6 @@
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
                 document.getElementById('notif-permission-banner').style.display = 'none';
-                // Notification de confirmation
                 new Notification('Notifications activées', {
                     body: 'Vous recevrez une alerte pour chaque nouvelle demande.',
                     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%231a202c"/><text x="50" y="68" font-size="60" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">S</text></svg>'
@@ -2016,7 +2125,7 @@
     function afficherNotificationSysteme(demande) {
         if (!('Notification' in window)) return;
         if (Notification.permission !== 'granted') return;
-        if (document.visibilityState === 'visible') return; // Ne pas notifier si l'app est ouverte au premier plan
+        if (document.visibilityState === 'visible') return;
 
         const titre = 'Nouvelle demande : ' + demande.service;
         const corps = demande.nom + (demande.modele ? ' - ' + demande.modele : '') + 
@@ -2041,12 +2150,9 @@
     }
 
     window.allerAuxDemandes = function() {
-        // Ouvre l'onglet Demandes
         const tabs = document.querySelectorAll('.tab');
         const tabDemandes = Array.from(tabs).find(t => t.textContent.includes('Demandes'));
-        if (tabDemandes) {
-            tabDemandes.click();
-        }
+        if (tabDemandes) tabDemandes.click();
     }
 
     /* ==========================================
@@ -2450,11 +2556,9 @@
         const index = clientServicesChoisis.indexOf(service);
         
         if (index > -1) {
-            // Retirer
             clientServicesChoisis.splice(index, 1);
             el.classList.remove('selected');
         } else {
-            // Ajouter
             clientServicesChoisis.push(service);
             el.classList.add('selected');
         }
@@ -2481,7 +2585,6 @@
     window.retirerService = function(index) {
         const service = clientServicesChoisis[index];
         clientServicesChoisis.splice(index, 1);
-        // Désélectionner la carte correspondante
         document.querySelectorAll('.service-card').forEach(card => {
             if (card.dataset.service === service) {
                 card.classList.remove('selected');
@@ -2528,7 +2631,6 @@
     window.clientEtape2 = function() {
         if (clientServicesChoisis.length === 0) return;
         
-        // Le modèle est maintenant demandé pour TOUS les services (sauf si 100% gratuit)
         const toutesGratuites = clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s));
         const groupeModele = document.getElementById('client-modele-group');
         
@@ -2555,12 +2657,10 @@
         const conteneur = document.getElementById('client-tarif-container');
         conteneur.innerHTML = '';
 
-        // Vérifier si c'est un service avec tarif (Révision)
         const contientRevisionService = contientRevision(clientServicesChoisis);
         const toutesGratuites = clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s));
 
         if (toutesGratuites) {
-            // 100% gratuit
             document.getElementById('client-step-3-title').textContent = "Service gratuit";
             document.getElementById('client-tarif-info').textContent = "Vos services sélectionnés sont gratuits.";
             conteneur.innerHTML = `
@@ -2571,7 +2671,6 @@
                 </div>
             `;
         } else if (contientRevisionService) {
-            // Contient "Révision" → afficher le tarif
             document.getElementById('client-step-3-title').textContent = "Tarif de la révision";
             document.getElementById('client-tarif-info').textContent = "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC.";
             
@@ -2584,7 +2683,6 @@
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
         } else {
-            // Autres services sans tarif
             document.getElementById('client-step-3-title').textContent = "Confirmation";
             document.getElementById('client-tarif-info').textContent = "Aucun tarif à afficher. Un conseiller vous prendra en charge.";
             conteneur.innerHTML = `
@@ -2655,7 +2753,6 @@
         const nouveauModele = document.getElementById('client-nouveau-modele').value.trim();
         const commentaire = document.getElementById('client-commentaire').value.trim();
 
-        // Déterminer le modèle
         let modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
         let modeleNom = modeleChoisi ? modeleChoisi.modele : '';
         
@@ -2738,11 +2835,14 @@
 
             ticketContent += `
                 <div style="margin-top:12px;color:var(--text-light);font-size:12px;">
-                    Heure : ${new Date().toLocaleTimeString('fr-FR')}
+                    Heure d'arrivée : ${new Date().toLocaleTimeString('fr-FR')}
                 </div>
             `;
 
             document.getElementById('client-ticket').innerHTML = ticketContent;
+
+            // Générer les documents à préparer selon les services
+            genererDocumentsPreparation();
 
             document.getElementById('client-step-3').classList.remove('active');
             document.getElementById('client-step-4').classList.add('active');
@@ -2752,6 +2852,50 @@
             console.error(e);
             alert("Erreur lors de l'envoi. Veuillez réessayer.");
         }
+    }
+
+    function genererDocumentsPreparation() {
+        const container = document.getElementById('docs-preparation-container');
+        if (!container) return;
+
+        const services = clientServicesChoisis;
+        const aRevision = services.includes('Révision') || services.includes('Première révision');
+        const aSinistre = services.includes('Sinistre');
+
+        // Si aucun document pertinent, ne rien afficher
+        if (!aRevision && !aSinistre) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let documentsList = '';
+
+        if (aRevision) {
+            documentsList += '<li><strong>Carnet de suivi</strong> du véhicule</li>';
+        }
+
+        if (aSinistre) {
+            documentsList += '<li><strong>Fiche d\'expertise</strong> et constat amiable</li>';
+        }
+
+        documentsList += '<li><strong>Bon de prise en charge</strong> (si vous en avez un)</li>';
+
+        container.innerHTML = `
+            <div class="docs-preparation">
+                <h4>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Préparez votre arrivée
+                </h4>
+                <p>Pour nous permettre de vous servir plus rapidement, merci de vous munir des documents suivants :</p>
+                <ul>${documentsList}</ul>
+            </div>
+        `;
     }
 
     /* ================================================================
@@ -2913,7 +3057,6 @@
             ? `<span style="background:var(--warning-light);color:#744210;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">NOUVEAU MODELE</span>` 
             : '';
 
-        // Afficher les services (nouveau format) ou service (ancien format)
         let servicesHtml = '';
         if (d.services && Array.isArray(d.services)) {
             servicesHtml = d.services.map(s => `<span class="demande-service">${s}</span>`).join('');
@@ -3099,7 +3242,6 @@
             </div>
         `;
 
-        // Répartition par service (gérer les services multiples)
         const parService = {};
         demandes.forEach(d => {
             const services = d.services && Array.isArray(d.services) ? d.services : (d.service ? [d.service] : []);
