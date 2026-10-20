@@ -1610,8 +1610,11 @@
         </div>
     </div>
 
-    <div id="tab-recap" class="tab-content">
-        <h3 style="margin-bottom: 20px; color: var(--primary);">Récapitulatif des prix</h3>
+       <div id="tab-recap" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+            <h3 style="color: var(--primary); margin: 0;">Récapitulatif des prix</h3>
+            <button class="btn-danger" onclick="nettoyerAnciensModeles()" style="font-size: 13px;">🧹 Nettoyer les anciens modèles</button>
+        </div>
         <div id="recap-container"></div>
     </div>
 
@@ -2347,7 +2350,50 @@
             afficherRecap();
         }
     }
+        window.nettoyerAnciensModeles = async function() {
+        const motsClesMarques = ['CHANGAN', 'CHERY', 'MG', 'JETOUR', 'GAC', 'DFSK', 'FAW', 'GEELY', 'HAVAL', 'JAC'];
+        
+        // On crée une liste de tous les modèles existants (en majuscules et sans espaces)
+        const modelesExistants = vehicules.map(v => v.modele.toUpperCase().replace(/\s/g, ''));
 
+        // On cherche les modèles qui n'ont PAS de marque, mais qui existent AVEC une marque
+        const aSupprimer = vehicules.filter(v => {
+            const modeleActuel = v.modele.toUpperCase().replace(/\s/g, '');
+            
+            // Si le modèle actuel contient déjà une marque, on le garde
+            const contientMarque = motsClesMarques.some(marque => modeleActuel.includes(marque));
+            if (contientMarque) return false;
+
+            // Si le modèle ne contient pas de marque, on vérifie si une version avec marque existe
+            return motsClesMarques.some(marque => modelesExistants.includes(marque + modeleActuel));
+        });
+
+        if (aSupprimer.length === 0) {
+            alert("✅ Aucun ancien doublon détecté. Ta base est propre !");
+            return;
+        }
+
+        const listeNoms = aSupprimer.map(v => v.modele).join(', ');
+        if (!confirm(`Voulez-vous supprimer ces anciens modèles (sans marque) ?\n\n${listeNoms}`)) return;
+
+        for (const v of aSupprimer) {
+            try {
+                if (firebaseDisponible) {
+                    await deleteDoc(doc(db, "tarifs_revision", v.id));
+                }
+            } catch(e) { console.error("Erreur suppression", e); }
+        }
+
+        // Mise à jour locale
+        vehicules = vehicules.filter(v => !aSupprimer.some(x => x.id === v.id));
+        if (!firebaseDisponible) {
+            localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+        }
+        
+        afficherTableau(vehicules);
+        afficherRecap();
+        alert(`✅ ${aSupprimer.length} ancien(s) modèle(s) supprimé(s) !`);
+    }
     /* ==========================================
        AJOUT VÉHICULE
        ========================================== */
