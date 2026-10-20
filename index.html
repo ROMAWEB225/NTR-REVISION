@@ -2205,10 +2205,24 @@
         });
         document.getElementById('status').textContent = triee.length + ' modèle(s)';
     }
-    window.filtrer = function() {
-        const terme = document.getElementById('search').value.toLowerCase().trim();
-        if (!terme) { afficherTableau(vehicules); return; }
-        const filtres = vehicules.filter(v => v.modele.toLowerCase().includes(terme));
+      window.filtrer = function() {
+        const champRecherche = document.getElementById('search');
+        if (!champRecherche) return;
+        
+        // On récupère le texte, on le met en minuscule et on SUPPRIME TOUS LES ESPACES
+        const terme = champRecherche.value.toLowerCase().replace(/\s/g, '');
+        
+        if (!terme) { 
+            afficherTableau(vehicules); 
+            return; 
+        }
+        
+        const filtres = vehicules.filter(v => {
+            // On fait pareil pour le nom du modèle (on supprime les espaces)
+            const modeleNormalise = v.modele.toLowerCase().replace(/\s/g, '');
+            return modeleNormalise.includes(terme);
+        });
+        
         afficherTableau(filtres);
     }
 
