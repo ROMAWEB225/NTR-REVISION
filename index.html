@@ -2873,22 +2873,27 @@
         }
     }
 
-     function genererDocumentsPreparation() {
+        function genererDocumentsPreparation() {
         const container = document.getElementById('docs-preparation-container');
         if (!container) return;
 
         const services = clientServicesChoisis;
-        const aRevision = services.includes('Révision') || services.includes('Première révision');
+        
+        // On vérifie la présence de "Révision" STRICTE (pas la première)
+        const aRevisionClassique = services.includes('Révision');
+        // On vérifie si c'est UNIQUEMENT la première révision (ou accompagnée d'autres services)
+        const aPremiereRevision = services.includes('Première révision');
         const aSinistre = services.includes('Sinistre');
 
-        // On affiche toujours ce bloc, car les pièces du véhicule sont toujours demandées
+        // Les pièces du véhicule sont TOUJOURS demandées
         let documentsList = '<li><strong>Les pièces du véhicule</strong> (carte grise, etc.)</li>';
 
-        // Ajouts spécifiques selon le service
-        if (aRevision) {
+        // Le carnet de suivi est demandé UNIQUEMENT pour une révision classique
+        if (aRevisionClassique) {
             documentsList += '<li><strong>Carnet de suivi</strong> du véhicule</li>';
         }
 
+        // Documents pour sinistre
         if (aSinistre) {
             documentsList += '<li><strong>Bon de prise en charge</strong></li>';
             documentsList += '<li><strong>Fiche d\'expertise</strong> et constat amiable</li>';
@@ -2908,10 +2913,10 @@
                 </h4>
                 <p>Pour nous permettre de vous servir plus rapidement, merci de vous munir des éléments suivants :</p>
                 <ul>${documentsList}</ul>
+                ${aPremiereRevision && !aRevisionClassique ? '<p style="font-size:11px;margin-top:10px;color:var(--text-light);font-style:italic;">* Votre carnet de suivi vous sera remis par le conseiller lors de cette première révision.</p>' : ''}
             </div>
         `;
     }
-
     /* ================================================================
        VUE CONSEILLER
        ================================================================ */
@@ -3095,6 +3100,7 @@
                 <div class="demande-infos">
                     ${d.modele ? `<span>Modèle : ${d.modele}</span>` : ''}
                     ${d.immatriculation ? `<span>Immat : ${d.immatriculation}</span>` : ''}
+                    ${d.telephone ? `<span>Tél : ${d.telephone}</span>` : ''} <!-- NOUVEAU -->
                     ${d.total > 0 ? `<span>Total : ${d.total.toLocaleString('fr-FR')} F</span>` : ''}
                     ${badgeConseiller}
                 </div>
