@@ -3678,13 +3678,13 @@
             window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
         }
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('SW enregistré'))
-                    .catch(err => console.log('SW :', err.message));
-            });
-        }
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', () => {
+        //         navigator.serviceWorker.register('service-worker.js')
+        //             .then(reg => console.log('SW enregistré'))
+        //             .catch(err => console.log('SW :', err.message));
+        //     });
+        // }
 
         console.log("Mode CONSEILLER activé");
     }
