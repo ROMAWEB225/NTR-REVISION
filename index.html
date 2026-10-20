@@ -31,6 +31,7 @@
             --warning-light: #fffaf0;
             --purple: #805ad5;
             --purple-light: #faf5ff;
+            --whatsapp: #25D366;
             --white: #ffffff;
         }
 
@@ -132,6 +133,7 @@
         .tab:hover { color: var(--primary); background: #edf2f7; }
         .tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--white); }
 
+        /* ===== BADGE TYPE WHATSAPP ===== */
         .tab-badge {
             display: none;
             background: var(--danger);
@@ -461,12 +463,7 @@
             font-size: 13px;
             margin-bottom: 25px;
         }
-                .voice-history {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border);
-            text-align: left;
-        }
+
         .voice-fab {
             position: fixed; bottom: 30px; right: 30px;
             width: 64px; height: 64px; border-radius: 50%;
@@ -691,6 +688,7 @@
             color: white;
         }
 
+        /* === Liste des services sélectionnés === */
         .services-selectionnes {
             background: var(--bg);
             border-radius: 8px;
@@ -751,6 +749,7 @@
             padding: 4px 0;
         }
 
+        /* === Ajout service personnalisé === */
         .service-personnalise-box {
             background: white;
             border: 1px solid var(--border);
@@ -910,17 +909,7 @@
             flex: 1;
         }
 
-        /* === ANIMATION DE CONFIRMATION === */
-        .confirmation-box {
-            text-align: center;
-            padding: 30px 20px;
-            animation: fadeInUp 0.5s ease;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .confirmation-box { text-align: center; padding: 30px 20px; }
 
         .confirmation-icon {
             width: 80px;
@@ -932,15 +921,9 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
-            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .confirmation-icon svg { width: 40px; height: 40px; stroke-width: 3; }
-
-        @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
-        }
 
         .confirmation-box h2 {
             color: var(--success);
@@ -961,109 +944,9 @@
             margin-top: 20px;
             text-align: left;
             font-size: 14px;
-            animation: fadeInUp 0.7s ease 0.2s both;
         }
 
         .confirmation-ticket strong { color: var(--primary); }
-
-        /* === BLOC DOCUMENTS À PRÉPARER === */
-        .docs-preparation {
-            margin-top: 25px;
-            padding: 20px;
-            background: var(--accent-light);
-            border-radius: 10px;
-            border-left: 4px solid var(--accent);
-            text-align: left;
-            animation: fadeInUp 0.7s ease 0.4s both;
-        }
-
-        .docs-preparation h4 {
-            color: #2c5282;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 15px;
-        }
-
-        .docs-preparation h4 svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .docs-preparation > p {
-            font-size: 13px;
-            color: var(--secondary);
-            margin-bottom: 10px;
-        }
-
-        .docs-preparation ul {
-            font-size: 13px;
-            color: var(--text);
-            margin-left: 20px;
-            margin-bottom: 0;
-            line-height: 1.8;
-        }
-
-        .docs-preparation li {
-            margin-bottom: 6px;
-        }
-
-        .docs-preparation li strong {
-            color: var(--primary);
-        }
-
-        /* === MESSAGE FINAL === */
-        .message-fermeture {
-            margin-top: 25px;
-            animation: fadeInUp 0.7s ease 0.6s both;
-        }
-
-        .message-fermeture .fermer-page {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .message-fermeture .patienter {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-
-        /* === SPINNER DE CHARGEMENT === */
-        .spinner-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .spinner-overlay.active { display: flex; }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .spinner-overlay p {
-            font-size: 15px;
-            color: var(--secondary);
-            font-weight: 500;
-        }
 
         .stat-grid {
             display: grid;
@@ -1201,6 +1084,8 @@
             color: var(--text-light);
         }
 
+        .empty-state-icon { font-size: 60px; margin-bottom: 15px; opacity: 0.5; }
+
         .notification-toast {
             position: fixed;
             top: 20px;
@@ -1291,6 +1176,7 @@
             display: block;
         }
 
+        /* Bannière d'autorisation notification */
         .notif-permission-banner {
             background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
             color: white;
@@ -1359,12 +1245,6 @@
     </style>
 </head>
 <body>
-
-<!-- SPINNER OVERLAY -->
-<div class="spinner-overlay" id="spinner-overlay">
-    <div class="spinner"></div>
-    <p>Envoi de votre demande en cours...</p>
-</div>
 
 <!-- VUE CLIENT -->
 <div id="client-view">
@@ -1454,6 +1334,7 @@
             </div>
         </div>
 
+        <!-- Service personnalisé -->
         <div class="service-personnalise-box">
             <label>Autre service (non listé)</label>
             <div class="service-personnalise-row">
@@ -1462,6 +1343,7 @@
             </div>
         </div>
 
+        <!-- Services sélectionnés -->
         <div class="services-selectionnes">
             <div class="services-selectionnes-title">Services sélectionnés</div>
             <div class="services-selectionnes-liste" id="services-selectionnes-liste">
@@ -1479,11 +1361,6 @@
         <div class="form-group">
             <label>Nom <span style="color:var(--danger)">*</span></label>
             <input type="text" id="client-nom" placeholder="Ex: DUPONT" required autocomplete="off">
-        </div>
-          <!-- AJOUTER CE BLOC ICI -->
-        <div class="form-group">
-            <label>Téléphone (optionnel)</label>
-            <input type="tel" id="client-telephone" placeholder="Ex: 0701020304" autocomplete="off">
         </div>
         <div class="form-group">
             <label>Immatriculation (optionnel)</label>
@@ -1534,18 +1411,12 @@
                     <polyline points="20 6 9 17 4 12"/>
                 </svg>
             </div>
-            <h2>Demande envoyée !</h2>
+            <h2>Demande envoyée</h2>
             <p>Un conseiller va vous prendre en charge.</p>
             <div class="confirmation-ticket" id="client-ticket"></div>
-
-            <!-- BLOC DOCUMENTS À PRÉPARER (généré dynamiquement) -->
-            <div id="docs-preparation-container"></div>
-
-            <!-- MESSAGE FINAL -->
-            <div class="message-fermeture">
-                <p class="fermer-page">Vous pouvez maintenant fermer cette page.</p>
-                <p class="patienter">Merci de patienter en salle d'attente. Un conseiller vous appellera dès que possible.</p>
-            </div>
+            <p style="margin-top:20px;font-size:12px;">
+                Vous pouvez fermer cette page. Merci de patienter en salle d'attente.
+            </p>
         </div>
     </div>
 </div>
@@ -1575,6 +1446,7 @@
         <button class="tab" onclick="ouvrirOnglet(event, 'tab-stats')">Statistiques</button>
     </div>
 
+    <!-- Bannière d'autorisation notification -->
     <div id="notif-permission-banner" class="notif-permission-banner" style="display:none; margin: 15px 30px 0 30px;">
         <div class="text">
             <h4>Activer les notifications</h4>
@@ -1761,7 +1633,7 @@
 
 <!-- MODAL VOCAL -->
 <div class="voice-modal" id="voice-modal">
-       <div class="voice-modal-content">
+    <div class="voice-modal-content">
         <button class="voice-modal-close" onclick="fermerAssistantVocal()">&times;</button>
         <div class="voice-icon-big" id="voice-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1773,17 +1645,7 @@
         </div>
         <div class="voice-transcript" id="voice-transcript">Appuyez sur le micro et dites un modèle...</div>
         <div class="voice-hint" id="voice-hint">Exemple : "CS 15", "P201 Gasoil", "T70"</div>
-        
-        <!-- Résultat unique -->
         <div id="voice-result" class="voice-result"></div>
-        
-        <!-- Historique unique -->
-        <div id="voice-history" class="voice-history" style="display:none;">
-            <div class="voice-suggestions-title">Dernières recherches :</div>
-            <div id="voice-history-list"></div>
-        </div>
-
-        <!-- Boutons uniques -->
         <div class="voice-actions" id="voice-actions" style="display:none;">
             <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
         </div>
@@ -1794,7 +1656,9 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { 
-        getFirestore, 
+        initializeFirestore,
+        persistentLocalCache,
+        persistentMultipleTabManager,
         collection, 
         doc, 
         onSnapshot, 
@@ -1816,21 +1680,20 @@
     /* ==========================================
        CONFIGURATION FIREBASE - REMPLACE PAR TES VALEURS
        ========================================== */
-   const firebaseConfig = {
-  apiKey: "AIzaSyAxfEpi-NERVExxVYD2EmH7JppiIQDwWOM",
-  authDomain: "ntr-garage.firebaseapp.com",
-  databaseURL: "https://ntr-garage-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ntr-garage",
-  storageBucket: "ntr-garage.firebasestorage.app",
-  messagingSenderId: "606167388967",
-  appId: "1:606167388967:web:7ad669fd353cdeeb7a8f02"
-};
+    const firebaseConfig = {
+        apiKey: "TON_API_KEY",
+        authDomain: "TON_PROJECT_ID.firebaseapp.com",
+        projectId: "TON_PROJECT_ID",
+        storageBucket: "TON_PROJECT_ID.appspot.com",
+        messagingSenderId: "TON_SENDER_ID",
+        appId: "TON_APP_ID"
+    };
 
     /* ==========================================
        CONSEILLERS
        ========================================== */
     const CONSEILLERS = {
-        "ngorantanohromaric@gmail.com": "Romaric TANOH"
+        "romaric@sav.local": "Romaric TANOH"
     };
 
     /* ==========================================
@@ -1851,7 +1714,7 @@
 
     function estServiceGratuit(services) {
         if (!services || !Array.isArray(services)) return false;
-        return services.every(s => SERVICES_GRATUITS.includes(s));
+        return services.some(s => SERVICES_GRATUITS.includes(s));
     }
 
     function contientRevision(services) {
@@ -1916,21 +1779,22 @@
     /* ==========================================
        INIT FIREBASE
        ========================================== */
-          function initFirebase() {
+    function initFirebase() {
         try {
             const app = initializeApp(firebaseConfig);
-            
-            // Utilisation de getFirestore simple
-            db = getFirestore(app);
-            
+            db = initializeFirestore(app, {
+                localCache: persistentLocalCache({
+                    tabManager: persistentMultipleTabManager()
+                })
+            });
             auth = getAuth(app);
             collectionRef = collection(db, "tarifs_revision");
             demandesRef = collection(db, "demandes_sav");
             firebaseDisponible = true;
-            console.log("✅ Firebase initialisé avec succès");
+            console.log("Firebase initialisé");
             return true;
         } catch (e) {
-            console.error("❌ Erreur d'initialisation Firebase :", e);
+            console.warn("Firebase non disponible.", e);
             firebaseDisponible = false;
             return false;
         }
@@ -1975,7 +1839,7 @@
     /* ==========================================
        CHARGEMENT VÉHICULES
        ========================================== */
-       async function chargerDonnees() {
+    async function chargerDonnees() {
         if (!firebaseDisponible) {
             const saved = localStorage.getItem("tarifs_vehicules_v5");
             vehicules = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(donneesInitiales));
@@ -1987,33 +1851,25 @@
         }
 
         majStatutSync('syncing');
-        
         onSnapshot(collectionRef, async (snapshot) => {
             const cloudData = [];
             snapshot.forEach((doc) => cloudData.push({ id: doc.id, ...doc.data() }));
 
-            // Si la base est vide au premier lancement, on injecte les données par défaut
             if (cloudData.length === 0 && premierChargement) {
                 const succes = await injecterDonneesInitiales();
                 if (succes) premierChargement = false;
                 return;
             }
 
-            // Dès qu'on reçoit des données (même une seule), on met à jour la liste COMPLÈTE
             if (cloudData.length > 0) {
                 premierChargement = false;
-                vehicules = cloudData; // On écrase la liste locale par la liste du serveur
+                vehicules = cloudData;
                 preparerDonnees();
-                
-                // On force le retour en ligne (point vert)
                 majStatutSync('online');
-                
-                // On rafraîchit TOUT l'écran
                 afficherTableau(vehicules);
                 afficherRecap();
                 remplirListeModelesClient();
 
-                // Si un panneau de détails est ouvert, on le rafraîchit
                 if (selectedId) {
                     const v = vehicules.find(x => x.id === selectedId);
                     if (v) afficherDetails(v);
@@ -2061,6 +1917,8 @@
             if (anciennes.length > 0) {
                 const nouvelles = demandes.filter(d => !anciennes.includes(d.id) && d.statut === 'en_attente');
                 nouvelles.forEach(n => afficherNotification(n));
+            } else if (demandes.length > 0 && document.visibilityState === 'visible') {
+                // Premier chargement : pas de notification
             }
 
             afficherDemandes();
@@ -2079,6 +1937,7 @@
         if (nb > 0) {
             badge.textContent = nb > 99 ? '99+' : nb;
             badge.classList.add('visible');
+            // Mettre à jour le titre de la page avec le compteur
             document.title = '(' + nb + ') Service Réception - SAV';
         } else {
             badge.classList.remove('visible');
@@ -2090,6 +1949,7 @@
        NOTIFICATIONS
        ========================================== */
     function afficherNotification(demande) {
+        // 1. Toast interne
         const toast = document.getElementById('notification-toast');
         document.getElementById('notif-title').textContent = "Nouvelle demande : " + demande.service;
         document.getElementById('notif-message').textContent = 
@@ -2097,7 +1957,10 @@
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 6000);
 
+        // 2. Son
         jouerSonNotification();
+
+        // 3. Notification navigateur (type WhatsApp si permission accordée)
         afficherNotificationSysteme(demande);
     }
 
@@ -2136,6 +1999,7 @@
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
                 document.getElementById('notif-permission-banner').style.display = 'none';
+                // Notification de confirmation
                 new Notification('Notifications activées', {
                     body: 'Vous recevrez une alerte pour chaque nouvelle demande.',
                     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="15" fill="%231a202c"/><text x="50" y="68" font-size="60" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">S</text></svg>'
@@ -2151,7 +2015,7 @@
     function afficherNotificationSysteme(demande) {
         if (!('Notification' in window)) return;
         if (Notification.permission !== 'granted') return;
-        if (document.visibilityState === 'visible') return;
+        if (document.visibilityState === 'visible') return; // Ne pas notifier si l'app est ouverte au premier plan
 
         const titre = 'Nouvelle demande : ' + demande.service;
         const corps = demande.nom + (demande.modele ? ' - ' + demande.modele : '') + 
@@ -2176,36 +2040,17 @@
     }
 
     window.allerAuxDemandes = function() {
+        // Ouvre l'onglet Demandes
         const tabs = document.querySelectorAll('.tab');
         const tabDemandes = Array.from(tabs).find(t => t.textContent.includes('Demandes'));
-        if (tabDemandes) tabDemandes.click();
+        if (tabDemandes) {
+            tabDemandes.click();
+        }
     }
 
     /* ==========================================
        TABLEAU
        ========================================== */
-
-
-      window.filtrer = function() {
-        const champRecherche = document.getElementById('search');
-        if (!champRecherche) return;
-        
-        // On supprime tous les espaces pour la recherche
-        const terme = champRecherche.value.toLowerCase().replace(/\s/g, '');
-        
-        if (!terme) { 
-            afficherTableau(vehicules); 
-            return; 
-        }
-        
-        const filtres = vehicules.filter(v => {
-            const modeleNormalise = v.modele.toLowerCase().replace(/\s/g, '');
-            return modeleNormalise.includes(terme);
-        });
-        
-        afficherTableau(filtres);
-    }
-      
     function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
         if (!tbody) return;
@@ -2216,31 +2061,32 @@
             return;
         }
 
-        // Tri alphabétique
         const triee = [...liste].sort((a, b) => a.modele.localeCompare(b.modele));
-
         triee.forEach(v => {
             const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
-            
-            // C'EST ICI QUE LA MAGIE OPÈRE POUR LA FNE
-            const fne = calculerFNE(v.prixTTC || 0);
-            const totalTTCReel = (v.prixTTC || 0) + fne;
-            
             const tr = document.createElement('tr');
             if (v.id === selectedId) tr.classList.add('selected');
             tr.onclick = () => ouvrirPanneau(v.id);
             tr.innerHTML = `
                 <td class="modele-cell">${v.modele}</td>
                 <td class="montant-ht">${prixHT > 0 ? prixHT.toLocaleString('fr-FR') + ' F' : '-'}</td>
-                <td class="montant-cell">${totalTTCReel > 0 ? totalTTCReel.toLocaleString('fr-FR') + ' F' : '-'}</td>
+                <td class="montant-cell">${v.prixTTC > 0 ? v.prixTTC.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="montant-extras">${prixExtras > 0 ? prixExtras.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="prestation-cell">${v.prestations || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
-        document.getElementById('status').textContent = triee.length + ' modèle(s)';
+        document.getElementById('status').textContent = liste.length + ' modèle(s)';
     }
+
+    window.filtrer = function() {
+        const terme = document.getElementById('search').value.toLowerCase().trim();
+        if (!terme) { afficherTableau(vehicules); return; }
+        const filtres = vehicules.filter(v => v.modele.toLowerCase().includes(terme));
+        afficherTableau(filtres);
+    }
+
     /* ==========================================
        PANNEAU DÉTAILS
        ========================================== */
@@ -2326,7 +2172,7 @@
                 </div>
             ` : ''}
 
-             <div class="total-global">
+            <div class="total-global">
                 <span>Total Général (TTC + Extras)</span>
                 <strong>${totalGeneral.toLocaleString('fr-FR')} F</strong>
             </div>
@@ -2384,19 +2230,11 @@
     /* ==========================================
        AJOUT VÉHICULE
        ========================================== */
-      window.ajouterVehicule = async function() {
-        const modele = document.getElementById('add-modele').value.trim().toUpperCase();
+    window.ajouterVehicule = async function() {
+        const modele = document.getElementById('add-modele').value.trim();
         const prixTTC = parseInt(document.getElementById('add-prix-ttc').value);
         const prestations = document.getElementById('add-prestations').value.trim();
-        
         if (!modele || isNaN(prixTTC) || prixTTC <= 0) { alert("Modèle et prix TTC valides requis."); return; }
-
-        // VÉRIFICATION ANTI-DOUBLON
-        const existeDeja = vehicules.some(v => v.modele.toUpperCase() === modele);
-        if (existeDeja) {
-            alert("❌ Ce modèle existe déjà dans la liste ! Utilisez le bouton 'Modifier' pour changer son prix.");
-            return;
-        }
 
         const huile = parseInt(document.getElementById('add-huile').value) || 0;
         const fh = parseInt(document.getElementById('add-fh').value) || 0;
@@ -2422,12 +2260,13 @@
         }
 
         document.getElementById('form-ajout').reset();
-        alert("✅ Véhicule ajouté !");
+        alert("Véhicule ajouté !");
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab')[0].classList.add('active');
         document.getElementById('tab-liste').classList.add('active');
     }
+
     /* ==========================================
        MODIFICATION
        ========================================== */
@@ -2610,9 +2449,11 @@
         const index = clientServicesChoisis.indexOf(service);
         
         if (index > -1) {
+            // Retirer
             clientServicesChoisis.splice(index, 1);
             el.classList.remove('selected');
         } else {
+            // Ajouter
             clientServicesChoisis.push(service);
             el.classList.add('selected');
         }
@@ -2639,6 +2480,7 @@
     window.retirerService = function(index) {
         const service = clientServicesChoisis[index];
         clientServicesChoisis.splice(index, 1);
+        // Désélectionner la carte correspondante
         document.querySelectorAll('.service-card').forEach(card => {
             if (card.dataset.service === service) {
                 card.classList.remove('selected');
@@ -2685,6 +2527,7 @@
     window.clientEtape2 = function() {
         if (clientServicesChoisis.length === 0) return;
         
+        // Le modèle est maintenant demandé pour TOUS les services (sauf si 100% gratuit)
         const toutesGratuites = clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s));
         const groupeModele = document.getElementById('client-modele-group');
         
@@ -2711,23 +2554,12 @@
         const conteneur = document.getElementById('client-tarif-container');
         conteneur.innerHTML = '';
 
+        // Vérifier si c'est un service avec tarif (Révision)
         const contientRevisionService = contientRevision(clientServicesChoisis);
-        const contientPremiereRevision = clientServicesChoisis.includes('Première révision');
         const toutesGratuites = clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s));
 
-        // GÉNÉRATION DU MESSAGE PREMIÈRE RÉVISION
-        let notePremiereRevision = '';
-        if (contientPremiereRevision) {
-            notePremiereRevision = `
-                <div style="background:var(--warning-light); border-left: 4px solid var(--warning); padding: 12px 15px; border-radius: 6px; font-size: 12.5px; color: #744210; margin-top: 15px; line-height: 1.6;">
-                    <strong>Information importante concernant la Première Révision :</strong><br>
-                    La gratuité de la première révision s'applique pour un kilométrage compris entre <strong>1 000 km et 1 500 km</strong>.<br>
-                    Au-delà de ce kilométrage, le Chef Mécanicien évaluera l'état du véhicule pour valider la gratuité ou vous orienter vers une révision classique (payante).
-                </div>
-            `;
-        }
-
         if (toutesGratuites) {
+            // 100% gratuit
             document.getElementById('client-step-3-title').textContent = "Service gratuit";
             document.getElementById('client-tarif-info').textContent = "Vos services sélectionnés sont gratuits.";
             conteneur.innerHTML = `
@@ -2736,9 +2568,9 @@
                     <div style="font-size:14px;">${clientServicesChoisis.join(', ')}</div>
                     <div style="font-size:12px;margin-top:10px;opacity:0.8;">Aucun frais à régler</div>
                 </div>
-                ${notePremiereRevision}
             `;
         } else if (contientRevisionService) {
+            // Contient "Révision" → afficher le tarif
             document.getElementById('client-step-3-title').textContent = "Tarif de la révision";
             document.getElementById('client-tarif-info').textContent = "Sélectionnez le modèle de votre véhicule pour voir le tarif TTC.";
             
@@ -2750,8 +2582,8 @@
             } else {
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
-            conteneur.innerHTML += notePremiereRevision;
         } else {
+            // Autres services sans tarif
             document.getElementById('client-step-3-title').textContent = "Confirmation";
             document.getElementById('client-tarif-info').textContent = "Aucun tarif à afficher. Un conseiller vous prendra en charge.";
             conteneur.innerHTML = `
@@ -2767,13 +2599,17 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-       function afficherTarifClient(v) {
+    window.clientRetourEtape2 = function() {
+        document.getElementById('client-step-3').classList.remove('active');
+        document.getElementById('client-step-2').classList.add('active');
+    }
+
+    function afficherTarifClient(v) {
         const conteneur = document.getElementById('client-tarif-container');
         const prixTTC = v.prixTTC || 0;
         const fne = calculerFNE(prixTTC);
         const additif = clientAdditifChoisi ? PRIX_ADDITIF : 0;
-        // CALCUL DU TOTAL AVEC FNE
-        const total = prixTTC + fne + additif; 
+        const total = prixTTC + fne + additif;
 
         conteneur.innerHTML = `
             <div class="tarif-card selected">
@@ -2793,7 +2629,7 @@
                     </div>
                 ` : ''}
                 <div class="tarif-ligne total">
-                    <span>Total TTC (Taxes incluses)</span>
+                    <span>Total estimé</span>
                     <span>${total.toLocaleString('fr-FR')} F</span>
                 </div>
             </div>
@@ -2813,12 +2649,12 @@
 
     window.clientConfirmer = async function() {
         const nom = document.getElementById('client-nom').value.trim();
-        const telephone = document.getElementById('client-telephone').value.trim(); // <-- NOUVEAU
         const immat = document.getElementById('client-immat').value.trim();
         const modeleId = document.getElementById('client-modele').value;
         const nouveauModele = document.getElementById('client-nouveau-modele').value.trim();
         const commentaire = document.getElementById('client-commentaire').value.trim();
 
+        // Déterminer le modèle
         let modeleChoisi = modeleId ? vehicules.find(v => v.id === modeleId) : null;
         let modeleNom = modeleChoisi ? modeleChoisi.modele : '';
         
@@ -2839,7 +2675,6 @@
 
         const demande = {
             nom,
-            telephone,
             immatriculation: immat,
             modeleId: modeleChoisi ? modeleChoisi.id : null,
             modele: modeleNom,
@@ -2902,14 +2737,11 @@
 
             ticketContent += `
                 <div style="margin-top:12px;color:var(--text-light);font-size:12px;">
-                    Heure d'arrivée : ${new Date().toLocaleTimeString('fr-FR')}
+                    Heure : ${new Date().toLocaleTimeString('fr-FR')}
                 </div>
             `;
 
             document.getElementById('client-ticket').innerHTML = ticketContent;
-
-            // Générer les documents à préparer selon les services
-            genererDocumentsPreparation();
 
             document.getElementById('client-step-3').classList.remove('active');
             document.getElementById('client-step-4').classList.add('active');
@@ -2921,50 +2753,6 @@
         }
     }
 
-        function genererDocumentsPreparation() {
-        const container = document.getElementById('docs-preparation-container');
-        if (!container) return;
-
-        const services = clientServicesChoisis;
-        
-        // On vérifie la présence de "Révision" STRICTE (pas la première)
-        const aRevisionClassique = services.includes('Révision');
-        // On vérifie si c'est UNIQUEMENT la première révision (ou accompagnée d'autres services)
-        const aPremiereRevision = services.includes('Première révision');
-        const aSinistre = services.includes('Sinistre');
-
-        // Les pièces du véhicule sont TOUJOURS demandées
-        let documentsList = '<li><strong>Les pièces du véhicule</strong> (carte grise, etc.)</li>';
-
-        // Le carnet de suivi est demandé UNIQUEMENT pour une révision classique
-        if (aRevisionClassique) {
-            documentsList += '<li><strong>Carnet de suivi</strong> du véhicule</li>';
-        }
-
-        // Documents pour sinistre
-        if (aSinistre) {
-            documentsList += '<li><strong>Bon de prise en charge</strong></li>';
-            documentsList += '<li><strong>Fiche d\'expertise</strong> et constat amiable</li>';
-        }
-
-        container.innerHTML = `
-            <div class="docs-preparation">
-                <h4>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Préparez votre arrivée
-                </h4>
-                <p>Pour nous permettre de vous servir plus rapidement, merci de vous munir des éléments suivants :</p>
-                <ul>${documentsList}</ul>
-                ${aPremiereRevision && !aRevisionClassique ? '<p style="font-size:11px;margin-top:10px;color:var(--text-light);font-style:italic;">* Votre carnet de suivi vous sera remis par le conseiller lors de cette première révision.</p>' : ''}
-            </div>
-        `;
-    }
     /* ================================================================
        VUE CONSEILLER
        ================================================================ */
@@ -3124,6 +2912,7 @@
             ? `<span style="background:var(--warning-light);color:#744210;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">NOUVEAU MODELE</span>` 
             : '';
 
+        // Afficher les services (nouveau format) ou service (ancien format)
         let servicesHtml = '';
         if (d.services && Array.isArray(d.services)) {
             servicesHtml = d.services.map(s => `<span class="demande-service">${s}</span>`).join('');
@@ -3148,7 +2937,6 @@
                 <div class="demande-infos">
                     ${d.modele ? `<span>Modèle : ${d.modele}</span>` : ''}
                     ${d.immatriculation ? `<span>Immat : ${d.immatriculation}</span>` : ''}
-                    ${d.telephone ? `<span>Tél : ${d.telephone}</span>` : ''} <!-- NOUVEAU -->
                     ${d.total > 0 ? `<span>Total : ${d.total.toLocaleString('fr-FR')} F</span>` : ''}
                     ${badgeConseiller}
                 </div>
@@ -3310,6 +3098,7 @@
             </div>
         `;
 
+        // Répartition par service (gérer les services multiples)
         const parService = {};
         demandes.forEach(d => {
             const services = d.services && Array.isArray(d.services) ? d.services : (d.service ? [d.service] : []);
@@ -3457,9 +3246,6 @@
         demarrerEcoute();
     }
 
-    // Variable globale pour l'historique
-    let historiqueVocal = [];
-
     function demarrerEcoute() {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) return;
@@ -3509,7 +3295,6 @@
         try { recognition.start(); } catch (e) {}
     }
 
-
     function arreterEcoute() {
         if (recognition) {
             try { recognition.stop(); } catch (e) {}
@@ -3518,43 +3303,16 @@
         isListening = false;
     }
 
-  function traiterTranscription(texte) {
+    function traiterTranscription(texte) {
         const { exact, proches } = trouverModeles(texte);
-        
-        if (exact.length === 1) {
-            afficherResultatVocal(exact[0]);
-            ajouterHistoriqueVocal(exact[0]);
-        } else if (exact.length > 1) {
-            afficherSuggestions(exact, "Plusieurs correspondances exactes :");
-        } else if (proches.length === 1) {
-            afficherResultatVocal(proches[0]);
-            ajouterHistoriqueVocal(proches[0]);
-        } else if (proches.length > 1) {
-            afficherSuggestions(proches, "Vouliez-vous dire :");
-        } else {
+        if (exact.length === 1) afficherResultatVocal(exact[0]);
+        else if (exact.length > 1) afficherSuggestions(exact, "Plusieurs correspondances exactes :");
+        else if (proches.length === 1) afficherResultatVocal(proches[0]);
+        else if (proches.length > 1) afficherSuggestions(proches, "Vouliez-vous dire :");
+        else {
             document.getElementById('voice-hint').innerHTML = "Aucun modèle trouvé. Réessayez.";
             document.getElementById('voice-actions').style.display = 'flex';
             parler("Désolé, je n'ai pas trouvé ce modèle.");
-        }
-    }
-
-      // Fonction pour afficher l'historique
-    function ajouterHistoriqueVocal(v) {
-        // Éviter les doublons
-        historiqueVocal = historiqueVocal.filter(item => item.id !== v.id);
-        historiqueVocal.unshift(v);
-        if (historiqueVocal.length > 3) historiqueVocal.pop();
-
-        const historyDiv = document.getElementById('voice-history');
-        const historyList = document.getElementById('voice-history-list');
-        
-        if (historiqueVocal.length > 0) {
-            historyDiv.style.display = 'block';
-            historyList.innerHTML = historiqueVocal.map(item => `
-                <button class="voice-suggestion-btn" onclick="choisirSuggestion('${item.id}')" style="padding: 8px 12px; font-size: 13px;">
-                    ${item.modele} — ${(item.prixTTC || 0).toLocaleString('fr-FR')} F
-                </button>
-            `).join('');
         }
     }
 
@@ -3678,13 +3436,13 @@
             window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
         }
 
-        // if ('serviceWorker' in navigator) {
-        //     window.addEventListener('load', () => {
-        //         navigator.serviceWorker.register('service-worker.js')
-        //             .then(reg => console.log('SW enregistré'))
-        //             .catch(err => console.log('SW :', err.message));
-        //     });
-        // }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('SW enregistré'))
+                    .catch(err => console.log('SW :', err.message));
+            });
+        }
 
         console.log("Mode CONSEILLER activé");
     }
