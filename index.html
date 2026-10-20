@@ -1761,7 +1761,7 @@
 
 <!-- MODAL VOCAL -->
 <div class="voice-modal" id="voice-modal">
-    <div class="voice-modal-content">
+       <div class="voice-modal-content">
         <button class="voice-modal-close" onclick="fermerAssistantVocal()">&times;</button>
         <div class="voice-icon-big" id="voice-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1773,23 +1773,21 @@
         </div>
         <div class="voice-transcript" id="voice-transcript">Appuyez sur le micro et dites un modèle...</div>
         <div class="voice-hint" id="voice-hint">Exemple : "CS 15", "P201 Gasoil", "T70"</div>
-        <div id="voice-result" class="voice-result"></div>
-        <div class="voice-actions" id="voice-actions" style="display:none;">
-            <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
-        </div>
-        <div id="voice-not-supported" class="voice-not-supported" style="display:none;"></div>
         
+        <!-- Résultat unique -->
         <div id="voice-result" class="voice-result"></div>
         
-        <!-- AJOUTER CE BLOC ICI -->
+        <!-- Historique unique -->
         <div id="voice-history" class="voice-history" style="display:none;">
             <div class="voice-suggestions-title">Dernières recherches :</div>
             <div id="voice-history-list"></div>
         </div>
 
+        <!-- Boutons uniques -->
         <div class="voice-actions" id="voice-actions" style="display:none;">
             <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
         </div>
+        <div id="voice-not-supported" class="voice-not-supported" style="display:none;"></div>
     </div>
 </div>
 
@@ -2178,7 +2176,29 @@
     /* ==========================================
        TABLEAU
        ========================================== */
-       function afficherTableau(liste) {
+
+
+      window.filtrer = function() {
+        const champRecherche = document.getElementById('search');
+        if (!champRecherche) return;
+        
+        // On supprime tous les espaces pour la recherche
+        const terme = champRecherche.value.toLowerCase().replace(/\s/g, '');
+        
+        if (!terme) { 
+            afficherTableau(vehicules); 
+            return; 
+        }
+        
+        const filtres = vehicules.filter(v => {
+            const modeleNormalise = v.modele.toLowerCase().replace(/\s/g, '');
+            return modeleNormalise.includes(terme);
+        });
+        
+        afficherTableau(filtres);
+    }
+      
+    function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
         if (!tbody) return;
         tbody.innerHTML = '';
