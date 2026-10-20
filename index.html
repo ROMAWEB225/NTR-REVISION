@@ -461,7 +461,12 @@
             font-size: 13px;
             margin-bottom: 25px;
         }
-
+                .voice-history {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+            text-align: left;
+        }
         .voice-fab {
             position: fixed; bottom: 30px; right: 30px;
             width: 64px; height: 64px; border-radius: 50%;
@@ -1773,6 +1778,18 @@
             <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
         </div>
         <div id="voice-not-supported" class="voice-not-supported" style="display:none;"></div>
+        
+        <div id="voice-result" class="voice-result"></div>
+        
+        <!-- AJOUTER CE BLOC ICI -->
+        <div id="voice-history" class="voice-history" style="display:none;">
+            <div class="voice-suggestions-title">Dernières recherches :</div>
+            <div id="voice-history-list"></div>
+        </div>
+
+        <div class="voice-actions" id="voice-actions" style="display:none;">
+            <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
+        </div>
     </div>
 </div>
 
@@ -2178,6 +2195,10 @@
         triee.forEach(v => {
             const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
+             // NOUVEAU : Calcul du TTC avec FNE
+            const fne = calculerFNE(v.prixTTC || 0);
+            const totalTTCReel = (v.prixTTC || 0) + fne;
+            
             const tr = document.createElement('tr');
             if (v.id === selectedId) tr.classList.add('selected');
             tr.onclick = () => ouvrirPanneau(v.id);
@@ -2285,7 +2306,7 @@
                 </div>
             ` : ''}
 
-            <div class="total-global">
+             <div class="total-global">
                 <span>Total Général (TTC + Extras)</span>
                 <strong>${totalGeneral.toLocaleString('fr-FR')} F</strong>
             </div>
@@ -3409,6 +3430,9 @@
         demarrerEcoute();
     }
 
+    // Variable globale pour l'historique
+    let historiqueVocal = [];
+
     function demarrerEcoute() {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) return;
@@ -3458,6 +3482,7 @@
         try { recognition.start(); } catch (e) {}
     }
 
+
     function arreterEcoute() {
         if (recognition) {
             try { recognition.stop(); } catch (e) {}
@@ -3466,16 +3491,43 @@
         isListening = false;
     }
 
-    function traiterTranscription(texte) {
+  function traiterTranscription(texte) {
         const { exact, proches } = trouverModeles(texte);
-        if (exact.length === 1) afficherResultatVocal(exact[0]);
-        else if (exact.length > 1) afficherSuggestions(exact, "Plusieurs correspondances exactes :");
-        else if (proches.length === 1) afficherResultatVocal(proches[0]);
-        else if (proches.length > 1) afficherSuggestions(proches, "Vouliez-vous dire :");
-        else {
+        
+        if (exact.length === 1) {
+            afficherResultatVocal(exact[0]);
+            ajouterHistoriqueVocal(exact[0]);
+        } else if (exact.length > 1) {
+            afficherSuggestions(exact, "Plusieurs correspondances exactes :");
+        } else if (proches.length === 1) {
+            afficherResultatVocal(proches[0]);
+            ajouterHistoriqueVocal(proches[0]);
+        } else if (proches.length > 1) {
+            afficherSuggestions(proches, "Vouliez-vous dire :");
+        } else {
             document.getElementById('voice-hint').innerHTML = "Aucun modèle trouvé. Réessayez.";
             document.getElementById('voice-actions').style.display = 'flex';
             parler("Désolé, je n'ai pas trouvé ce modèle.");
+        }
+    }
+
+      // Fonction pour afficher l'historique
+    function ajouterHistoriqueVocal(v) {
+        // Éviter les doublons
+        historiqueVocal = historiqueVocal.filter(item => item.id !== v.id);
+        historiqueVocal.unshift(v);
+        if (historiqueVocal.length > 3) historiqueVocal.pop();
+
+        const historyDiv = document.getElementById('voice-history');
+        const historyList = document.getElementById('voice-history-list');
+        
+        if (historiqueVocal.length > 0) {
+            historyDiv.style.display = 'block';
+            historyList.innerHTML = historiqueVocal.map(item => `
+                <button class="voice-suggestion-btn" onclick="choisirSuggestion('${item.id}')" style="padding: 8px 12px; font-size: 13px;">
+                    ${item.modele} — ${(item.prixTTC || 0).toLocaleString('fr-FR')} F
+                </button>
+            `).join('');
         }
     }
 
