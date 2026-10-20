@@ -2164,7 +2164,7 @@
     /* ==========================================
        TABLEAU
        ========================================== */
-    function afficherTableau(liste) {
+      function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
         if (!tbody) return;
         tbody.innerHTML = '';
@@ -2178,21 +2178,25 @@
         triee.forEach(v => {
             const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
+            
+            // --- CALCUL DE LA TAXE FNE ---
+            const fne = calculerFNE(v.prixTTC || 0);
+            const totalTTCReel = (v.prixTTC || 0) + fne;
+            
             const tr = document.createElement('tr');
             if (v.id === selectedId) tr.classList.add('selected');
             tr.onclick = () => ouvrirPanneau(v.id);
             tr.innerHTML = `
                 <td class="modele-cell">${v.modele}</td>
                 <td class="montant-ht">${prixHT > 0 ? prixHT.toLocaleString('fr-FR') + ' F' : '-'}</td>
-                <td class="montant-cell">${v.prixTTC > 0 ? v.prixTTC.toLocaleString('fr-FR') + ' F' : '-'}</td>
+                <td class="montant-cell">${totalTTCReel > 0 ? totalTTCReel.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="montant-extras">${prixExtras > 0 ? prixExtras.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="prestation-cell">${v.prestations || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
-        document.getElementById('status').textContent = liste.length + ' modèle(s)';
+        document.getElementById('status').textContent = triee.length + ' modèle(s)';
     }
-
     window.filtrer = function() {
         const terme = document.getElementById('search').value.toLowerCase().trim();
         if (!terme) { afficherTableau(vehicules); return; }
@@ -2221,13 +2225,17 @@
         afficherTableau(vehicules);
     }
 
-    function afficherDetails(v) {
+       function afficherDetails(v) {
         const contenu = document.getElementById('panel-content');
         const d = v.details || { huile: 0, fh: 0, fa: 0, fp: 0, fg: 0, mod: 0 };
         const prixHT = calculerPrixHT(v);
         const prixExtras = calculerPrixExtras(v);
         const marge = calculerMarge(v);
-        const totalGeneral = (v.prixTTC || 0) + prixExtras;
+        
+        // --- CALCUL DE LA TAXE FNE ---
+        const fne = calculerFNE(v.prixTTC || 0);
+        const totalTTCReel = (v.prixTTC || 0) + fne;
+        const totalGeneral = totalTTCReel + prixExtras;
 
         let customHtml = '';
         if (v.custom && v.custom.length > 0) {
@@ -2261,7 +2269,7 @@
                 <div class="sub-total ttc"><span>Prix Révision TTC</span><strong>${(v.prixTTC || 0).toLocaleString('fr-FR')} F</strong></div>
                 <div class="sub-total" style="background:#fff5f5;color:var(--danger);">
                     <span>Taxe FNE (client)</span>
-                    <strong style="color:var(--danger);">+${calculerFNE(v.prixTTC || 0).toLocaleString('fr-FR')} F</strong>
+                    <strong style="color:var(--danger);">+${fne.toLocaleString('fr-FR')} F</strong>
                 </div>
             </div>
 
@@ -2286,7 +2294,7 @@
             ` : ''}
 
             <div class="total-global">
-                <span>Total Général (TTC + Extras)</span>
+                <span>Total Général (TTC + FNE + Extras)</span>
                 <strong>${totalGeneral.toLocaleString('fr-FR')} F</strong>
             </div>
 
