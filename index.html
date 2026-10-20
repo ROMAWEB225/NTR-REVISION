@@ -1975,7 +1975,7 @@
     /* ==========================================
        CHARGEMENT VÉHICULES
        ========================================== */
-    async function chargerDonnees() {
+       async function chargerDonnees() {
         if (!firebaseDisponible) {
             const saved = localStorage.getItem("tarifs_vehicules_v5");
             vehicules = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(donneesInitiales));
@@ -1987,25 +1987,33 @@
         }
 
         majStatutSync('syncing');
+        
         onSnapshot(collectionRef, async (snapshot) => {
             const cloudData = [];
             snapshot.forEach((doc) => cloudData.push({ id: doc.id, ...doc.data() }));
 
+            // Si la base est vide au premier lancement, on injecte les données par défaut
             if (cloudData.length === 0 && premierChargement) {
                 const succes = await injecterDonneesInitiales();
                 if (succes) premierChargement = false;
                 return;
             }
 
+            // Dès qu'on reçoit des données (même une seule), on met à jour la liste COMPLÈTE
             if (cloudData.length > 0) {
                 premierChargement = false;
-                vehicules = cloudData;
+                vehicules = cloudData; // On écrase la liste locale par la liste du serveur
                 preparerDonnees();
+                
+                // On force le retour en ligne (point vert)
                 majStatutSync('online');
+                
+                // On rafraîchit TOUT l'écran
                 afficherTableau(vehicules);
                 afficherRecap();
                 remplirListeModelesClient();
 
+                // Si un panneau de détails est ouvert, on le rafraîchit
                 if (selectedId) {
                     const v = vehicules.find(x => x.id === selectedId);
                     if (v) afficherDetails(v);
