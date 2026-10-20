@@ -1772,6 +1772,11 @@
         <div class="voice-transcript" id="voice-transcript">Appuyez sur le micro et dites un modèle...</div>
         <div class="voice-hint" id="voice-hint">Exemple : "CS 15", "P201 Gasoil", "T70"</div>
         <div id="voice-result" class="voice-result"></div>
+                <!-- Historique des recherches -->
+        <div id="voice-history" class="voice-history" style="display:none;">
+            <div class="voice-suggestions-title">Dernières recherches :</div>
+            <div id="voice-history-list"></div>
+        </div>
         <div class="voice-actions" id="voice-actions" style="display:none;">
             <button class="btn-voice-retry" onclick="relancerEcoute()">Réessayer</button>
         </div>
@@ -2350,49 +2355,80 @@
             afficherRecap();
         }
     }
-        window.nettoyerAnciensModeles = async function() {
-        const motsClesMarques = ['CHANGAN', 'CHERY', 'MG', 'JETOUR', 'GAC', 'DFSK', 'FAW', 'GEELY', 'HAVAL', 'JAC'];
+           window.nettoyerAnciensModeles = async function() {
+        // On crée un modal pour afficher la liste
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        modal.style.zIndex = '2000';
         
-        // On crée une liste de tous les modèles existants (en majuscules et sans espaces)
-        const modelesExistants = vehicules.map(v => v.modele.toUpperCase().replace(/\s/g, ''));
-
-        // On cherche les modèles qui n'ont PAS de marque, mais qui existent AVEC une marque
-        const aSupprimer = vehicules.filter(v => {
-            const modeleActuel = v.modele.toUpperCase().replace(/\s/g, '');
-            
-            // Si le modèle actuel contient déjà une marque, on le garde
-            const contientMarque = motsClesMarques.some(marque => modeleActuel.includes(marque));
-            if (contientMarque) return false;
-
-            // Si le modèle ne contient pas de marque, on vérifie si une version avec marque existe
-            return motsClesMarques.some(marque => modelesExistants.includes(marque + modeleActuel));
+        let listHtml = '';
+        // On trie par ordre alphabétique pour y voir plus clair
+        const tries = [...vehicules].sort((a, b) => a.modele.localeCompare(b.modele));
+        
+        tries.forEach(v => {
+            listHtml += `
+                <div style="display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                    <input type="checkbox" id="check-${v.id}" value="${v.id}" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer;">
+                    <label for="check-${v.id}" style="flex: 1; cursor: pointer; font-size: 14px;">${v.modele}</label>
+                    <span style="color: #718096; font-size: 13px;">${(v.prixTTC || 0).toLocaleString('fr-FR')} F</span>
+                </div>
+            `;
         });
 
-        if (aSupprimer.length === 0) {
-            alert("✅ Aucun ancien doublon détecté. Ta base est propre !");
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                <h3 style="margin-bottom: 10px;">Nettoyage manuel</h3>
+                <p style="font-size: 13px; color: #718096; margin-bottom: 15px;">Cochez les modèles que vous souhaitez <strong>supprimer définitivement</strong>.</p>
+                
+                <div style="margin-bottom: 20px;">
+                    ${listHtml}
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">Annuler</button>
+                    <button class="btn-danger" onclick="supprimerSelectionManuelle(this)">Supprimer la sélection</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+
+    // Fonction pour supprimer la sélection
+    window.supprimerSelectionManuelle = async function(btn) {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) {
+            alert("Veuillez cocher au moins un modèle à supprimer.");
             return;
         }
 
-        const listeNoms = aSupprimer.map(v => v.modele).join(', ');
-        if (!confirm(`Voulez-vous supprimer ces anciens modèles (sans marque) ?\n\n${listeNoms}`)) return;
+        if (!confirm(`Supprimer définitivement les ${checkboxes.length} modèle(s) sélectionné(s) ?`)) return;
 
-        for (const v of aSupprimer) {
+        const idsASupprimer = Array.from(checkboxes).map(cb => cb.value);
+
+        for (const id of idsASupprimer) {
             try {
                 if (firebaseDisponible) {
-                    await deleteDoc(doc(db, "tarifs_revision", v.id));
+                    await deleteDoc(doc(db, "tarifs_revision", id));
                 }
             } catch(e) { console.error("Erreur suppression", e); }
         }
 
         // Mise à jour locale
-        vehicules = vehicules.filter(v => !aSupprimer.some(x => x.id === v.id));
+        vehicules = vehicules.filter(v => !idsASupprimer.includes(v.id));
         if (!firebaseDisponible) {
             localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
         }
         
         afficherTableau(vehicules);
         afficherRecap();
-        alert(`✅ ${aSupprimer.length} ancien(s) modèle(s) supprimé(s) !`);
+        
+        // Fermer la modale
+        btn.closest('.modal').remove();
+        
+        alert(`✅ ${idsASupprimer.length} modèle(s) supprimé(s) !`);
     }
     /* ==========================================
        AJOUT VÉHICULE
@@ -3522,9 +3558,10 @@
         demarrerEcoute();
     }
 
-    function demarrerEcoute() {
+      function demarrerEcoute() {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) return;
+        
         recognition = new SR();
         recognition.lang = 'fr-FR';
         recognition.continuous = false;
@@ -3570,7 +3607,6 @@
         };
         try { recognition.start(); } catch (e) {}
     }
-
     function arreterEcoute() {
         if (recognition) {
             try { recognition.stop(); } catch (e) {}
@@ -3579,19 +3615,48 @@
         isListening = false;
     }
 
+       // Variable globale pour l'historique
+    let historiqueVocal = [];
+
     function traiterTranscription(texte) {
         const { exact, proches } = trouverModeles(texte);
-        if (exact.length === 1) afficherResultatVocal(exact[0]);
-        else if (exact.length > 1) afficherSuggestions(exact, "Plusieurs correspondances exactes :");
-        else if (proches.length === 1) afficherResultatVocal(proches[0]);
-        else if (proches.length > 1) afficherSuggestions(proches, "Vouliez-vous dire :");
-        else {
+        
+        if (exact.length === 1) {
+            afficherResultatVocal(exact[0]);
+            ajouterHistoriqueVocal(exact[0]);
+        } else if (exact.length > 1) {
+            afficherSuggestions(exact, "Plusieurs correspondances exactes :");
+        } else if (proches.length === 1) {
+            afficherResultatVocal(proches[0]);
+            ajouterHistoriqueVocal(proches[0]);
+        } else if (proches.length > 1) {
+            afficherSuggestions(proches, "Vouliez-vous dire :");
+        } else {
             document.getElementById('voice-hint').innerHTML = "Aucun modèle trouvé. Réessayez.";
             document.getElementById('voice-actions').style.display = 'flex';
             parler("Désolé, je n'ai pas trouvé ce modèle.");
         }
     }
 
+    // Fonction pour afficher et gérer l'historique
+    function ajouterHistoriqueVocal(v) {
+        // Éviter les doublons dans l'historique
+        historiqueVocal = historiqueVocal.filter(item => item.id !== v.id);
+        historiqueVocal.unshift(v);
+        if (historiqueVocal.length > 3) historiqueVocal.pop();
+
+        const historyDiv = document.getElementById('voice-history');
+        const historyList = document.getElementById('voice-history-list');
+        
+        if (historiqueVocal.length > 0) {
+            historyDiv.style.display = 'block';
+            historyList.innerHTML = historiqueVocal.map(item => `
+                <button class="voice-suggestion-btn" onclick="choisirSuggestion('${item.id}')" style="padding: 8px 12px; font-size: 13px;">
+                    ${item.modele} — ${(item.prixTTC || 0).toLocaleString('fr-FR')} F
+                </button>
+            `).join('');
+        }
+    }
     function afficherResultatVocal(v) {
         const prixTTC = v.prixTTC || 0;
         const fne = calculerFNE(prixTTC);
