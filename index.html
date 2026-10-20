@@ -1918,11 +1918,11 @@
     /* ==========================================
        INIT FIREBASE
        ========================================== */
-       function initFirebase() {
+          function initFirebase() {
         try {
             const app = initializeApp(firebaseConfig);
             
-            // La méthode la plus simple, sans options complexes qui font planter
+            // Utilisation de getFirestore simple
             db = getFirestore(app);
             
             auth = getAuth(app);
@@ -2178,7 +2178,7 @@
     /* ==========================================
        TABLEAU
        ========================================== */
-    function afficherTableau(liste) {
+      function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
         if (!tbody) return;
         tbody.innerHTML = '';
@@ -2188,36 +2188,34 @@
             return;
         }
 
-        const triee = [...liste].sort((a, b) => a.modele.localeCompare(b.modele));
+        // On trie la liste sans créer de doublons
+        const mapUniques = new Map();
+        liste.forEach(v => mapUniques.set(v.modele, v));
+        const triee = Array.from(mapUniques.values()).sort((a, b) => a.modele.localeCompare(b.modele));
+
         triee.forEach(v => {
             const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
-             // NOUVEAU : Calcul du TTC avec FNE
+            
+            // CALCUL DU TTC AVEC FNE
             const fne = calculerFNE(v.prixTTC || 0);
             const totalTTCReel = (v.prixTTC || 0) + fne;
             
             const tr = document.createElement('tr');
             if (v.id === selectedId) tr.classList.add('selected');
             tr.onclick = () => ouvrirPanneau(v.id);
+            
             tr.innerHTML = `
                 <td class="modele-cell">${v.modele}</td>
                 <td class="montant-ht">${prixHT > 0 ? prixHT.toLocaleString('fr-FR') + ' F' : '-'}</td>
-                <td class="montant-cell">${v.prixTTC > 0 ? v.prixTTC.toLocaleString('fr-FR') + ' F' : '-'}</td>
+                <td class="montant-cell">${totalTTCReel > 0 ? totalTTCReel.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="montant-extras">${prixExtras > 0 ? prixExtras.toLocaleString('fr-FR') + ' F' : '-'}</td>
                 <td class="prestation-cell">${v.prestations || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
-        document.getElementById('status').textContent = liste.length + ' modèle(s)';
+        document.getElementById('status').textContent = triee.length + ' modèle(s)';
     }
-
-    window.filtrer = function() {
-        const terme = document.getElementById('search').value.toLowerCase().trim();
-        if (!terme) { afficherTableau(vehicules); return; }
-        const filtres = vehicules.filter(v => v.modele.toLowerCase().includes(terme));
-        afficherTableau(filtres);
-    }
-
     /* ==========================================
        PANNEAU DÉTAILS
        ========================================== */
