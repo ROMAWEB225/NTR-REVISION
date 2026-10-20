@@ -2352,11 +2352,21 @@
        AJOUT VÉHICULE
        ========================================== */
     window.ajouterVehicule = async function() {
-        const modele = document.getElementById('add-modele').value.trim();
+        const modele = document.getElementById('add-modele').value.trim().toUpperCase();
         const prixTTC = parseInt(document.getElementById('add-prix-ttc').value);
         const prestations = document.getElementById('add-prestations').value.trim();
+        
         if (!modele || isNaN(prixTTC) || prixTTC <= 0) { alert("Modèle et prix TTC valides requis."); return; }
 
+        // VÉRIFICATION ANTI-DOUBLON INTELLIGENTE (ignore les espaces)
+        const modeleSansEspaces = modele.replace(/\s/g, '');
+        const existeDeja = vehicules.some(v => v.modele.toUpperCase().replace(/\s/g, '') === modeleSansEspaces);
+        
+        if (existeDeja) {
+            alert("❌ Ce modèle existe déjà dans la liste ! Utilisez le bouton 'Modifier' pour changer son prix.");
+            return;
+        }
+        
         const huile = parseInt(document.getElementById('add-huile').value) || 0;
         const fh = parseInt(document.getElementById('add-fh').value) || 0;
         const fa = parseInt(document.getElementById('add-fa').value) || 0;
@@ -2504,7 +2514,51 @@
         if (tabId === 'tab-historique') afficherHistorique();
         if (tabId === 'tab-stats') afficherStats();
     }
+    // FONCTION DE NETTOYAGE DES DOUBLONS
+    window.nettoyerDoublons = async function() {
+        if (!confirm("Voulez-vous supprimer tous les modèles en double ? Cette action est irréversible.")) return;
+        
+        const uniques = [];
+        const vus = new Set();
+        const aSupprimer = [];
 
+        // On trie d'abord par ID pour garder le plus ancien
+        const tries = [...vehicules].sort((a, b) => a.id.localeCompare(b.id));
+
+        tries.forEach(v => {
+            const nom = v.modele.trim().toUpperCase();
+            if (vus.has(nom)) {
+                aSupprimer.push(v); // C'est un doublon
+            } else {
+                vus.add(nom);
+                uniques.push(v);
+            }
+        });
+
+        if (aSupprimer.length === 0) {
+            alert("Aucun doublon trouvé !");
+            return;
+        }
+
+        // Suppression des doublons dans Firebase
+        for (const v of aSupprimer) {
+            try {
+                if (firebaseDisponible) {
+                    await deleteDoc(doc(db, "tarifs_revision", v.id));
+                }
+            } catch(e) { console.error("Erreur suppression", e); }
+        }
+
+        // Mise à jour de l'affichage local
+        vehicules = uniques;
+        if (!firebaseDisponible) {
+            localStorage.setItem("tarifs_vehicules_v5", JSON.stringify(vehicules));
+        }
+        
+        afficherTableau(vehicules);
+        afficherRecap();
+        alert(`✅ ${aSupprimer.length} doublon(s) supprimé(s) !`);
+    }
     /* ==========================================
        EXPORT/IMPORT
        ========================================== */
