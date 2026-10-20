@@ -1475,6 +1475,11 @@
             <label>Nom <span style="color:var(--danger)">*</span></label>
             <input type="text" id="client-nom" placeholder="Ex: DUPONT" required autocomplete="off">
         </div>
+          <!-- AJOUTER CE BLOC ICI -->
+        <div class="form-group">
+            <label>Téléphone (optionnel)</label>
+            <input type="tel" id="client-telephone" placeholder="Ex: 0701020304" autocomplete="off">
+        </div>
         <div class="form-group">
             <label>Immatriculation (optionnel)</label>
             <input type="text" id="client-immat" placeholder="Ex: AB-123-CD" autocomplete="off">
@@ -2659,7 +2664,20 @@
         conteneur.innerHTML = '';
 
         const contientRevisionService = contientRevision(clientServicesChoisis);
+        const contientPremiereRevision = clientServicesChoisis.includes('Première révision');
         const toutesGratuites = clientServicesChoisis.every(s => SERVICES_GRATUITS.includes(s));
+
+        // GÉNÉRATION DU MESSAGE PREMIÈRE RÉVISION
+        let notePremiereRevision = '';
+        if (contientPremiereRevision) {
+            notePremiereRevision = `
+                <div style="background:var(--warning-light); border-left: 4px solid var(--warning); padding: 12px 15px; border-radius: 6px; font-size: 12.5px; color: #744210; margin-top: 15px; line-height: 1.6;">
+                    <strong>Information importante concernant la Première Révision :</strong><br>
+                    La gratuité de la première révision s'applique pour un kilométrage compris entre <strong>1 000 km et 1 500 km</strong>.<br>
+                    Au-delà de ce kilométrage, le Chef Mécanicien évaluera l'état du véhicule pour valider la gratuité ou vous orienter vers une révision classique (payante).
+                </div>
+            `;
+        }
 
         if (toutesGratuites) {
             document.getElementById('client-step-3-title').textContent = "Service gratuit";
@@ -2670,6 +2688,7 @@
                     <div style="font-size:14px;">${clientServicesChoisis.join(', ')}</div>
                     <div style="font-size:12px;margin-top:10px;opacity:0.8;">Aucun frais à régler</div>
                 </div>
+                ${notePremiereRevision}
             `;
         } else if (contientRevisionService) {
             document.getElementById('client-step-3-title').textContent = "Tarif de la révision";
@@ -2683,6 +2702,7 @@
             } else {
                 conteneur.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px;">Veuillez sélectionner un modèle à l\'étape précédente.</p>';
             }
+            conteneur.innerHTML += notePremiereRevision;
         } else {
             document.getElementById('client-step-3-title').textContent = "Confirmation";
             document.getElementById('client-tarif-info').textContent = "Aucun tarif à afficher. Un conseiller vous prendra en charge.";
@@ -2699,17 +2719,13 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    window.clientRetourEtape2 = function() {
-        document.getElementById('client-step-3').classList.remove('active');
-        document.getElementById('client-step-2').classList.add('active');
-    }
-
-    function afficherTarifClient(v) {
+       function afficherTarifClient(v) {
         const conteneur = document.getElementById('client-tarif-container');
         const prixTTC = v.prixTTC || 0;
         const fne = calculerFNE(prixTTC);
         const additif = clientAdditifChoisi ? PRIX_ADDITIF : 0;
-        const total = prixTTC + fne + additif;
+        // CALCUL DU TOTAL AVEC FNE
+        const total = prixTTC + fne + additif; 
 
         conteneur.innerHTML = `
             <div class="tarif-card selected">
@@ -2729,7 +2745,7 @@
                     </div>
                 ` : ''}
                 <div class="tarif-ligne total">
-                    <span>Total estimé</span>
+                    <span>Total TTC (Taxes incluses)</span>
                     <span>${total.toLocaleString('fr-FR')} F</span>
                 </div>
             </div>
@@ -2749,6 +2765,7 @@
 
     window.clientConfirmer = async function() {
         const nom = document.getElementById('client-nom').value.trim();
+        const telephone = document.getElementById('client-telephone').value.trim(); // <-- NOUVEAU
         const immat = document.getElementById('client-immat').value.trim();
         const modeleId = document.getElementById('client-modele').value;
         const nouveauModele = document.getElementById('client-nouveau-modele').value.trim();
@@ -2774,6 +2791,7 @@
 
         const demande = {
             nom,
+            telephone,
             immatriculation: immat,
             modeleId: modeleChoisi ? modeleChoisi.id : null,
             modele: modeleNom,
