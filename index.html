@@ -1796,6 +1796,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { 
+        getFirestore, 
         initializeFirestore,
         persistentLocalCache,
         persistentMultipleTabManager,
@@ -1923,13 +1924,20 @@
     function initFirebase() {
         try {
             const app = initializeApp(firebaseConfig);
-              // AJOUTE L'OPTION ICI
-        db = initializeFirestore(app, {
-            experimentalForceLongPolling: true,
-            localCache: persistentLocalCache({
-                tabManager: persistentMultipleTabManager()
-            })
-        });
+              
+       // On essaie d'initialiser avec les options, sinon on récupère l'instance existante
+try {
+    db = initializeFirestore(app, {
+        experimentalForceLongPolling: true,
+        localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager()
+        })
+    });
+} catch (e) {
+    // Si Firestore a déjà été initialisé, on récupère simplement l'instance existante
+    console.warn("Firestore déjà initialisé, récupération de l'instance existante.");
+    db = getFirestore(app);
+}
         auth = getAuth(app);
             db = initializeFirestore(app, {
                 localCache: persistentLocalCache({
