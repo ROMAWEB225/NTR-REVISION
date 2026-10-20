@@ -2178,7 +2178,7 @@
     /* ==========================================
        TABLEAU
        ========================================== */
-      function afficherTableau(liste) {
+       function afficherTableau(liste) {
         const tbody = document.getElementById('table-body');
         if (!tbody) return;
         tbody.innerHTML = '';
@@ -2188,23 +2188,20 @@
             return;
         }
 
-        // On trie la liste sans créer de doublons
-        const mapUniques = new Map();
-        liste.forEach(v => mapUniques.set(v.modele, v));
-        const triee = Array.from(mapUniques.values()).sort((a, b) => a.modele.localeCompare(b.modele));
+        // Tri alphabétique
+        const triee = [...liste].sort((a, b) => a.modele.localeCompare(b.modele));
 
         triee.forEach(v => {
             const prixHT = calculerPrixHT(v);
             const prixExtras = calculerPrixExtras(v);
             
-            // CALCUL DU TTC AVEC FNE
+            // C'EST ICI QUE LA MAGIE OPÈRE POUR LA FNE
             const fne = calculerFNE(v.prixTTC || 0);
             const totalTTCReel = (v.prixTTC || 0) + fne;
             
             const tr = document.createElement('tr');
             if (v.id === selectedId) tr.classList.add('selected');
             tr.onclick = () => ouvrirPanneau(v.id);
-            
             tr.innerHTML = `
                 <td class="modele-cell">${v.modele}</td>
                 <td class="montant-ht">${prixHT > 0 ? prixHT.toLocaleString('fr-FR') + ' F' : '-'}</td>
@@ -2359,11 +2356,19 @@
     /* ==========================================
        AJOUT VÉHICULE
        ========================================== */
-    window.ajouterVehicule = async function() {
-        const modele = document.getElementById('add-modele').value.trim();
+      window.ajouterVehicule = async function() {
+        const modele = document.getElementById('add-modele').value.trim().toUpperCase();
         const prixTTC = parseInt(document.getElementById('add-prix-ttc').value);
         const prestations = document.getElementById('add-prestations').value.trim();
+        
         if (!modele || isNaN(prixTTC) || prixTTC <= 0) { alert("Modèle et prix TTC valides requis."); return; }
+
+        // VÉRIFICATION ANTI-DOUBLON
+        const existeDeja = vehicules.some(v => v.modele.toUpperCase() === modele);
+        if (existeDeja) {
+            alert("❌ Ce modèle existe déjà dans la liste ! Utilisez le bouton 'Modifier' pour changer son prix.");
+            return;
+        }
 
         const huile = parseInt(document.getElementById('add-huile').value) || 0;
         const fh = parseInt(document.getElementById('add-fh').value) || 0;
@@ -2389,13 +2394,12 @@
         }
 
         document.getElementById('form-ajout').reset();
-        alert("Véhicule ajouté !");
+        alert("✅ Véhicule ajouté !");
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab')[0].classList.add('active');
         document.getElementById('tab-liste').classList.add('active');
     }
-
     /* ==========================================
        MODIFICATION
        ========================================== */
